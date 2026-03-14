@@ -654,7 +654,9 @@ select option { background: var(--bg2); }
       </div>
     </main>
   </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- xlsx-js-style: drop-in xlsx replacement with full cell styling support -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
 // ===== CONSTANTS =====
@@ -1530,77 +1532,332 @@ function renderDashBody() {
   }, 80);
 }
 
-// ===== EXCEL EXPORT =====
+// ===== EXCEL EXPORT WITH FULL STYLING =====
+// Uses xlsx-js-style (loaded via CDN) for cell colors, fonts, borders
+
+function cellStyle(fill, fontColor, bold, sz, border, align, wrap) {
+  const s = {};
+  if (fill) s.fill = { fgColor: { rgb: fill } };
+  s.font = { name: 'Calibri', sz: sz || 11, bold: !!bold, color: { rgb: fontColor || 'FF000000' } };
+  if (border) s.border = {
+    top:    { style:'thin', color:{ rgb:'FFD0D0D0' } },
+    bottom: { style:'thin', color:{ rgb:'FFD0D0D0' } },
+    left:   { style:'thin', color:{ rgb:'FFD0D0D0' } },
+    right:  { style:'thin', color:{ rgb:'FFD0D0D0' } }
+  };
+  s.alignment = { vertical:'center', horizontal: align || 'left', wrapText: !!wrap };
+  return s;
+}
+
+function scoreColor(val) {
+  if (!val || val === '') return null;
+  const n = parseFloat(val);
+  if (isNaN(n)) return null;
+  if (n >= 8) return { fill:'FFD4EDDA', font:'FF155724' };
+  if (n >= 5) return { fill:'FFFFF3CD', font:'FF856404' };
+  return { fill:'FFF8D7DA', font:'FF721C24' };
+}
+
+function col(letter, row) { return letter + row; }
+
 function exportXlsx(id) {
   const r = loadReviews().find(x => x.id === id);
   if (!r) return;
   const sm   = DEFS[r.type].scoreMap;
   const secs = DEFS[r.type].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
-  const filename = [TYPE_LABELS[r.type], r.brand, r.model].filter(Boolean).join(' - ').replace(/[^a-zA-Z0-9 \-_]/g, '') || 'review';
+  const ov   = calcOverall(r);
+  const filename = [TYPE_LABELS[r.type], r.brand, r.model].filter(Boolean).join(' - ').replace(/[^a-zA-Z0-9 \-_]/g,'') || 'review';
 
-  const rows = [
-    ['Smartphone & IoT Lab — Review Export'], [''],
-    ['Category', TYPE_LABELS[r.type]],
-    ['Brand', r.brand || ''],
-    ['Model', r.model || ''],
-    ['Reviewer', r.reviewer || ''],
-    ['Price (BRL)', r.retail_price || ''],
-    ['Positioning', r.positioning || ''],
-    ['Overall Score', calcOverall(r) || ''],
-    [''], ['CATEGORY SCORES'], ['Category', 'Score']
+  // Color palette per type
+  const ACCENT = { smartphone:'FF2EA043', smartwatch:'FF388BFD', tws:'FFA855F7' };
+  const ACCENT_LIGHT = { smartphone:'FFE8F5E9', smartwatch:'FFE3F2FD', tws:'FFF3E5FF' };
+  const accent      = ACCENT[r.type]      || 'FF2EA043';
+  const accentLight = ACCENT_LIGHT[r.type] || 'FFE8F5E9';
+
+  const ws = {};
+  let row = 1;
+
+  function setCell(c, v, style) {
+    ws[c] = { v: v === undefined || v === null ? '' : v, t: typeof v === 'number' ? 'n' : 's', s: style };
+  }
+  function mergeRange(r1,c1,r2,c2) {
+    if (!ws['!merges']) ws['!merges'] = [];
+    ws['!merges'].push({ s:{r:r1-1,c:c1-1}, e:{r:r2-1,c:c2-1} });
+  }
+
+  // ── ROW 1: Big header banner ──
+  setCell('A'+row, 'JOVI — ' + TYPE_LABELS[r.type] + ' Review', cellStyle(accent,'FFFFFFFF',true,16,false,'left'));
+  setCell('B'+row, '', cellStyle(accent,'FFFFFFFF',false,16,false));
+  setCell('C'+row, '', cellStyle(accent,'FFFFFFFF',false,16,false));
+  mergeRange(row,1,row,3);
+  row++;
+
+  // ── ROW 2: Sub-header with date ──
+  const today = new Date().toLocaleDateString('pt-BR');
+  setCell('A'+row, 'Generated on ' + today, cellStyle('FF4A4A4A','FFAAAAAA',false,10,false));
+  setCell('B'+row, '', cellStyle('FF4A4A4A','FFAAAAAA',false,10,false));
+  setCell('C'+row, '', cellStyle('FF4A4A4A','FFAAAAAA',false,10,false));
+  mergeRange(row,1,row,3);
+  row++;
+  row++; // blank
+
+  // ── DEVICE INFO BLOCK ──
+  setCell('A'+row, 'DEVICE INFORMATION', cellStyle(accentLight, accent, true, 11, true));
+  setCell('B'+row, '', cellStyle(accentLight, accent, true, 11, true));
+  setCell('C'+row, '', cellStyle(accentLight, accent, true, 11, true));
+  mergeRange(row,1,row,3);
+  row++;
+
+  const infoRows = [
+    ['Brand',         r.brand        || '—'],
+    ['Model',         r.model        || '—'],
+    ['Reviewer',      r.reviewer     || '—'],
+    ['Category',      TYPE_LABELS[r.type]],
+    ['Market Segment',r.positioning  || '—'],
+    ['Price (BRL)',   r.retail_price ? 'R$ ' + parseInt(r.retail_price).toLocaleString('pt-BR') : '—'],
   ];
-  Object.entries(sm).forEach(([k, lbl]) => rows.push([lbl, r[k] || '']));
-  rows.push([''], ['DETAILED FIELDS', 'Value']);
-  secs.forEach(sec => {
-    rows.push([sec.t, '']);
-    (sec.f || []).forEach(f => { if (r[f.k]) rows.push(['  ' + f.l, r[f.k]]); });
+  infoRows.forEach(([label, value]) => {
+    setCell('A'+row, label,  cellStyle('FFFAFAFA','FF555555',true,11,true));
+    setCell('B'+row, value,  cellStyle('FFFFFFFF','FF222222',false,11,true,'left',true));
+    setCell('C'+row, '',     cellStyle('FFFFFFFF','FF222222',false,11,true));
+    mergeRange(row,2,row,3);
+    row++;
   });
-  rows.push([''], ['VERDICT', '']);
-  if (r.pros)          rows.push(['Pros', r.pros]);
-  if (r.cons)          rows.push(['Cons', r.cons]);
-  if (r.final_verdict) rows.push(['Final Verdict', r.final_verdict]);
+  row++;
 
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{ wch: 35 }, { wch: 55 }];
-  XLSX.utils.book_append_sheet(wb, ws, 'Review');
+  // ── OVERALL SCORE hero ──
+  const ovColor = ov >= 8 ? { fill:'FFD4EDDA',font:'FF155724' } : ov >= 5 ? { fill:'FFFFF3CD',font:'FF856404' } : { fill:'FFF8D7DA',font:'FF721C24' };
+  setCell('A'+row, 'OVERALL SCORE', cellStyle(accent,'FFFFFFFF',true,12,false,'center'));
+  setCell('B'+row, ov ? ov + ' / 10' : '—', cellStyle(ovColor.fill, ovColor.font, true, 18, false, 'center'));
+  setCell('C'+row, r.purchase_intent || '', cellStyle('FFFAFAFA','FF555555',false,11,true,'center'));
+  row++;
+  row++;
+
+  // ── CATEGORY SCORES ──
+  setCell('A'+row, 'CATEGORY SCORES', cellStyle(accentLight, accent, true, 11, true));
+  setCell('B'+row, 'Score', cellStyle(accentLight, accent, true, 11, true, 'center'));
+  setCell('C'+row, 'Rating', cellStyle(accentLight, accent, true, 11, true, 'center'));
+  row++;
+
+  Object.entries(sm).forEach(([k, lbl]) => {
+    const val = r[k];
+    const sc  = scoreColor(val);
+    const rating = !val ? '—' : val >= 8 ? '★★★★★ Excellent' : val >= 6 ? '★★★★☆ Good' : val >= 4 ? '★★★☆☆ Fair' : '★★☆☆☆ Poor';
+    setCell('A'+row, lbl,               cellStyle('FFFFFFFF','FF333333',false,11,true));
+    setCell('B'+row, val ? Number(val) : '—', sc ? cellStyle(sc.fill, sc.font, true, 12, true, 'center') : cellStyle('FFF5F5F5','FF999999',false,11,true,'center'));
+    setCell('C'+row, rating,            sc ? cellStyle(sc.fill, sc.font, false, 10, true, 'center') : cellStyle('FFF5F5F5','FF999999',false,10,true,'center'));
+    row++;
+  });
+  row++;
+
+  // ── DETAILED ANSWERS per section ──
+  secs.forEach(sec => {
+    const filled = (sec.f||[]).filter(f => r[f.k] && r[f.k] !== '');
+    if (!filled.length) return;
+
+    setCell('A'+row, sec.n + '.  ' + sec.t.toUpperCase(), cellStyle(accentLight, accent, true, 11, true));
+    setCell('B'+row, '', cellStyle(accentLight, accent, true, 11, true));
+    setCell('C'+row, '', cellStyle(accentLight, accent, true, 11, true));
+    mergeRange(row,1,row,3);
+    row++;
+
+    filled.forEach(f => {
+      setCell('A'+row, f.l,    cellStyle('FFFAFAFA','FF555555',false,10,true,'left',true));
+      setCell('B'+row, r[f.k], cellStyle('FFFFFFFF','FF222222',false,10,true,'left',true));
+      setCell('C'+row, '',     cellStyle('FFFFFFFF','FF222222',false,10,true));
+      mergeRange(row,2,row,3);
+      row++;
+    });
+    row++;
+  });
+
+  // ── VERDICT ──
+  if (r.pros || r.cons || r.final_verdict) {
+    setCell('A'+row, 'FINAL VERDICT', cellStyle(accent,'FFFFFFFF',true,12,false));
+    setCell('B'+row, '', cellStyle(accent,'FFFFFFFF',true,12,false));
+    setCell('C'+row, '', cellStyle(accent,'FFFFFFFF',true,12,false));
+    mergeRange(row,1,row,3);
+    row++;
+
+    if (r.pros) {
+      setCell('A'+row, '✓  PROS',  cellStyle('FFD4EDDA','FF155724',true,11,true));
+      setCell('B'+row, r.pros,     cellStyle('FFE8F5E9','FF155724',false,11,true,'left',true));
+      setCell('C'+row, '',         cellStyle('FFE8F5E9','FF155724',false,11,true));
+      mergeRange(row,2,row,3);
+      row++;
+    }
+    if (r.cons) {
+      setCell('A'+row, '✗  CONS',  cellStyle('FFF8D7DA','FF721C24',true,11,true));
+      setCell('B'+row, r.cons,     cellStyle('FFFDECEA','FF721C24',false,11,true,'left',true));
+      setCell('C'+row, '',         cellStyle('FFFDECEA','FF721C24',false,11,true));
+      mergeRange(row,2,row,3);
+      row++;
+    }
+    if (r.final_verdict) {
+      setCell('A'+row, 'Verdict',      cellStyle('FFFAFAFA','FF333333',true,11,true));
+      setCell('B'+row, r.final_verdict,cellStyle('FFFFFFFF','FF333333',false,11,true,'left',true));
+      setCell('C'+row, '',             cellStyle('FFFFFFFF','FF333333',false,11,true));
+      mergeRange(row,2,row,3);
+      row++;
+    }
+  }
+
+  ws['!ref'] = 'A1:C' + row;
+  ws['!cols'] = [{ wch:32 }, { wch:36 }, { wch:22 }];
+  ws['!rows'] = [];
+  ws['!rows'][0] = { hpt: 36 };
+  ws['!rows'][1] = { hpt: 18 };
+
+  const wb = { SheetNames:['Review'], Sheets:{ Review: ws } };
   XLSX.writeFile(wb, filename + '.xlsx');
 }
 
+// ===== COMPARISON EXPORT =====
 function exportComparisonXlsx() {
   const compared = loadReviews().filter(r => selIds.includes(r.id));
   if (!compared.length) return;
   const sm = DEFS[curTab].scoreMap;
+  const secs = DEFS[curTab].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
   const filename = TYPE_LABELS[curTab] + ' - Comparison';
 
-  const headers = ['Field', ...compared.map(r => [r.brand, r.model].filter(Boolean).join(' '))];
-  const rows = [
-    headers,
-    ['Type',         ...compared.map(r => TYPE_LABELS[r.type])],
-    ['Brand',        ...compared.map(r => r.brand || '')],
-    ['Model',        ...compared.map(r => r.model || '')],
-    ['Reviewer',     ...compared.map(r => r.reviewer || '')],
-    ['Price (BRL)',  ...compared.map(r => r.retail_price || '')],
-    ['Overall Score',...compared.map(r => calcOverall(r) || '')],
-    [''], ['SCORES']
+  const ACCENT = { smartphone:'FF2EA043', smartwatch:'FF388BFD', tws:'FFA855F7' };
+  const ACCENT_LIGHT = { smartphone:'FFE8F5E9', smartwatch:'FFE3F2FD', tws:'FFF3E5FF' };
+  const accent      = ACCENT[curTab]       || 'FF2EA043';
+  const accentLight = ACCENT_LIGHT[curTab] || 'FFE8F5E9';
+
+  // Device colors — one per column
+  const DEV_COLORS = [
+    { header:'FF1A56DB', light:'FFDBEAFE' },
+    { header:'FF7E3AF2', light:'FFEDE9FE' },
+    { header:'FF0E9F6E', light:'FFD1FAE5' },
+    { header:'FFD97706', light:'FFFEF3C7' },
+    { header:'FFDC2626', light:'FFFEE2E2' },
+    { header:'FF0891B2', light:'FFE0F2FE' },
   ];
-  Object.entries(sm).forEach(([k, lbl]) => rows.push([lbl, ...compared.map(r => r[k] || '')]));
-  rows.push([''], ['DETAILS']);
-  const secs = DEFS[curTab].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
-  secs.forEach(sec => {
-    (sec.f || []).forEach(f => {
-      if (compared.some(r => r[f.k])) rows.push([f.l, ...compared.map(r => r[f.k] || '')]);
-    });
+
+  const ws = {};
+  let row = 1;
+  const nCols = compared.length + 1; // label col + one per device
+
+  function setCell(addr, v, style) {
+    ws[addr] = { v: v === undefined || v === null ? '' : v, t: typeof v === 'number' ? 'n' : 's', s: style };
+  }
+  function addr(r, c) {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    return (c < 26 ? letters[c] : letters[Math.floor(c/26)-1]+letters[c%26]) + r;
+  }
+  function mergeRange(r1,c1,r2,c2) {
+    if (!ws['!merges']) ws['!merges'] = [];
+    ws['!merges'].push({ s:{r:r1-1,c:c1-1}, e:{r:r2-1,c:c2-1} });
+  }
+  function fillRow(rowNum, cols, styles) {
+    cols.forEach((v,i) => setCell(addr(rowNum,i), v, styles[i] || styles[styles.length-1]));
+  }
+
+  // ── BANNER ──
+  setCell(addr(row,0), 'JOVI — ' + TYPE_LABELS[curTab] + ' Comparison', cellStyle(accent,'FFFFFFFF',true,16,false));
+  for(let c=1;c<nCols;c++) setCell(addr(row,c),'',cellStyle(accent,'FFFFFFFF',false,16,false));
+  mergeRange(row,1,row,nCols);
+  row++;
+  const today = new Date().toLocaleDateString('pt-BR');
+  setCell(addr(row,0),'Generated on '+today, cellStyle('FF4A4A4A','FFAAAAAA',false,10,false));
+  for(let c=1;c<nCols;c++) setCell(addr(row,c),'',cellStyle('FF4A4A4A','FFAAAAAA',false,10,false));
+  mergeRange(row,1,row,nCols);
+  row++; row++;
+
+  // ── DEVICE HEADER COLUMNS ──
+  setCell(addr(row,0),'', cellStyle('FFF5F5F5','FF333333',true,11,true));
+  compared.forEach((r,i) => {
+    const dc = DEV_COLORS[i] || DEV_COLORS[0];
+    setCell(addr(row,i+1), (r.brand||'') + ' ' + (r.model||''), cellStyle(dc.header,'FFFFFFFF',true,12,true,'center'));
   });
-  rows.push(['']);
-  [['Pros','pros'],['Cons','cons'],['Final Verdict','final_verdict']].forEach(([lbl,k]) => {
-    if (compared.some(r => r[k])) rows.push([lbl, ...compared.map(r => r[k] || '')]);
+  row++;
+
+  // Reviewer row
+  setCell(addr(row,0),'Reviewer', cellStyle('FFFAFAFA','FF777777',true,10,true));
+  compared.forEach((r,i) => { const dc=DEV_COLORS[i]||DEV_COLORS[0]; setCell(addr(row,i+1), r.reviewer||'—', cellStyle(dc.light,'FF333333',false,10,true,'center')); });
+  row++;
+
+  // Price row
+  setCell(addr(row,0),'Price (BRL)', cellStyle('FFFAFAFA','FF777777',true,10,true));
+  compared.forEach((r,i) => { const dc=DEV_COLORS[i]||DEV_COLORS[0]; setCell(addr(row,i+1), r.retail_price ? 'R$ '+parseInt(r.retail_price).toLocaleString('pt-BR') : '—', cellStyle(dc.light,'FF333333',false,10,true,'center')); });
+  row++;
+
+  // Segment row
+  setCell(addr(row,0),'Market Segment', cellStyle('FFFAFAFA','FF777777',true,10,true));
+  compared.forEach((r,i) => { const dc=DEV_COLORS[i]||DEV_COLORS[0]; setCell(addr(row,i+1), r.positioning||'—', cellStyle(dc.light,'FF333333',false,10,true,'center')); });
+  row++; row++;
+
+  // ── OVERALL SCORES ──
+  setCell(addr(row,0),'OVERALL SCORE', cellStyle(accentLight,accent,true,12,true,'center'));
+  compared.forEach((r,i) => { const dc=DEV_COLORS[i]||DEV_COLORS[0]; setCell(addr(row,i+1),'',cellStyle(dc.header,'FFFFFFFF',true,12,true,'center')); });
+  mergeRange(row,1,row,1);
+  row++;
+
+  setCell(addr(row,0),'Score / 10', cellStyle('FFFAFAFA','FF555555',true,11,true,'center'));
+  compared.forEach((r,i) => {
+    const ov = calcOverall(r);
+    const sc = ov ? (ov>=8?{fill:'FFD4EDDA',font:'FF155724'}:ov>=5?{fill:'FFFFF3CD',font:'FF856404'}:{fill:'FFF8D7DA',font:'FF721C24'}) : {fill:'FFF5F5F5',font:'FF999999'};
+    setCell(addr(row,i+1), ov ? Number(ov) : '—', cellStyle(sc.fill,sc.font,true,16,true,'center'));
+  });
+  row++; row++;
+
+  // ── CATEGORY SCORES ──
+  setCell(addr(row,0),'CATEGORY SCORES', cellStyle(accentLight,accent,true,11,true));
+  compared.forEach((_,i) => { const dc=DEV_COLORS[i]||DEV_COLORS[0]; setCell(addr(row,i+1),'',cellStyle(accentLight,accent,true,11,true,'center')); });
+  row++;
+
+  Object.entries(sm).forEach(([k,lbl]) => {
+    setCell(addr(row,0), lbl, cellStyle('FFFAFAFA','FF444444',false,11,true));
+    compared.forEach((r,i) => {
+      const val = r[k];
+      const sc  = scoreColor(val);
+      setCell(addr(row,i+1), val ? Number(val) : '—', sc ? cellStyle(sc.fill,sc.font,true,12,true,'center') : cellStyle('FFF5F5F5','FFBBBBBB',false,11,true,'center'));
+    });
+    row++;
+  });
+  row++;
+
+  // ── DETAILED ANSWERS ──
+  secs.forEach(sec => {
+    const anyFilled = compared.some(r => (sec.f||[]).some(f => r[f.k]));
+    if (!anyFilled) return;
+
+    setCell(addr(row,0), sec.n + '.  ' + sec.t.toUpperCase(), cellStyle(accentLight,accent,true,10,true));
+    for(let c=1;c<nCols;c++) setCell(addr(row,c),'',cellStyle(accentLight,accent,true,10,true,'center'));
+    row++;
+
+    (sec.f||[]).forEach(f => {
+      if (!compared.some(r => r[f.k])) return;
+      setCell(addr(row,0), f.l, cellStyle('FFFAFAFA','FF666666',false,10,true,'left',true));
+      compared.forEach((r,i) => {
+        const dc=DEV_COLORS[i]||DEV_COLORS[0];
+        setCell(addr(row,i+1), r[f.k]||'—', cellStyle(i%2===0?'FFFFFFFF':dc.light,'FF333333',false,10,true,'left',true));
+      });
+      row++;
+    });
+    row++;
   });
 
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{ wch: 30 }, ...compared.map(() => ({ wch: 38 }))];
-  XLSX.utils.book_append_sheet(wb, ws, 'Comparison');
+  // ── PROS / CONS / VERDICT ──
+  setCell(addr(row,0),'VERDICT', cellStyle(accent,'FFFFFFFF',true,12,true));
+  for(let c=1;c<nCols;c++) setCell(addr(row,c),'',cellStyle(accent,'FFFFFFFF',true,12,true));
+  row++;
+
+  [['✓  Pros','pros','FFD4EDDA','FF155724'],['✗  Cons','cons','FFF8D7DA','FF721C24'],['Final Verdict','final_verdict','FFFAFAFA','FF333333']].forEach(([lbl,k,fill,font]) => {
+    if (!compared.some(r => r[k])) return;
+    setCell(addr(row,0), lbl, cellStyle(fill,font,true,11,true,'left',true));
+    compared.forEach((r,i) => setCell(addr(row,i+1), r[k]||'—', cellStyle('FFFFFFFF','FF333333',false,10,true,'left',true)));
+    row++;
+  });
+
+  // Set sheet bounds, col widths, row heights
+  const lastCol = String.fromCharCode(65 + nCols - 1);
+  ws['!ref'] = 'A1:' + lastCol + row;
+  ws['!cols'] = [{ wch:28 }, ...compared.map(() => ({ wch:30 }))];
+  ws['!rows'] = [{ hpt:36 }, { hpt:16 }];
+
+  const wb = { SheetNames:['Comparison'], Sheets:{ Comparison: ws } };
   XLSX.writeFile(wb, filename + '.xlsx');
 }
 

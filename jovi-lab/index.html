@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JOVI — Smartphone & IoT Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%231a56ff'/><text y='.9em' font-size='72' x='8' fill='white' font-family='sans-serif' font-weight='800'>J</text></svg>">
+</head>
+<body>
+  <div id="app">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="header-left">
+          <div class="header-brand">
+            <div class="brand-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="17" x2="12" y2="17.5" stroke-linecap="round" stroke-width="2.5"/></svg>
+            </div>
+            <div>
+              <div class="brand-name">Smartphone &amp; IoT Lab</div>
+              <div class="brand-sub">Tech Review Tool</div>
+            </div>
+          </div>
+        </div>
+        <div class="jovi-badge">JOVI</div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs-wrap">
+        <nav class="tabs">
+          <button class="tab active" data-tab="smartphone" onclick="switchTab('smartphone',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="17" x2="12" y2="17.5"/></svg>
+            Smartphone
+          </button>
+          <button class="tab" data-tab="smartwatch" onclick="switchTab('smartwatch',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M7 8h10M7 16h10"/></svg>
+            Smartwatch
+          </button>
+          <button class="tab" data-tab="tws" onclick="switchTab('tws',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+            TWS
+          </button>
+          <button class="tab" data-tab="iot" onclick="switchTab('iot',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+            IoT
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- PAGES -->
+    <main class="main">
+
+      <!-- HOME PAGE -->
+      <div id="page-home" class="page active">
+        <button class="cta-banner" id="cta-banner" onclick="goAdd()">
+          <div class="cta-left">
+            <div class="cta-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <div>
+              <div class="cta-title" id="cta-title">New Smartphone Review</div>
+              <div class="cta-sub">Start testing a new device</div>
+            </div>
+          </div>
+          <svg class="cta-arrow" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+
+        <div class="section-header">
+          <span class="section-label">REVIEWS</span>
+          <button class="dash-btn" onclick="goDash()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+          </button>
+        </div>
+
+        <div id="reviews-list"></div>
+      </div>
+
+      <!-- ADD/EDIT PAGE -->
+      <div id="page-add" class="page">
+        <div class="page-topbar">
+          <button class="back-btn" onclick="goHome()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            <div>
+              <div class="page-title" id="add-title">New Review</div>
+              <div class="page-sub" id="add-sub">Draft</div>
+            </div>
+          </button>
+          <button class="save-icon-btn" onclick="quickSave()" title="Save">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          </button>
+        </div>
+
+        <div id="acc-sections"></div>
+        <div style="height:80px"></div>
+
+        <div class="bottom-bar">
+          <button class="btn-del" onclick="deleteCurrentReview()" title="Delete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </button>
+          <button class="btn-draft" onclick="saveDraft()">Save &amp; Back</button>
+          <button class="btn-complete" id="btn-complete" onclick="saveComplete()">Complete &amp; View Dashboard</button>
+        </div>
+      </div>
+
+      <!-- DETAIL PAGE -->
+      <div id="page-detail" class="page">
+        <button class="back-btn" onclick="goHome()" style="margin-bottom:14px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <div id="detail-body"></div>
+      </div>
+
+      <!-- DASHBOARD PAGE -->
+      <div id="page-dash" class="page">
+        <button class="back-btn" onclick="goHome()" style="margin-bottom:14px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to Reviews
+        </button>
+        <p class="hint-text">Tap to select/deselect (up to 6)</p>
+        <div class="chips-row" id="dash-chips"></div>
+        <div id="dash-body"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- CDN Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/libs/pptxgen.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- App Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/form.js"></script>
+  <script src="js/detail.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

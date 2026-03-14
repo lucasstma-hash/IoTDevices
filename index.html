@@ -4,33 +4,570 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>JOVI — Smartphone &amp; IoT Lab</title>
-  <link rel="stylesheet" href="css/style.css">
   <style>
-    /* Critical inline fallback — ensures basic layout even if CSS file fails to load */
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:14px}
-    svg{display:inline-block;vertical-align:middle;flex-shrink:0}
-    /* Hard-cap ALL svgs so none render huge */
-    svg:not([width]):not([class*="score"]):not([class*="detail"]) { max-width:24px; max-height:24px; }
-    .brand-icon svg{width:15px!important;height:15px!important}
-    .tab svg{width:13px!important;height:13px!important}
-    .cta-icon svg{width:13px!important;height:13px!important}
-    .dash-btn svg{width:12px!important;height:12px!important}
-    .back-btn svg{width:14px!important;height:14px!important}
-    .save-icon-btn svg{width:18px!important;height:18px!important}
-    .btn-del svg{width:16px!important;height:16px!important}
-    .btn-export svg{width:12px!important;height:12px!important}
-    .empty-state svg{width:36px!important;height:36px!important}
-    .photo-upload svg{width:22px!important;height:22px!important}
-    .cta-arrow{width:18px!important;height:18px!important}
-    #app{max-width:680px;margin:0 auto}
-    .page{display:none}.page.active{display:block}
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Global SVG safeguard — prevents any SVG rendering at huge default size */
+svg { display: inline-block; vertical-align: middle; overflow: visible; }
+
+:root {
+  --bg:        #0d1117;
+  --bg2:       #161b22;
+  --bg3:       #1c2128;
+  --border:    #21262d;
+  --border2:   #30363d;
+  --text:      #e6edf3;
+  --text2:     #c9d1d9;
+  --text3:     #8b949e;
+  --text4:     #6e7681;
+  --text5:     #484f58;
+  --green:     #2ea043;
+  --green-lt:  #3fb950;
+  --blue:      #388bfd;
+  --purple:    #a855f7;
+  --teal:      #22c55e;
+  --score-g:   #22c55e;
+  --score-y:   #f59e0b;
+  --score-r:   #ef4444;
+  --radius:    10px;
+  --radius-lg: 13px;
+  --font:      -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Segoe UI Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== LAYOUT ===== */
+#app { max-width: 680px; margin: 0 auto; }
+
+.header {
+  background: #0d1117ee;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 0;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  width: 28px; height: 28px;
+  border: 2px solid var(--green);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--green);
+}
+.brand-icon svg { width: 15px; height: 15px; }
+
+.brand-name { font-size: 16px; font-weight: 700; color: var(--text); }
+.brand-sub  { font-size: 11px; color: var(--text4); margin-top: 1px; }
+
+.jovi-badge {
+  background: #1a56ff;
+  border-radius: 8px;
+  padding: 5px 11px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-family: var(--font-mono);
+}
+
+/* ===== TABS ===== */
+.tabs-wrap { padding: 0 20px; }
+.tabs { display: flex; border-bottom: 1px solid var(--border); }
+
+.tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 16px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text4);
+  background: none; border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color .15s;
+  font-family: var(--font);
+}
+.tab:hover { color: var(--text2); }
+.tab.active { color: var(--text); border-bottom-color: var(--green); }
+.tab svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* ===== MAIN & PAGES ===== */
+.main { padding: 16px 20px; padding-bottom: 40px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ===== CTA BANNER ===== */
+.cta-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: opacity .15s, transform .1s;
+  background: var(--green);
+}
+.cta-banner:hover { opacity: .92; }
+.cta-banner:active { transform: scale(.99); }
+
+.cta-left { display: flex; align-items: center; gap: 11px; }
+.cta-icon {
+  width: 24px; height: 24px;
+  border: 2px solid #ffffff44;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cta-icon svg { width: 13px; height: 13px; }
+.cta-title { font-size: 14px; font-weight: 600; color: #fff; }
+.cta-sub   { font-size: 11px; color: #ffffffaa; margin-top: 1px; }
+.cta-arrow { width: 18px; height: 18px; flex-shrink: 0; opacity: .7; }
+
+/* ===== SECTION HEADER ===== */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.section-label { font-size: 11px; font-weight: 700; color: var(--text4); letter-spacing: .08em; font-family: var(--font-mono); }
+
+.dash-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--text2); font-size: 12px;
+  padding: 5px 10px; cursor: pointer; font-family: var(--font);
+  transition: background .15s;
+}
+.dash-btn:hover { background: var(--bg3); }
+.dash-btn svg { width: 12px; height: 12px; }
+
+/* ===== REVIEW CARDS ===== */
+.review-card {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 12px 14px;
+  margin-bottom: 8px; cursor: pointer;
+  transition: border-color .15s;
+}
+.review-card:hover { border-color: var(--border2); }
+
+.review-thumb {
+  width: 42px; height: 42px;
+  border-radius: 8px; background: var(--bg3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0; overflow: hidden;
+}
+.review-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+
+.review-info { flex: 1; min-width: 0; }
+.review-brand { font-size: 11px; color: var(--text4); margin-bottom: 1px; }
+.review-model { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.review-meta { font-size: 11px; color: var(--text4); margin-top: 2px; display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+
+.status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+.type-badge {
+  font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 500;
+  font-family: var(--font-mono);
+}
+.type-p { background: #1e3a5f55; color: #60a5fa; }
+.type-s { background: #1a3a2a55; color: #3fb950; }
+.type-t { background: #2d1b6955; color: #c084fc; }
+.type-i { background: #064e3b55; color: #34d399; }
+
+/* ===== SCORE RING ===== */
+.score-ring {
+  width: 42px; height: 42px; flex-shrink: 0;
+  position: relative; display: flex; align-items: center; justify-content: center;
+}
+.score-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+.score-ring-num { font-size: 12px; font-weight: 700; z-index: 1; font-family: var(--font-mono); }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center; padding: 48px 20px; color: var(--text5); font-size: 13px;
+}
+.empty-state svg { width: 36px; height: 36px; margin: 0 auto 10px; display: block; opacity: .4; }
+
+/* ===== PAGE TOPBAR ===== */
+.page-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0; margin-bottom: 6px;
+}
+.back-btn {
+  display: flex; align-items: center; gap: 7px;
+  background: none; border: none; color: var(--text2); font-size: 13px;
+  font-weight: 600; cursor: pointer; font-family: var(--font);
+}
+.back-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+.page-title { font-size: 13px; font-weight: 600; }
+.page-sub   { font-size: 11px; color: var(--text4); }
+
+.save-icon-btn {
+  background: none; border: none; cursor: pointer; color: var(--text4); padding: 4px;
+  display: flex; align-items: center; justify-content: center;
+  transition: color .15s;
+}
+.save-icon-btn:hover { color: var(--text2); }
+.save-icon-btn svg { width: 18px; height: 18px; }
+
+/* ===== ACCORDION ===== */
+.accordion {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); margin-bottom: 8px; overflow: hidden;
+}
+
+.acc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 16px; cursor: pointer; user-select: none;
+  transition: background .12s;
+}
+.acc-header:hover { background: var(--bg3); }
+
+.acc-left  { display: flex; align-items: center; gap: 10px; }
+.acc-num   {
+  width: 24px; height: 24px; border-radius: 7px;
+  background: #1f3a6e; color: #58a6ff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-family: var(--font-mono);
+}
+.acc-title { font-size: 13px; font-weight: 600; }
+.acc-meta  { display: flex; align-items: center; gap: 7px; }
+
+.acc-score-badge {
+  font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+  display: none; font-family: var(--font-mono);
+}
+.acc-arrow { color: var(--text4); font-size: 13px; transition: transform .2s; }
+.acc-arrow.open { transform: rotate(180deg); }
+
+.acc-body { display: none; padding: 4px 16px 16px; }
+.acc-body.open { display: block; }
+
+/* ===== FORM FIELDS ===== */
+.field-block { margin-bottom: 14px; }
+.field-label { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.field-hint  { font-size: 11px; color: var(--text4); margin-bottom: 6px; line-height: 1.45; }
+
+input[type=text],
+input[type=number],
+select,
+textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 10px 12px;
+  font-family: var(--font);
+  transition: border-color .15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: #388bfd;
+  box-shadow: 0 0 0 3px #388bfd1a;
+}
+textarea { resize: vertical; min-height: 72px; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236e7681' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-color: var(--bg);
+  padding-right: 32px;
+  cursor: pointer;
+}
+select option { background: var(--bg2); }
+
+/* ===== PHOTO UPLOAD ===== */
+.photo-upload-wrap { display: flex; flex-direction: column; gap: 8px; }
+.photo-upload {
+  width: 160px; height: 110px;
+  border: 2px dashed var(--border2);
+  border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; gap: 6px; position: relative; overflow: hidden;
+  transition: border-color .15s;
+}
+.photo-upload:hover { border-color: var(--text4); }
+.photo-upload svg   { width: 22px; height: 22px; stroke: var(--text4); fill: none; stroke-width: 1.5; }
+.photo-upload span  { font-size: 11px; color: var(--text4); text-align: center; }
+.photo-upload .sub  { font-size: 10px; color: var(--text5); }
+.photo-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.photo-preview { width: 160px; height: 110px; border-radius: 10px; object-fit: cover; display: block; cursor: pointer; }
+.photo-remove  { font-size: 11px; color: var(--text5); cursor: pointer; }
+.photo-remove:hover { color: #f85149; }
+
+/* ===== RATING BUTTONS ===== */
+.rating-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; align-items: center; }
+
+.rb {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: #1e2a1e;
+  color: var(--text3);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  transition: transform .08s, background .12s, color .12s;
+  position: relative;
+}
+.rb:hover { transform: scale(1.1); }
+.rb:active { transform: scale(.95); }
+
+/* Selected state — all buttons 1..N get filled green */
+.rb.selected {
+  background: var(--score-g);
+  color: #fff;
+  box-shadow: 0 0 0 0px transparent;
+}
+/* The exact button clicked gets a brighter ring */
+.rb.selected.active-btn {
+  background: var(--score-g);
+  color: #fff;
+  box-shadow: 0 0 0 3px #22c55e55;
+}
+/* Yellow range (5-7) */
+.rb.selected.range-yellow { background: var(--score-y); color: #fff; }
+.rb.selected.range-yellow.active-btn { box-shadow: 0 0 0 3px #f59e0b55; }
+/* Red range (1-4) */
+.rb.selected.range-red    { background: var(--score-r); color: #fff; }
+.rb.selected.range-red.active-btn { box-shadow: 0 0 0 3px #ef444455; }
+
+/* Score label after buttons */
+.rating-score-label {
+  font-size: 13px; font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text3);
+  min-width: 36px;
+  margin-left: 2px;
+}
+.rating-score-label.green  { color: var(--score-g); }
+.rating-score-label.yellow { color: var(--score-y); }
+.rating-score-label.red    { color: var(--score-r); }
+
+/* ===== OVERALL BOX ===== */
+.overall-box {
+  display: inline-flex; align-items: baseline; gap: 6px;
+  padding: 8px 16px; border-radius: 10px; margin: 4px 0 12px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+}
+.overall-box.green  { background: #0d422033; border-color: #2ea04344; }
+.overall-box.yellow { background: #3d2c0033; border-color: #d2992244; }
+.overall-box.red    { background: #3d0c1233; border-color: #da363344; }
+.overall-box-num { font-size: 24px; font-weight: 700; font-family: var(--font-mono); color: var(--text4); }
+.overall-box-num.green  { color: var(--score-g); }
+.overall-box-num.yellow { color: var(--score-y); }
+.overall-box-num.red    { color: var(--score-r); }
+.overall-box-denom { font-size: 13px; color: var(--text4); }
+
+/* ===== BOTTOM BAR ===== */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 680px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex; gap: 8px; align-items: center;
+  z-index: 50;
+}
+.btn-del {
+  width: 44px; height: 44px; flex-shrink: 0;
+  background: transparent; border: 1px solid #da363355;
+  border-radius: 10px; color: #f85149;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.btn-del:hover { background: #3d0c1233; }
+.btn-del svg { width: 16px; height: 16px; }
+
+.btn-draft {
+  flex: 1;
+  background: transparent; border: 1px solid var(--border2);
+  border-radius: 10px; color: var(--text2);
+  font-size: 13px; font-weight: 500; padding: 11px;
+  cursor: pointer; font-family: var(--font);
+  transition: background .15s;
+}
+.btn-draft:hover { background: var(--bg2); }
+
+.btn-complete {
+  flex: 2;
+  border: none; border-radius: 10px; color: #fff;
+  font-size: 13px; font-weight: 600; padding: 11px;
+  cursor: pointer; font-family: var(--font);
+  background: var(--green);
+  transition: opacity .15s;
+}
+.btn-complete:hover { opacity: .9; }
+
+/* ===== DETAIL PAGE ===== */
+.detail-hero {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px; margin-bottom: 10px;
+}
+.detail-hero-photo {
+  width: 100%; height: 160px; object-fit: cover;
+  border-radius: 9px; margin-bottom: 14px; display: block;
+}
+.detail-hero-body { display: flex; align-items: center; gap: 14px; }
+.detail-hero-info { flex: 1; min-width: 0; }
+.detail-brand  { font-size: 11px; color: var(--text4); margin-bottom: 2px; }
+.detail-model  { font-size: 17px; font-weight: 700; }
+.detail-price  { font-size: 12px; color: var(--text4); margin-top: 3px; display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+
+.detail-ring {
+  width: 78px; height: 78px; flex-shrink: 0;
+  position: relative; display: flex; align-items: center; justify-content: center;
+}
+.detail-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+.detail-ring-score { font-size: 26px; font-weight: 700; z-index: 1; font-family: var(--font-mono); line-height: 1; }
+.detail-ring-denom { font-size: 10px; color: var(--text4); z-index: 1; margin-top: 1px; text-align: center; }
+
+.detail-verdict {
+  font-size: 12px; color: var(--text3); font-style: italic;
+  border-top: 1px solid var(--border); padding-top: 11px; margin-top: 11px;
+}
+
+/* Score bars */
+.score-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.score-bar-name { font-size: 12px; color: var(--text2); min-width: 105px; font-weight: 500; }
+.score-bar-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.score-bar-fill  { height: 100%; border-radius: 3px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+.score-bar-val   { font-size: 12px; font-weight: 700; min-width: 22px; text-align: right; font-family: var(--font-mono); }
+
+/* Pros/Cons */
+.pc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 2px; }
+.pc-box  { padding: 11px; border-radius: 9px; }
+.pc-box p { font-size: 12px; color: var(--text2); line-height: 1.55; margin-top: 5px; }
+
+/* Full details table */
+.details-table { width: 100%; border-collapse: collapse; }
+.details-table td { padding: 5px 0; font-size: 11px; vertical-align: top; }
+.details-table .dt-key { color: var(--text3); width: 46%; padding-right: 8px; }
+.details-table .dt-val { color: var(--text); font-weight: 500; }
+
+.detail-section-header {
+  font-size: 10px; font-weight: 700; color: var(--text4);
+  letter-spacing: .06em; margin-bottom: 7px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* Action row */
+.action-row { display: flex; gap: 8px; margin-top: 14px; }
+.btn-outline {
+  flex: 1; background: transparent; border: 1px solid var(--border2);
+  border-radius: 10px; color: var(--text2); font-size: 12px;
+  padding: 9px; cursor: pointer; font-family: var(--font);
+  transition: background .15s;
+}
+.btn-outline:hover { background: var(--bg2); }
+.btn-export {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 10px; color: var(--text2); font-size: 12px;
+  padding: 9px 13px; cursor: pointer; font-family: var(--font);
+  transition: background .15s;
+}
+.btn-export:hover { background: var(--bg3); }
+.btn-export svg { width: 12px; height: 12px; }
+.btn-del-sm {
+  background: transparent; border: 1px solid #da363355;
+  border-radius: 10px; color: #f85149; font-size: 12px;
+  padding: 9px 12px; cursor: pointer; font-family: var(--font);
+  transition: background .15s;
+}
+.btn-del-sm:hover { background: #3d0c1222; }
+
+/* ===== DASHBOARD ===== */
+.hint-text { font-size: 11px; color: var(--text4); margin-bottom: 10px; }
+
+.chips-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+.d-chip {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 11px; border-radius: 10px;
+  border: 1px solid var(--border2); background: var(--bg2);
+  font-size: 12px; cursor: pointer; transition: all .15s;
+  font-family: var(--font);
+}
+.d-chip.on { border-color: #1f6feb; background: #1f6feb22; }
+.d-chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.d-chip-score { color: #e3b341; font-weight: 700; font-size: 11px; font-family: var(--font-mono); }
+
+/* Dashboard cards */
+.dash-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 10px;
+}
+.dash-card-title { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+
+/* Comparison table */
+.comp-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.comp-table th { padding: 7px 8px; text-align: center; border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 600; }
+.comp-table td { padding: 7px 8px; border-bottom: 1px solid #21262d44; }
+.comp-table td:first-child { text-align: left; color: var(--text2); font-weight: 500; }
+.comp-table .ovr-row td { background: #21262d55; font-weight: 700; padding: 9px 8px; }
+
+.s-badge { display: inline-block; padding: 2px 7px; border-radius: 6px; font-weight: 700; font-size: 11px; font-family: var(--font-mono); }
+.s-g { background: #0d422055; color: var(--score-g); }
+.s-y { background: #3d2c0055; color: var(--score-y); }
+.s-r { background: #3d0c1255; color: var(--score-r); }
+.s-x { background: var(--bg3); color: var(--text4); }
+
+/* Export buttons */
+.export-row { display: flex; gap: 8px; margin-top: 6px; }
+.export-row .btn-export { flex: 1; }
+
+/* ===== MISC ===== */
+.hint-text { font-size: 11px; color: var(--text4); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .main { padding: 12px 14px; }
+  .tab { padding: 9px 10px; font-size: 12px; }
+  .pc-grid { grid-template-columns: 1fr; }
+}
+
   </style>
 </head>
 <body>
   <div id="app">
 
-    <!-- HEADER -->
     <header class="header">
       <div class="header-inner">
         <div class="header-left">
@@ -46,77 +583,68 @@
         </div>
         <div class="jovi-badge">JOVI</div>
       </div>
-
-      <!-- TABS -->
       <div class="tabs-wrap">
         <nav class="tabs">
           <button class="tab active" data-tab="smartphone" onclick="switchTab('smartphone',this)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="17" x2="12" y2="17.5"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
             Smartphone
           </button>
           <button class="tab" data-tab="smartwatch" onclick="switchTab('smartwatch',this)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M7 8h10M7 16h10"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M7 8h10M7 16h10"/></svg>
             Smartwatch
           </button>
           <button class="tab" data-tab="tws" onclick="switchTab('tws',this)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
             TWS
           </button>
           <button class="tab" data-tab="iot" onclick="switchTab('iot',this)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
             IoT
           </button>
         </nav>
       </div>
     </header>
 
-    <!-- PAGES -->
     <main class="main">
 
-      <!-- HOME PAGE -->
       <div id="page-home" class="page active">
         <button class="cta-banner" id="cta-banner" onclick="goAdd()">
           <div class="cta-left">
             <div class="cta-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </div>
             <div>
               <div class="cta-title" id="cta-title">New Smartphone Review</div>
               <div class="cta-sub">Start testing a new device</div>
             </div>
           </div>
-          <svg class="cta-arrow" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg class="cta-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-
         <div class="section-header">
           <span class="section-label">REVIEWS</span>
           <button class="dash-btn" onclick="goDash()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             Dashboard
           </button>
         </div>
-
         <div id="reviews-list"></div>
       </div>
 
-      <!-- ADD/EDIT PAGE -->
       <div id="page-add" class="page">
         <div class="page-topbar">
           <button class="back-btn" onclick="goHome()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
             <div>
               <div class="page-title" id="add-title">New Review</div>
               <div class="page-sub" id="add-sub">Draft</div>
             </div>
           </button>
           <button class="save-icon-btn" onclick="quickSave()" title="Save">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
           </button>
         </div>
-
         <div id="acc-sections"></div>
         <div style="height:80px"></div>
-
         <div class="bottom-bar">
           <button class="btn-del" onclick="deleteCurrentReview()" title="Delete">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
@@ -126,22 +654,20 @@
         </div>
       </div>
 
-      <!-- DETAIL PAGE -->
       <div id="page-detail" class="page">
         <button class="back-btn" onclick="goHome()" style="margin-bottom:14px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           Back
         </button>
         <div id="detail-body"></div>
       </div>
 
-      <!-- DASHBOARD PAGE -->
       <div id="page-dash" class="page">
         <button class="back-btn" onclick="goHome()" style="margin-bottom:14px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           Back to Reviews
         </button>
-        <p class="hint-text">Tap to select/deselect (up to 6)</p>
+        <p class="hint-text" style="margin-bottom:10px">Tap to select/deselect (up to 6)</p>
         <div class="chips-row" id="dash-chips"></div>
         <div id="dash-body"></div>
       </div>
@@ -149,18 +675,1257 @@
     </main>
   </div>
 
-  <!-- CDN Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/libs/pptxgen.bundle.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+// ===== CONSTANTS =====
+const EMOJIS = { smartphone: '📱', smartwatch: '⌚', tws: '🎧', iot: '🔌' };
+const TYPE_LABELS = { smartphone: 'Smartphone', smartwatch: 'Smartwatch', tws: 'TWS Earbuds', iot: 'IoT Device' };
+const TYPE_COLORS = { smartphone: '#2ea043', smartwatch: '#388bfd', tws: '#a855f7', iot: '#22c55e' };
+const TYPE_CLASS  = { smartphone: 'type-p', smartwatch: 'type-s', tws: 'type-t', iot: 'type-i' };
+const CHART_COLORS = ['#3b82f6','#a855f7','#22c55e','#f59e0b','#ef4444','#06b6d4'];
 
-  <!-- App Scripts -->
-  <script src="js/data.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/form.js"></script>
-  <script src="js/detail.js"></script>
-  <script src="js/dashboard.js"></script>
-  <script src="js/export.js"></script>
-  <script src="js/app.js"></script>
+// ===== SECTION DEFINITIONS =====
+const DEFS = {
+  smartphone: {
+    scoreMap: { s_price:'Price/Value', s_display:'Display', s_perf:'Performance', s_cam:'Camera', s_batt:'Battery', s_sw:'Software', s_build:'Build' },
+    sections: [
+      { n:'0', k:'photo',  t:'Product Photo', sk: null },
+      { n:'1', k:'price',  t:'Price & Positioning', sk:'s_price', f:[
+        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'' },
+        { tp:'sel', k:'positioning', l:'Market Positioning', h:'How does it position against direct competitors?', o:['Entry-level','Mid-range','Premium','Flagship'] },
+        { tp:'sel', k:'value_money', l:'Value for Money', h:'Does the cost-benefit make sense for what it delivers?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'price_notes', l:'Notes', h:'Price vs. competitors, promotions, bundles...' }
+      ]},
+      { n:'2', k:'display', t:'Display', sk:'s_display', f:[
+        { tp:'sel', k:'display_tech', l:'Display Technology', h:'', o:['AMOLED/OLED','LCD IPS','LCD TFT','Mini-LED'] },
+        { tp:'sel', k:'refresh_rate', l:'Refresh Rate', h:'Higher refresh rate = smoother scrolling and animations', o:['144Hz+','120Hz','90Hz','60Hz'] },
+        { tp:'num', k:'peak_brightness', l:'Peak Brightness (nits)', h:'Maximum brightness measured or rated' },
+        { tp:'sel', k:'sunlight', l:'Sunlight Visibility', h:'Can you comfortably read the screen outdoors in direct sunlight?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'color_accuracy', l:'Color Accuracy', h:'Do colors look natural and accurate vs. oversaturated/washed out?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'display_notes', l:'Notes', h:'' }
+      ]},
+      { n:'3', k:'performance', t:'Performance', sk:'s_perf', f:[
+        { tp:'txt', k:'chipset', l:'Chipset', h:'e.g. Snapdragon 8 Gen 3, Dimensity 9300, Apple A17 Pro' },
+        { tp:'num', k:'ram', l:'RAM (GB)', h:'' },
+        { tp:'num', k:'antutu', l:'AnTuTu Score', h:'Benchmark score for reference' },
+        { tp:'sel', k:'daily_perf', l:'Daily Performance', h:'How does it handle day-to-day tasks like browsing, social media, multitasking?', o:['Buttery Smooth','Smooth','Minor Hiccups','Laggy'] },
+        { tp:'sel', k:'gaming_perf', l:'Gaming Performance', h:'How does it handle demanding 3D games at high settings?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'thermal', l:'Thermal Throttling', h:'Does performance drop significantly after extended gaming sessions due to heat?', o:['None','Slight after 30min','Noticeable','Severe'] },
+        { tp:'ta',  k:'perf_notes', l:'Notes', h:'' }
+      ]},
+      { n:'4', k:'camera', t:'Camera System', sk:'s_cam', f:[
+        { tp:'num', k:'main_mp', l:'Main Camera (MP)', h:'' },
+        { tp:'sel', k:'main_quality', l:'Main Camera Quality', h:'Overall photo quality in mixed lighting conditions', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'ultrawide', l:'Ultrawide Quality', h:'Does the ultrawide lens deliver consistent color and sharpness?', o:['Excellent','Good','Fair','Poor/None'] },
+        { tp:'sel', k:'telephoto', l:'Telephoto / Zoom Quality', h:'Does the zoom camera produce sharp, usable images?', o:['Excellent','Good','Fair','Poor/None'] },
+        { tp:'sel', k:'video_res', l:'Max Video Resolution', h:'Highest supported video recording resolution', o:['8K','4K 120fps','4K 60fps','4K 30fps','1080p max'] },
+        { tp:'sel', k:'night_mode', l:'Night Mode Quality', h:'How well does it handle low-light photography?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'selfie', l:'Selfie Camera Quality', h:'Front camera quality for photos and video calls', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'cam_notes', l:'Notes', h:'' }
+      ]},
+      { n:'5', k:'battery', t:'Battery & Charging', sk:'s_batt', f:[
+        { tp:'num', k:'batt_mah', l:'Battery Capacity (mAh)', h:'' },
+        { tp:'num', k:'screen_on', l:'Real Screen-On Time (hours)', h:'How many hours of active screen use before needing charge?' },
+        { tp:'num', k:'wired_w', l:'Wired Charging (Watts)', h:'' },
+        { tp:'num', k:'wireless_w', l:'Wireless Charging (Watts)', h:'0 if not supported' },
+        { tp:'sel', k:'reverse_wl', l:'Reverse Wireless Charging', h:'Can it wirelessly charge accessories like earbuds?', o:['Yes','No'] },
+        { tp:'ta',  k:'batt_notes', l:'Notes', h:'' }
+      ]},
+      { n:'6', k:'software', t:'Software & OS', sk:'s_sw', f:[
+        { tp:'txt', k:'os_ver', l:'OS Version', h:'e.g. Android 14 / One UI 6.1 / iOS 17.4' },
+        { tp:'sel', k:'bloatware', l:'Bloatware Level', h:'How many pre-installed apps are non-removable?', o:['None','Minimal','Moderate','Heavy'] },
+        { tp:'sel', k:'update_policy', l:'Software Update Policy', h:'How many years of OS and security updates are guaranteed?', o:['5+ years OS updates','3-4 years','1-2 years','Unclear/None'] },
+        { tp:'sel', k:'ui_smooth', l:'UI Smoothness', h:'Does the interface feel fluid during animations and transitions?', o:['Very Smooth','Smooth','Minor Lag','Laggy'] },
+        { tp:'ta',  k:'sw_features', l:'Unique Software Features', h:'e.g. Samsung DeX, Circle to Search, AI eraser, split-screen gaming' },
+        { tp:'ta',  k:'sw_notes', l:'Notes', h:'' }
+      ]},
+      { n:'7', k:'build', t:'Build Quality & Ergonomics', sk:'s_build', f:[
+        { tp:'sel', k:'build_mat', l:'Build Material', h:'What materials are used for the chassis and back?', o:['Titanium + Glass','Aluminum + Glass','Plastic','Other'] },
+        { tp:'sel', k:'ip_rating', l:'IP Rating (Dust & Water)', h:'Official ingress protection certification', o:['IP68','IP67','IP65','IP54','No rating'] },
+        { tp:'sel', k:'in_hand', l:'In-Hand Feel', h:'Does it feel premium, grippy and balanced when held?', o:['Premium','Good','Acceptable','Cheap/Slippery'] },
+        { tp:'num', k:'weight', l:'Weight (grams)', h:'' },
+        { tp:'sel', k:'one_hand', l:'One-Hand Usability', h:'Can you comfortably operate the phone with one hand?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'build_notes', l:'Notes', h:'' }
+      ]},
+      { n:'★', k:'verdict', t:'Final Verdict', sk: null }
+    ]
+  },
+
+  smartwatch: {
+    scoreMap: { s_price:'Price/Value', s_design:'Design/Comfort', s_display:'Display', s_usability:'Usability', s_sports:'Sports/GPS', s_health:'Health', s_smart:'Smart', s_batt:'Battery', s_app:'App' },
+    sections: [
+      { n:'0', k:'photo', t:'Product Photo', sk: null },
+      { n:'1', k:'price', t:'Price & Positioning', sk:'s_price', f:[
+        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'' },
+        { tp:'sel', k:'positioning', l:'Market Positioning', h:'How does it position against direct competitors?', o:['Entry-level','Mid-range','Premium','Flagship'] },
+        { tp:'sel', k:'value_money', l:'Value for Money', h:'Does the cost-benefit make sense for what it delivers?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'price_notes', l:'Notes', h:'Price vs. competitors, promotions, bundles...' }
+      ]},
+      { n:'2', k:'design', t:'Design, Build & Comfort', sk:'s_design', f:[
+        { tp:'sel', k:'daily_comfort', l:'Daily Comfort', h:'Light and comfortable enough to wear all day and while sleeping?', o:['Very Comfortable','Comfortable','Acceptable','Uncomfortable'] },
+        { tp:'sel', k:'band_irritation', l:'Band Skin Irritation', h:'Does the band material irritate skin when sweating?', o:['None','Slight','Moderate','Severe'] },
+        { tp:'sel', k:'band_compat', l:'Third-Party Band Compatibility', h:'Easy to replace with universal third-party bands?', o:['Yes - Universal','Yes - Brand Specific','No'] },
+        { tp:'sel', k:'ergonomics', l:'Ergonomics', h:'Does the case size get in the way during long-sleeve shirts or specific workout movements?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'material_feel', l:'Material Feel', h:'Does it feel premium or cheap/plasticky on the wrist?', o:['Premium','Good','Acceptable','Cheap/Plasticky'] },
+        { tp:'ta',  k:'design_notes', l:'Notes', h:'' }
+      ]},
+      { n:'3', k:'display', t:'Display, Watch Faces & Customization', sk:'s_display', f:[
+        { tp:'sel', k:'wf_change', l:'Watch Face Change Ease', h:'Is it easy and intuitive to change the watch face directly on the watch?', o:['Very Easy','Easy','Average','Difficult'] },
+        { tp:'sel', k:'free_wf', l:'Free Watch Face Variety', h:'Does the app offer a good variety of quality free watch faces?', o:['Excellent','Good','Limited','Very Limited'] },
+        { tp:'sel', k:'paid_wf', l:'Paid Watch Faces', h:'Are there paid watch faces? Is the price fair or abusive?', o:['None','Fair Price','Overpriced'] },
+        { tp:'sel', k:'custom_photo_wf', l:'Custom Photo Watch Face', h:'Can you set a personal photo as a watch face?', o:['Yes','No'] },
+        { tp:'sel', k:'raise_wake', l:'Raise-to-Wake Speed', h:'Is the screen-on gesture fast and natural, or do you need exaggerated movements?', o:['Instant','Fast','Slow','Unreliable'] },
+        { tp:'sel', k:'sunlight', l:'Sunlight Visibility', h:'Is maximum brightness sufficient for reading under direct sunlight?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'display_notes', l:'Notes', h:'' }
+      ]},
+      { n:'4', k:'usability', t:'Usability & System Fluidity', sk:'s_usability', f:[
+        { tp:'sel', k:'ui_fluidity', l:'UI Fluidity', h:'Does the system run smoothly or show lag when scrolling menus and opening apps?', o:['Very Smooth','Smooth','Minor Lag','Laggy'] },
+        { tp:'sel', k:'menu_intuit', l:'Menu Intuitiveness', h:'Are menus intuitive? Easy to find basic settings like brightness, alarms, do-not-disturb?', o:['Very Intuitive','Intuitive','Confusing','Very Confusing'] },
+        { tp:'sel', k:'btn_haptic', l:'Button / Crown Haptic Feedback', h:'Do physical buttons or rotary crown have good tactile response, especially with sweaty hands?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'usability_notes', l:'Notes', h:'' }
+      ]},
+      { n:'5', k:'sports', t:'Sports, GPS & Navigation', sk:'s_sports', f:[
+        { tp:'num', k:'sport_modes', l:'Number of Sport Modes', h:'Total included sport/activity modes' },
+        { tp:'sel', k:'gps_accuracy', l:'GPS Accuracy', h:'During runs/rides in dense trees or buildings, does the tracked route stay true to the street?', o:['Excellent','Good','Fair','Poor - Many Deviations'] },
+        { tp:'sel', k:'offline_maps', l:'Offline Maps', h:'Does the watch support offline maps with terrain detail?', o:['Yes - Full Detail','Yes - Basic','No'] },
+        { tp:'sel', k:'gpx_import', l:'GPX Route Import', h:'Can you import routes (GPX files) from other apps like Strava?', o:['Yes','No'] },
+        { tp:'ta',  k:'sports_notes', l:'Notes', h:'' }
+      ]},
+      { n:'6', k:'health', t:'Health & Sleep Monitoring', sk:'s_health', f:[
+        { tp:'sel', k:'hr_accuracy', l:'Heart Rate Accuracy (Exercise)', h:'During high arm-movement exercises (e.g. weightlifting), does the optical sensor track HR reliably or show unrealistic spikes?', o:['Excellent','Good','Fair','Poor - Many Spikes'] },
+        { tp:'sel', k:'calorie_acc', l:'Calorie Calculation Accuracy', h:'Do the algorithms estimate caloric burn coherently with your actual effort?', o:['Accurate','Slightly Off','Very Inaccurate'] },
+        { tp:'sel', k:'sleep_track', l:'Sleep Tracking Accuracy', h:'Does the watch correctly detect when you fell asleep and woke up?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'hrv', l:'HRV Monitoring', h:'Does the system measure Heart Rate Variability (HRV)?', o:['Yes - Reliable','Yes - Unreliable','No'] },
+        { tp:'sel', k:'spo2', l:'Apnea / SpO2 Alerts', h:'Does it have reliable sleep apnea risk alerts or blood oxygen (SpO2) monitoring?', o:['Yes - Reliable','Yes - Unreliable','No'] },
+        { tp:'ta',  k:'health_notes', l:'Notes', h:'' }
+      ]},
+      { n:'7', k:'smart', t:'Smart Features', sk:'s_smart', f:[
+        { tp:'sel', k:'notif_group', l:'Notification Grouping', h:'Does the watch organize phone notifications well?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'notif_reply', l:'Notification Reply Method', h:'Can you reply to notifications? If yes, how?', o:['Full QWERTY','Voice Dictation','Preset Replies Only','Read Only'] },
+        { tp:'sel', k:'voice_asst', l:'Voice Assistant Quality', h:'Does the native voice assistant understand commands well, or is it frustrating to use?', o:['Excellent','Good','Fair','Frustrating/None'] },
+        { tp:'sel', k:'call_speaker', l:'Call Speaker', h:'Can you make and answer calls directly from the watch speaker? Is the audio clear?', o:['Yes - Clear Audio','Yes - Poor Audio','No'] },
+        { tp:'sel', k:'nfc_pay', l:'NFC Payments', h:'Does it support NFC contactless payments in your region?', o:['Yes - Works in my region','Yes - Limited region support','No'] },
+        { tp:'sel', k:'music_ctrl', l:'Music App Control', h:'Can you control music apps (play, pause, skip) directly from the watch?', o:['Yes - Full Control','Yes - Basic (Play/Pause/Skip)','No'] },
+        { tp:'ta',  k:'music_apps', l:'Supported Music Apps', h:'Which apps work? (e.g. Spotify, YouTube Music, Apple Music, Amazon Music)' },
+        { tp:'ta',  k:'smart_notes', l:'Notes', h:'' }
+      ]},
+      { n:'8', k:'battery', t:'Battery & Real Autonomy', sk:'s_batt', f:[
+        { tp:'num', k:'nightly_drain', l:'Nightly Battery Drain (%)', h:'Exact % of battery consumed during one night of sleep with sensors active' },
+        { tp:'num', k:'gps_drain', l:'GPS Workout Drain (% per hour)', h:'% battery consumed per 1 hour of workout with GPS active' },
+        { tp:'num', k:'real_batt_days', l:'Real Battery Life (days)', h:"Forget the box claim — in your real mixed use, how many days did it last?" },
+        { tp:'ta',  k:'batt_notes', l:'Notes', h:'' }
+      ]},
+      { n:'9', k:'app', t:'Companion App & Ecosystem', sk:'s_app', f:[
+        { tp:'sel', k:'app_ui', l:'App Interface Quality', h:'Is the app clean and does it present health/workout data clearly and easily?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'subscriptions', l:'Subscription Paywalls', h:'Besides paid watch faces, are core features locked behind a monthly subscription?', o:['None','Optional Features','Core Features Locked'] },
+        { tp:'sel', k:'in_app_ads', l:'In-App Ads', h:'Does the app show brand advertisements every time you open it?', o:['None','Occasional','Frequent/Annoying'] },
+        { tp:'sel', k:'bt_stability', l:'Bluetooth Connection Stability', h:'Is the Bluetooth link to your phone stable or does the watch disconnect on its own?', o:['Very Stable','Stable','Occasional Drops','Frequent Drops'] },
+        { tp:'ta',  k:'app_notes', l:'Notes', h:'' }
+      ]},
+      { n:'★', k:'verdict', t:'Final Verdict', sk: null }
+    ]
+  },
+
+  tws: {
+    scoreMap: { s_price:'Price/Value', s_sound:'Sound', s_anc:'ANC', s_design:'Design/Fit', s_batt:'Battery', s_conn:'Connectivity', s_ctrl:'Controls' },
+    sections: [
+      { n:'0', k:'photo', t:'Product Photo', sk: null },
+      { n:'1', k:'price', t:'Price & Positioning', sk:'s_price', f:[
+        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'' },
+        { tp:'sel', k:'positioning', l:'Market Positioning', h:'', o:['Entry-level','Mid-range','Premium','Flagship'] },
+        { tp:'sel', k:'value_money', l:'Value for Money', h:'Is the asking price justified?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'price_notes', l:'Notes', h:'' }
+      ]},
+      { n:'2', k:'sound', t:'Sound Quality', sk:'s_sound', f:[
+        { tp:'sel', k:'driver', l:'Driver Type', h:'What transducer technology is used?', o:['Dynamic','Balanced Armature','Hybrid','Planar'] },
+        { tp:'sel', k:'bass', l:'Bass Quality', h:'Is the low end punchy and controlled, or muddy?', o:['Excellent','Good','Fair','Weak/Muddy'] },
+        { tp:'sel', k:'mids', l:'Mids Quality', h:'Are vocals and instruments natural and present?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'treble', l:'Treble Quality', h:'Are highs detailed without harshness or sibilance?', o:['Excellent','Good','Fair','Harsh/Sibilant'] },
+        { tp:'sel', k:'soundstage', l:'Soundstage', h:'Does music feel spacious and immersive, or closed/in-head?', o:['Wide & Immersive','Good','Narrow','Very Narrow'] },
+        { tp:'sel', k:'eq_support', l:'EQ / App Support', h:'Does the companion app offer EQ customization?', o:['Full parametric EQ','Preset EQ only','No EQ'] },
+        { tp:'ta',  k:'sound_notes', l:'Notes', h:'' }
+      ]},
+      { n:'3', k:'anc', t:'ANC & Transparency Mode', sk:'s_anc', f:[
+        { tp:'sel', k:'anc_eff', l:'ANC Effectiveness', h:'How well does it block ambient noise (e.g. office, plane, street)?', o:['Excellent','Good','Fair','Poor/None'] },
+        { tp:'sel', k:'anc_sound', l:'ANC Impact on Sound Quality', h:'Does activating ANC degrade the audio quality?', o:['No impact','Slight degradation','Noticeable degradation'] },
+        { tp:'sel', k:'transparency', l:'Transparency Mode', h:'Does passthrough mode sound natural, like not wearing earbuds?', o:['Natural & Clear','Good','Muffled','None'] },
+        { tp:'sel', k:'wind_noise', l:'Wind Noise Handling (ANC on)', h:'Does wind cause loud noise artifacts when ANC is active?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'anc_notes', l:'Notes', h:'' }
+      ]},
+      { n:'4', k:'design', t:'Design, Fit & Build', sk:'s_design', f:[
+        { tp:'sel', k:'fit_type', l:'Fit Type', h:'', o:['In-ear (silicone tips)','Semi-in-ear','Open-ear (hook)','Over-ear'] },
+        { tp:'sel', k:'comfort', l:'Comfort for Long Sessions', h:'Can you wear them comfortably for 2+ hours without ear fatigue?', o:['Excellent (4h+)','Good (2-4h)','Fair (1-2h)','Uncomfortable (<1h)'] },
+        { tp:'sel', k:'tip_sizes', l:'Ear Tip Sizes Included', h:'How many silicone tip sizes are provided in the box?', o:['XS/S/M/L/XL (5 sizes)','S/M/L (3 sizes)','Only 1 size'] },
+        { tp:'sel', k:'ipx', l:'IPX / Water Resistance Rating', h:'Is there official water/sweat resistance certification?', o:['IPX8','IPX7','IPX5/IPX4','No rating'] },
+        { tp:'sel', k:'build_quality', l:'Build Quality', h:'Do the earbuds and case feel premium or cheap?', o:['Premium','Good','Acceptable','Cheap/Plasticky'] },
+        { tp:'ta',  k:'design_notes', l:'Notes', h:'' }
+      ]},
+      { n:'5', k:'battery', t:'Battery & Charging', sk:'s_batt', f:[
+        { tp:'num', k:'earbud_hrs', l:'Earbud Battery Life (hours)', h:'Real-world battery life per charge (ANC off)' },
+        { tp:'num', k:'case_hrs', l:'Total with Case (hours)', h:'Total playtime including all charges from the case' },
+        { tp:'txt', k:'fast_charge', l:'Fast Charge', h:'e.g. 10 min charge = 2h playback' },
+        { tp:'sel', k:'wireless_case', l:'Wireless Charging Case', h:'Does the charging case support Qi wireless charging?', o:['Yes','No'] },
+        { tp:'ta',  k:'batt_notes', l:'Notes', h:'' }
+      ]},
+      { n:'6', k:'connectivity', t:'Calls & Connectivity', sk:'s_conn', f:[
+        { tp:'sel', k:'mic_quality', l:'Call Microphone Quality', h:'How do you sound to the other person on calls?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'wind_call', l:'Wind Noise Rejection (Calls)', h:'Does wind interfere with call clarity?', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'multipoint', l:'Multipoint Connection', h:'Can the earbuds connect to 2 devices simultaneously?', o:['Yes - Seamless','Yes - Manual switch','No'] },
+        { tp:'txt', k:'codec_support', l:'Codec Support', h:'e.g. AAC, aptX HD, LDAC, LC3/LE Audio' },
+        { tp:'sel', k:'latency', l:'Latency (Video/Gaming)', h:'Is there noticeable audio/video desync when watching or gaming?', o:['Excellent (<40ms)','Good (40-80ms)','Acceptable (80-150ms)','High (>150ms)'] },
+        { tp:'ta',  k:'conn_notes', l:'Notes', h:'' }
+      ]},
+      { n:'7', k:'controls', t:'Controls & Companion App', sk:'s_ctrl', f:[
+        { tp:'sel', k:'touch_ease', l:'Touch Controls Ease of Use', h:'Are touch gestures reliable and intuitive to use?', o:['Excellent','Good','Fair','Frustrating'] },
+        { tp:'sel', k:'accidental_touch', l:'Accidental Touch Rate', h:'Do earbuds accidentally trigger actions when adjusting them?', o:['Never','Rarely','Sometimes','Frequently'] },
+        { tp:'sel', k:'wear_detect', l:'Wear Detection (Auto Pause)', h:'Does the auto-pause when removing earbuds work reliably?', o:['Yes - Reliable','Yes - Unreliable','No'] },
+        { tp:'sel', k:'app_quality', l:'Companion App Quality', h:'Is the companion app well-designed and useful?', o:['Excellent','Good','Fair','Poor/None'] },
+        { tp:'ta',  k:'ctrl_notes', l:'Notes', h:'' }
+      ]},
+      { n:'★', k:'verdict', t:'Final Verdict', sk: null }
+    ]
+  },
+
+  iot: {
+    scoreMap: { s_price:'Price/Value', s_conn:'Connectivity', s_perf:'Performance', s_app:'App', s_batt:'Battery', s_sec:'Security', s_use:'Usability' },
+    sections: [
+      { n:'0', k:'photo', t:'Product Photo', sk: null },
+      { n:'1', k:'price', t:'Price & Positioning', sk:'s_price', f:[
+        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'' },
+        { tp:'sel', k:'positioning', l:'Market Positioning', h:'', o:['Entry-level','Mid-range','Premium','Flagship'] },
+        { tp:'sel', k:'value_money', l:'Value for Money', h:'', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'price_notes', l:'Notes', h:'' }
+      ]},
+      { n:'2', k:'connectivity', t:'Connectivity', sk:'s_conn', f:[
+        { tp:'sel', k:'wifi', l:'Wi-Fi Standard', h:'', o:['Wi-Fi 6E','Wi-Fi 6','Wi-Fi 5','Wi-Fi 4'] },
+        { tp:'sel', k:'protocols', l:'Smart Home Protocols', h:'', o:['Matter + Thread + Zigbee','Matter + Thread','Zigbee only','Proprietary only'] },
+        { tp:'ta',  k:'conn_notes', l:'Notes', h:'' }
+      ]},
+      { n:'3', k:'performance', t:'Performance', sk:'s_perf', f:[
+        { tp:'sel', k:'response', l:'Responsiveness', h:'', o:['Instant','Fast','Acceptable','Slow'] },
+        { tp:'sel', k:'reliability', l:'Reliability', h:'', o:['Very Reliable','Reliable','Occasional Issues','Unreliable'] },
+        { tp:'ta',  k:'perf_notes', l:'Notes', h:'' }
+      ]},
+      { n:'4', k:'app', t:'App & Ecosystem', sk:'s_app', f:[
+        { tp:'sel', k:'app_quality', l:'App Interface Quality', h:'', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'sel', k:'integrations', l:'Third-Party Integrations', h:'', o:['All major platforms','Most platforms','Limited','None'] },
+        { tp:'sel', k:'subscriptions', l:'Subscription Paywalls', h:'', o:['None','Optional Features','Core Features Locked'] },
+        { tp:'ta',  k:'app_notes', l:'Notes', h:'' }
+      ]},
+      { n:'5', k:'battery', t:'Battery / Power', sk:'s_batt', f:[
+        { tp:'sel', k:'power_type', l:'Power Type', h:'', o:['Battery powered','Plug-in','Solar + Battery','USB-C'] },
+        { tp:'num', k:'batt_life', l:'Battery Life (months)', h:'If battery powered' },
+        { tp:'ta',  k:'batt_notes', l:'Notes', h:'' }
+      ]},
+      { n:'6', k:'security', t:'Security & Privacy', sk:'s_sec', f:[
+        { tp:'sel', k:'local_proc', l:'Local Processing', h:'', o:['Fully local','Mostly local','Cloud dependent','Cloud only'] },
+        { tp:'sel', k:'sec_updates', l:'Security Updates', h:'', o:['Regular updates','Occasional','Rarely','None'] },
+        { tp:'ta',  k:'sec_notes', l:'Notes', h:'' }
+      ]},
+      { n:'7', k:'usability', t:'Usability', sk:'s_use', f:[
+        { tp:'sel', k:'setup', l:'Setup Difficulty', h:'', o:['Very Easy','Easy','Moderate','Difficult'] },
+        { tp:'sel', k:'daily_use', l:'Daily Use', h:'', o:['Excellent','Good','Fair','Poor'] },
+        { tp:'ta',  k:'use_notes', l:'Notes', h:'' }
+      ]},
+      { n:'★', k:'verdict', t:'Final Verdict', sk: null }
+    ]
+  }
+};
+
+// ===== SCORE HELPERS =====
+function calcOverall(r) {
+  const sm = DEFS[r.type].scoreMap;
+  const vals = Object.keys(sm).map(k => r[k]).filter(v => v && v > 0);
+  if (!vals.length) return null;
+  return Math.round((vals.reduce((a,b) => a + b, 0) / vals.length) * 10) / 10;
+}
+function scoreClass(s) { if (!s) return 's-x'; if (s >= 8) return 's-g'; if (s >= 5) return 's-y'; return 's-r'; }
+function barColor(s)   { if (!s) return '#374151'; if (s >= 8) return '#22c55e'; if (s >= 5) return '#f59e0b'; return '#ef4444'; }
+function scoreColor(s) { if (!s) return '#6e7681'; if (s >= 8) return '#22c55e'; if (s >= 5) return '#f59e0b'; return '#ef4444'; }
+function scoreBoxClass(s) { if (!s) return ''; if (s >= 8) return 'green'; if (s >= 5) return 'yellow'; return 'red'; }
+function ratingClass(n, selected) {
+  if (n > selected) return '';
+  if (selected >= 8) return 'selected';
+  if (selected >= 5) return 'selected range-yellow';
+  return 'selected range-red';
+}
+
+// ===== STORAGE =====
+const STORAGE_KEY = 'jovi_lab_reviews';
+
+function loadReviews() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+
+function saveReviews(reviews) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+  } catch(e) { console.error('Storage error:', e); }
+}
+
+function addReview(review) {
+  const reviews = loadReviews();
+  reviews.push(review);
+  saveReviews(reviews);
+  return reviews;
+}
+
+function updateReview(review) {
+  const reviews = loadReviews();
+  const idx = reviews.findIndex(r => r.id === review.id);
+  if (idx !== -1) reviews[idx] = review;
+  else reviews.push(review);
+  saveReviews(reviews);
+  return reviews;
+}
+
+function deleteReview(id) {
+  const reviews = loadReviews().filter(r => r.id !== id);
+  saveReviews(reviews);
+  return reviews;
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+// ===== FORM STATE =====
+let formData = {};
+let formPhotoURL = null;
+let editingReviewId = null;
+
+// ===== BUILD ACCORDIONS =====
+function buildAccordions() {
+  const secs = DEFS[curTab].sections;
+  const container = document.getElementById('acc-sections');
+  container.innerHTML = secs.map(sec => {
+    const isOpen = sec.k === 'photo';
+    return `
+    <div class="accordion" id="acc-${sec.k}">
+      <div class="acc-header" onclick="toggleAcc('${sec.k}')">
+        <div class="acc-left">
+          <div class="acc-num">${sec.n}</div>
+          <span class="acc-title">${sec.t}</span>
+        </div>
+        <div class="acc-meta">
+          <span class="acc-score-badge" id="asb-${sec.k}"></span>
+          <span class="acc-arrow ${isOpen ? 'open' : ''}" id="aar-${sec.k}">⌄</span>
+        </div>
+      </div>
+      <div class="acc-body ${isOpen ? 'open' : ''}" id="ab-${sec.k}">
+        ${sec.k === 'photo'    ? buildPhotoSection() :
+          sec.k === 'verdict' ? buildVerdictSection() :
+          buildFields(sec) + (sec.sk ? buildRatingBlock(sec.k, sec.sk) : '')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAcc(k) {
+  document.getElementById('ab-' + k).classList.toggle('open');
+  document.getElementById('aar-' + k).classList.toggle('open');
+}
+
+// ===== PHOTO SECTION =====
+function buildPhotoSection() {
+  return `<div class="field-block">
+    <div class="field-label">Product Photo</div>
+    <div class="photo-upload-wrap" id="photo-wrap">
+      <label class="photo-upload">
+        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span>Tap to upload photo</span>
+        <span class="sub">JPG, PNG, WEBP</span>
+        <input type="file" accept="image/*" onchange="handlePhoto(event)">
+      </label>
+    </div>
+  </div>`;
+}
+
+function handlePhoto(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    formPhotoURL = ev.target.result;
+    document.getElementById('photo-wrap').innerHTML = `
+      <img class="photo-preview" src="${formPhotoURL}" onclick="clearPhoto()" title="Click to remove" alt="Product photo">
+      <span class="photo-remove" onclick="clearPhoto()">✕ Remove photo</span>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearPhoto() {
+  formPhotoURL = null;
+  document.getElementById('photo-wrap').innerHTML = `
+    <label class="photo-upload">
+      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span>Tap to upload photo</span>
+      <span class="sub">JPG, PNG, WEBP</span>
+      <input type="file" accept="image/*" onchange="handlePhoto(event)">
+    </label>`;
+}
+
+// ===== FIELD BUILDER =====
+function buildFields(sec) {
+  return (sec.f || []).map(f => {
+    const hint = f.h ? `<div class="field-hint">${f.h}</div>` : '';
+    if (f.tp === 'ta')  return `<div class="field-block"><div class="field-label">${f.l}</div>${hint}<textarea id="ff-${f.k}" placeholder="Write your notes here..." oninput="fd('${f.k}', this.value)"></textarea></div>`;
+    if (f.tp === 'sel') return `<div class="field-block"><div class="field-label">${f.l}</div>${hint}<select id="ff-${f.k}" onchange="fd('${f.k}', this.value)"><option value="">Select...</option>${(f.o||[]).map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+    if (f.tp === 'num') return `<div class="field-block"><div class="field-label">${f.l}</div>${hint}<input type="number" id="ff-${f.k}" placeholder="${f.h||''}" oninput="fd('${f.k}', this.value)"></div>`;
+    return `<div class="field-block"><div class="field-label">${f.l}</div>${hint}<input type="text" id="ff-${f.k}" placeholder="${f.h||''}" oninput="fd('${f.k}', this.value)"></div>`;
+  }).join('');
+}
+
+// ===== RATING BLOCK =====
+function buildRatingBlock(secK, storeK) {
+  const btns = [1,2,3,4,5,6,7,8,9,10].map(n =>
+    `<button type="button" class="rb" data-sec="${secK}" data-sk="${storeK}" data-n="${n}" onclick="setScore(this)">${n}</button>`
+  ).join('');
+  return `<div class="field-block">
+    <div class="field-label" style="margin-bottom:6px">Section Score</div>
+    <div class="rating-row" id="rr-${secK}">
+      ${btns}
+      <span class="rating-score-label" id="rsl-${secK}"></span>
+    </div>
+  </div>`;
+}
+
+// ===== SET SCORE — KEY FIX =====
+function setScore(btn) {
+  const secK  = btn.getAttribute('data-sec');
+  const storeK = btn.getAttribute('data-sk');
+  const n     = parseInt(btn.getAttribute('data-n'), 10);
+
+  formData[storeK] = n;
+
+  // Update all buttons in this rating row
+  const row = document.getElementById('rr-' + secK);
+  row.querySelectorAll('.rb').forEach(b => {
+    const bN = parseInt(b.getAttribute('data-n'), 10);
+    b.className = 'rb'; // reset
+    if (bN <= n) {
+      b.classList.add('selected');
+      if (n >= 8) { /* green — default */ }
+      else if (n >= 5) b.classList.add('range-yellow');
+      else b.classList.add('range-red');
+    }
+    if (bN === n) b.classList.add('active-btn');
+  });
+
+  // Score label  "9/10"
+  const label = document.getElementById('rsl-' + secK);
+  if (label) {
+    label.textContent = n + '/10';
+    label.className = 'rating-score-label ' + (n >= 8 ? 'green' : n >= 5 ? 'yellow' : 'red');
+  }
+
+  // Section badge in accordion header
+  const badge = document.getElementById('asb-' + secK);
+  if (badge) {
+    badge.style.display = 'inline-block';
+    badge.textContent = n + '/10';
+    badge.className = 'acc-score-badge ' + (n >= 8 ? 's-g' : n >= 5 ? 's-y' : 's-r');
+  }
+
+  // Update overall score display
+  updateOverallDisplay();
+}
+
+// ===== VERDICT SECTION =====
+function buildVerdictSection() {
+  return `
+  <div class="field-block">
+    <div class="field-label">Overall Score (auto-calculated)</div>
+    <div class="field-hint">Average of all section scores</div>
+    <div class="overall-box" id="overall-box">
+      <span class="overall-box-num" id="overall-num">—</span>
+      <span class="overall-box-denom">/10</span>
+    </div>
+  </div>
+  <div class="field-block"><div class="field-label">Pros</div><div class="field-hint">Top strengths of this device</div><textarea id="ff-pros" placeholder="Top strengths..." oninput="fd('pros', this.value)"></textarea></div>
+  <div class="field-block"><div class="field-label">Cons</div><div class="field-hint">Main weaknesses or deal-breakers</div><textarea id="ff-cons" placeholder="Main weaknesses..." oninput="fd('cons', this.value)"></textarea></div>
+  <div class="field-block"><div class="field-label">Final Verdict</div><div class="field-hint">Your overall conclusion and who you'd recommend this to</div><textarea id="ff-verdict" placeholder="Your conclusion..." oninput="fd('final_verdict', this.value)"></textarea></div>`;
+}
+
+function updateOverallDisplay() {
+  const sm = DEFS[curTab].scoreMap;
+  const vals = Object.keys(sm).map(k => formData[k]).filter(v => v && v > 0);
+  const ov = vals.length ? Math.round((vals.reduce((a,b) => a + b, 0) / vals.length) * 10) / 10 : null;
+  const box = document.getElementById('overall-box');
+  const num = document.getElementById('overall-num');
+  if (!box || !num) return;
+  const cls = scoreBoxClass(ov);
+  box.className = 'overall-box' + (cls ? ' ' + cls : '');
+  num.className = 'overall-box-num' + (cls ? ' ' + cls : '');
+  num.textContent = ov !== null ? String(ov) : '—';
+}
+
+// ===== FORM DATA =====
+function fd(k, v) {
+  formData[k] = v;
+  if (k === 'brand' || k === 'model') {
+    const title = ((formData.brand || '') + (formData.model ? ' ' + formData.model : '')).trim();
+    document.getElementById('add-title').textContent = title || 'New Review';
+  }
+}
+
+function collectReview(completed) {
+  const secs = DEFS[curTab].sections;
+  const r = { ...formData, type: curTab, completed, photo: formPhotoURL };
+  if (!r.id) r.id = editingReviewId || genId();
+  // Collect all textarea/input/select values too (in case user typed without triggering oninput on some)
+  secs.forEach(sec => {
+    (sec.f || []).forEach(f => {
+      const el = document.getElementById('ff-' + f.k);
+      if (el && el.value) r[f.k] = el.value;
+    });
+  });
+  ['pros', 'cons', 'final_verdict'].forEach(k => {
+    const el = document.getElementById('ff-' + k);
+    if (el) r[k] = el.value;
+  });
+  return r;
+}
+
+// ===== POPULATE FORM for editing =====
+function populateForm(r) {
+  formData = { ...r };
+  formPhotoURL = r.photo || null;
+  editingReviewId = r.id;
+
+  // Wait for DOM to be built, then fill
+  setTimeout(() => {
+    const secs = DEFS[r.type].sections;
+    // Photo
+    if (r.photo) {
+      const pw = document.getElementById('photo-wrap');
+      if (pw) pw.innerHTML = `<img class="photo-preview" src="${r.photo}" onclick="clearPhoto()" alt="Photo"><span class="photo-remove" onclick="clearPhoto()">✕ Remove photo</span>`;
+    }
+    // Fields
+    secs.forEach(sec => {
+      (sec.f || []).forEach(f => {
+        const el = document.getElementById('ff-' + f.k);
+        if (el && r[f.k] !== undefined) el.value = r[f.k];
+      });
+      // Restore ratings
+      if (sec.sk && r[sec.sk]) {
+        const n = r[sec.sk];
+        const row = document.getElementById('rr-' + sec.k);
+        if (row) {
+          row.querySelectorAll('.rb').forEach(b => {
+            const bN = parseInt(b.getAttribute('data-n'), 10);
+            b.className = 'rb';
+            if (bN <= n) {
+              b.classList.add('selected');
+              if (n < 5) b.classList.add('range-red');
+              else if (n < 8) b.classList.add('range-yellow');
+            }
+            if (bN === n) b.classList.add('active-btn');
+          });
+          const lbl = document.getElementById('rsl-' + sec.k);
+          if (lbl) { lbl.textContent = n + '/10'; lbl.className = 'rating-score-label ' + (n >= 8 ? 'green' : n >= 5 ? 'yellow' : 'red'); }
+          const badge = document.getElementById('asb-' + sec.k);
+          if (badge) { badge.style.display = 'inline-block'; badge.textContent = n + '/10'; badge.className = 'acc-score-badge ' + (n >= 8 ? 's-g' : n >= 5 ? 's-y' : 's-r'); }
+        }
+      }
+    });
+    ['pros','cons','final_verdict'].forEach(k => {
+      const el = document.getElementById('ff-' + k);
+      if (el && r[k]) el.value = r[k];
+    });
+    updateOverallDisplay();
+  }, 50);
+}
+
+// ===== DETAIL PAGE =====
+function showDetail(id) {
+  const r = loadReviews().find(x => x.id === id);
+  if (!r) return;
+
+  const ov = calcOverall(r);
+  const c  = scoreColor(ov);
+  const sm = DEFS[r.type].scoreMap;
+  const circ = 2 * Math.PI * 34;
+  const dash = ov ? (circ * ov / 10).toFixed(1) : '0';
+
+  // Score bars
+  const bars = Object.entries(sm).map(([k, lbl]) => {
+    const v = r[k] || 0;
+    return `<div class="score-bar-row">
+      <span class="score-bar-name">${lbl}</span>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:${v*10}%;background:${barColor(v)}"></div></div>
+      <span class="score-bar-val" style="color:${barColor(v)}">${v || '—'}</span>
+    </div>`;
+  }).join('');
+
+  // Full section details
+  const secs = DEFS[r.type].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
+  const fullDetails = secs.map(sec => {
+    const filled = (sec.f || []).filter(f => r[f.k] && r[f.k] !== '');
+    if (!filled.length) return '';
+    const sv = sec.sk ? r[sec.sk] : null;
+    const rows = filled.map(f => `<tr>
+      <td class="dt-key">${f.l}</td>
+      <td class="dt-val">${r[f.k]}</td>
+    </tr>`).join('');
+    return `<div style="margin-bottom:14px">
+      <div class="detail-section-header">
+        ${sec.n}. ${sec.t.toUpperCase()}
+        ${sv ? `<span class="s-badge ${scoreClass(sv)}">${sv}</span>` : ''}
+      </div>
+      <table class="details-table">${rows}</table>
+    </div>`;
+  }).join('');
+
+  const typeCls = { smartphone:'type-p', smartwatch:'type-s', tws:'type-t', iot:'type-i' };
+
+  document.getElementById('detail-body').innerHTML = `
+    <div class="detail-hero">
+      ${r.photo ? `<img class="detail-hero-photo" src="${r.photo}" alt="${r.model || ''}">` : ''}
+      <div class="detail-hero-body">
+        <div class="detail-hero-info">
+          <div class="detail-brand">${r.brand || '—'}</div>
+          <div class="detail-model">${r.model || 'New Device'}</div>
+          <div class="detail-price">
+            ${r.retail_price ? `<span>R$ ${parseInt(r.retail_price).toLocaleString('pt-BR')}</span><span style="color:#374151">·</span>` : ''}
+            <span class="type-badge ${typeCls[r.type]}">${TYPE_LABELS[r.type]}</span>
+            ${r.positioning ? `<span style="font-size:10px;color:#6e7681">· ${r.positioning}</span>` : ''}
+          </div>
+        </div>
+        <div class="detail-ring">
+          <svg width="78" height="78" viewBox="0 0 78 78">
+            <circle cx="39" cy="39" r="34" fill="none" stroke="#21262d" stroke-width="5"/>
+            <circle cx="39" cy="39" r="34" fill="none" stroke="${c}" stroke-width="5"
+              stroke-dasharray="${dash} ${circ.toFixed(1)}" stroke-linecap="round"/>
+          </svg>
+          <div style="z-index:1;text-align:center">
+            <div class="detail-ring-score" style="color:${c}">${ov ?? '—'}</div>
+            <div class="detail-ring-denom">/10</div>
+          </div>
+        </div>
+      </div>
+      ${r.final_verdict ? `<div class="detail-verdict">"${r.final_verdict}"</div>` : ''}
+    </div>
+
+    <div class="accordion" style="margin-bottom:10px">
+      <div style="padding:14px 16px">
+        <div class="dash-card-title">Category Scores</div>
+        ${bars}
+      </div>
+    </div>
+
+    ${(r.pros || r.cons) ? `
+    <div class="accordion" style="margin-bottom:10px">
+      <div style="padding:14px 16px">
+        <div class="dash-card-title">Pros &amp; Cons</div>
+        <div class="pc-grid">
+          ${r.pros ? `<div class="pc-box" style="background:#0d422022;border:1px solid #2ea04322"><div style="font-size:10px;font-weight:700;color:#3fb950">✓ PROS</div><p>${r.pros}</p></div>` : ''}
+          ${r.cons ? `<div class="pc-box" style="background:#3d0c1222;border:1px solid #da363322"><div style="font-size:10px;font-weight:700;color:#f85149">✗ CONS</div><p>${r.cons}</p></div>` : ''}
+        </div>
+      </div>
+    </div>` : ''}
+
+    ${fullDetails ? `
+    <div class="accordion" style="margin-bottom:10px">
+      <div style="padding:14px 16px">
+        <div class="dash-card-title">Full Review Details</div>
+        ${fullDetails}
+      </div>
+    </div>` : ''}
+
+    <div class="action-row">
+      <button class="btn-del-sm" onclick="deleteAndGoHome('${r.id}')">Delete</button>
+      <button class="btn-export" onclick="exportXlsx('${r.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Excel
+      </button>
+      <button class="btn-export" onclick="exportSinglePptx('${r.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        PowerPoint
+      </button>
+      <button class="btn-export" onclick="goEditReview('${r.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit
+      </button>
+      <button class="btn-outline" onclick="goHome()">Back</button>
+    </div>`;
+
+  showPage('detail');
+}
+
+function deleteAndGoHome(id) {
+  if (!confirm('Delete this review permanently?')) return;
+  deleteReview(id);
+  goHome();
+}
+
+// ===== DASHBOARD STATE =====
+let selIds = [];
+let radarChart = null, barChart = null;
+
+function renderDash() {
+  const list = loadReviews().filter(r => r.type === curTab);
+
+  document.getElementById('dash-chips').innerHTML = list.map((r, i) => {
+    const idx = selIds.indexOf(r.id);
+    const on  = idx !== -1;
+    const ov  = calcOverall(r);
+    return `<div class="d-chip ${on ? 'on' : ''}" onclick="toggleDashChip('${r.id}')">
+      <div class="d-chip-dot" style="background:${on ? CHART_COLORS[idx] : '#374151'}"></div>
+      <span>${r.brand || ''} ${r.model || 'Device'}</span>
+      ${ov ? `<span class="d-chip-score">${ov}</span>` : ''}
+    </div>`;
+  }).join('');
+
+  renderDashBody();
+}
+
+function toggleDashChip(id) {
+  if (selIds.includes(id)) selIds = selIds.filter(x => x !== id);
+  else if (selIds.length < 6) selIds.push(id);
+  renderDash();
+}
+
+function renderDashBody() {
+  const allReviews = loadReviews();
+  const compared   = allReviews.filter(r => selIds.includes(r.id));
+  const body       = document.getElementById('dash-body');
+
+  if (!compared.length) {
+    body.innerHTML = '<p class="hint-text" style="text-align:center;padding:28px">Select at least one device above</p>';
+    return;
+  }
+
+  const sm = DEFS[curTab].scoreMap;
+  const theadCols = compared.map((w, i) =>
+    `<th style="color:${CHART_COLORS[selIds.indexOf(w.id)]}">${(w.brand || '') + ' ' + (w.model || '')}</th>`
+  ).join('');
+
+  const tableRows = Object.entries(sm).map(([k, lbl]) => {
+    const cells = compared.map(w => {
+      const v = w[k];
+      return `<td style="text-align:center"><span class="s-badge ${scoreClass(v)}">${v ?? '—'}</span></td>`;
+    }).join('');
+    return `<tr><td>${lbl}</td>${cells}</tr>`;
+  }).join('');
+
+  const ovrCells = compared.map(w => {
+    const v = calcOverall(w);
+    return `<td style="text-align:center"><span class="s-badge ${scoreClass(v)}" style="font-size:12px">${v ?? '—'}</span></td>`;
+  }).join('');
+
+  // Pros/Cons cards
+  const pcCards = compared.filter(w => w.pros || w.cons).map(w => `
+    <div class="accordion" style="margin-bottom:8px">
+      <div style="padding:13px 15px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+          <div class="d-chip-dot" style="background:${CHART_COLORS[selIds.indexOf(w.id)]}"></div>
+          <span style="font-size:13px;font-weight:600">${w.brand || ''} ${w.model || ''}</span>
+        </div>
+        <div class="pc-grid">
+          ${w.pros ? `<div class="pc-box" style="background:#0d422022;border:1px solid #2ea04322"><div style="font-size:10px;font-weight:700;color:#3fb950">✓ PROS</div><p>${w.pros}</p></div>` : ''}
+          ${w.cons ? `<div class="pc-box" style="background:#3d0c1222;border:1px solid #da363322"><div style="font-size:10px;font-weight:700;color:#f85149">✗ CONS</div><p>${w.cons}</p></div>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+
+  body.innerHTML = `
+    <div class="dash-card">
+      <div class="dash-card-title">Overall Score</div>
+      <div style="position:relative;height:${Math.max(120, compared.length * 50)}px">
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+
+    ${compared.length >= 2 ? `
+    <div class="dash-card">
+      <div class="dash-card-title">Category Radar</div>
+      <div style="position:relative;height:260px">
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>` : ''}
+
+    <div class="dash-card">
+      <div class="dash-card-title">Category Breakdown</div>
+      <div style="overflow-x:auto">
+        <table class="comp-table">
+          <thead><tr><th style="text-align:left;color:#6e7681;font-size:10px">Category</th>${theadCols}</tr></thead>
+          <tbody>
+            ${tableRows}
+            <tr class="ovr-row">
+              <td style="color:#e6edf3">Overall</td>${ovrCells}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    ${pcCards}
+
+    <div class="export-row">
+      <button class="btn-export" onclick="exportComparisonXlsx()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export Excel
+      </button>
+      <button class="btn-export" onclick="exportDashPptx()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Export PowerPoint
+      </button>
+    </div>`;
+
+  // Charts
+  setTimeout(() => {
+    const bcEl = document.getElementById('barChart');
+    const rcEl = document.getElementById('radarChart');
+
+    const bLabels = compared.map(w => ((w.brand || '') + ' ' + (w.model || '')).slice(0, 15));
+    const bData   = compared.map(w => calcOverall(w) || 0);
+    const bBg     = compared.map(w => CHART_COLORS[selIds.indexOf(w.id)]);
+
+    const rLabels = Object.values(sm);
+    const rDS     = compared.map((w, i) => ({
+      label: (w.model || 'Device'),
+      data:  Object.keys(sm).map(k => w[k] || 0),
+      backgroundColor: CHART_COLORS[selIds.indexOf(w.id)] + '22',
+      borderColor:     CHART_COLORS[selIds.indexOf(w.id)],
+      pointBackgroundColor: CHART_COLORS[selIds.indexOf(w.id)],
+      borderWidth: 2, pointRadius: 3
+    }));
+
+    if (bcEl) {
+      if (barChart) barChart.destroy();
+      barChart = new Chart(bcEl, {
+        type: 'bar',
+        data: { labels: bLabels, datasets: [{ data: bData, backgroundColor: bBg, borderRadius: 6, borderSkipped: false }] },
+        options: {
+          indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { min:0, max:10, ticks:{color:'#8b949e',font:{size:10}}, grid:{color:'#21262d'} },
+            y: { ticks:{color:'#8b949e',font:{size:10}}, grid:{display:false} }
+          }
+        }
+      });
+    }
+
+    if (rcEl && compared.length >= 2) {
+      if (radarChart) radarChart.destroy();
+      radarChart = new Chart(rcEl, {
+        type: 'radar',
+        data: { labels: rLabels, datasets: rDS },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            r: {
+              min: 0, max: 10,
+              ticks: { display: false },
+              grid: { color: '#21262d' },
+              angleLines: { color: '#21262d' },
+              pointLabels: { color: '#8b949e', font: { size: 9 } }
+            }
+          },
+          plugins: { legend: { labels: { color: '#8b949e', font: { size: 10 }, boxWidth: 10 } } }
+        }
+      });
+    }
+  }, 80);
+}
+
+// ===== EXCEL EXPORT =====
+function exportXlsx(id) {
+  const r = loadReviews().find(x => x.id === id);
+  if (!r) return;
+  const sm   = DEFS[r.type].scoreMap;
+  const secs = DEFS[r.type].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
+
+  const rows = [
+    ['Smartphone & IoT Lab — Review Export'], [''],
+    ['Device', `${r.brand || ''} ${r.model || ''}`],
+    ['Type', TYPE_LABELS[r.type]],
+    ['Price (BRL)', r.retail_price || ''],
+    ['Positioning', r.positioning || ''],
+    ['Overall Score', calcOverall(r) || ''],
+    [''], ['CATEGORY SCORES'], ['Category', 'Score']
+  ];
+  Object.entries(sm).forEach(([k, lbl]) => rows.push([lbl, r[k] || '']));
+  rows.push([''], ['DETAILED FIELDS', 'Value']);
+  secs.forEach(sec => {
+    rows.push([sec.t, '']);
+    (sec.f || []).forEach(f => { if (r[f.k]) rows.push(['  ' + f.l, r[f.k]]); });
+  });
+  rows.push([''], ['VERDICT', '']);
+  if (r.pros)          rows.push(['Pros', r.pros]);
+  if (r.cons)          rows.push(['Cons', r.cons]);
+  if (r.final_verdict) rows.push(['Final Verdict', r.final_verdict]);
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{ wch: 35 }, { wch: 55 }];
+  XLSX.utils.book_append_sheet(wb, ws, 'Review');
+  XLSX.writeFile(wb, `${(r.brand||'device').replace(/ /g,'_')}_${(r.model||'review').replace(/ /g,'_')}_review.xlsx`);
+}
+
+function exportComparisonXlsx() {
+  const compared = loadReviews().filter(r => selIds.includes(r.id));
+  if (!compared.length) return;
+  const sm = DEFS[curTab].scoreMap;
+
+  const headers = ['Field', ...compared.map(r => `${r.brand || ''} ${r.model || ''}`)];
+  const rows = [
+    headers,
+    ['Type', ...compared.map(r => TYPE_LABELS[r.type])],
+    ['Price (BRL)', ...compared.map(r => r.retail_price || '')],
+    ['Overall Score', ...compared.map(r => calcOverall(r) || '')],
+    [''], ['SCORES']
+  ];
+  Object.entries(sm).forEach(([k, lbl]) => rows.push([lbl, ...compared.map(r => r[k] || '')]));
+  rows.push([''], ['DETAILS']);
+  const secs = DEFS[curTab].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
+  secs.forEach(sec => {
+    (sec.f || []).forEach(f => {
+      if (compared.some(r => r[f.k])) rows.push([f.l, ...compared.map(r => r[f.k] || '')]);
+    });
+  });
+  rows.push(['']);
+  [['Pros','pros'],['Cons','cons'],['Final Verdict','final_verdict']].forEach(([lbl,k]) => {
+    if (compared.some(r => r[k])) rows.push([lbl, ...compared.map(r => r[k] || '')]);
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{ wch: 30 }, ...compared.map(() => ({ wch: 38 }))];
+  XLSX.utils.book_append_sheet(wb, ws, 'Comparison');
+  XLSX.writeFile(wb, `${TYPE_LABELS[curTab].replace(/ /g,'_')}_comparison.xlsx`);
+}
+
+// ===== POWERPOINT HELPERS =====
+function hex(color) { return color.replace('#', ''); }
+function pScore(v) { return !v ? '374151' : v >= 8 ? '22c55e' : v >= 5 ? 'f59e0b' : 'ef4444'; }
+
+// ===== SINGLE REVIEW PPTX =====
+function exportSinglePptx(id) {
+  const r = loadReviews().find(x => x.id === id);
+  if (!r) return;
+  const sm     = DEFS[r.type].scoreMap;
+  const ov     = calcOverall(r);
+  const accent = hex(TYPE_COLORS[r.type]);
+  const pres   = new PptxGenJS();
+  pres.layout  = 'LAYOUT_WIDE';
+
+  // ── Slide 1: Cover ──
+  const s1 = pres.addSlide();
+  s1.background = { color: '0d1117' };
+  s1.addShape(pres.ShapeType.rect, { x:0, y:0, w:0.07, h:7.5, fill:{ color: accent } });
+  s1.addText(TYPE_LABELS[r.type] + ' Review', { x:0.35, y:1.1, w:10, h:0.45, fontSize:13, color:'6e7681', fontFace:'Calibri' });
+  s1.addText((r.brand||'') + (r.model ? ' ' + r.model : ''), { x:0.35, y:1.55, w:10, h:1.1, fontSize:40, bold:true, color:'e6edf3', fontFace:'Calibri' });
+  if (r.positioning) s1.addText(r.positioning + (r.retail_price ? '  ·  R$ ' + parseInt(r.retail_price).toLocaleString('pt-BR') : ''), { x:0.35, y:2.75, w:8, h:0.38, fontSize:15, color:'8b949e', fontFace:'Calibri' });
+  if (ov) {
+    s1.addShape(pres.ShapeType.rect, { x:0.35, y:3.3, w:2.4, h:1.9, fill:{ color:'161b22' }, line:{ color:'21262d', width:1 } });
+    s1.addText('Overall Score', { x:0.35, y:3.4, w:2.4, h:0.3, fontSize:10, color:'6e7681', align:'center', fontFace:'Calibri' });
+    s1.addText(String(ov), { x:0.35, y:3.68, w:2.4, h:0.82, fontSize:52, bold:true, color:pScore(ov), align:'center', fontFace:'Calibri' });
+    s1.addText('/10', { x:0.35, y:4.45, w:2.4, h:0.28, fontSize:12, color:'6e7681', align:'center', fontFace:'Calibri' });
+  }
+  if (r.final_verdict) s1.addText('"' + r.final_verdict + '"', { x:3.05, y:3.3, w:9.85, h:1.9, fontSize:14, color:'9ca3af', italic:true, fontFace:'Calibri', valign:'middle', wrap:true });
+  s1.addText('Smartphone & IoT Lab  ·  JOVI', { x:0.35, y:6.9, w:12, h:0.35, fontSize:9, color:'374151', fontFace:'Calibri' });
+
+  // ── Slide 2: Category Scores ──
+  const s2 = pres.addSlide();
+  s2.background = { color: '0d1117' };
+  s2.addShape(pres.ShapeType.rect, { x:0, y:0, w:13.3, h:0.65, fill:{ color:'161b22' } });
+  s2.addText('Category Scores', { x:0.35, y:0.1, w:12, h:0.45, fontSize:17, bold:true, color:'e6edf3', fontFace:'Calibri' });
+  const ents = Object.entries(sm);
+  const cols = Math.min(4, ents.length);
+  const cw = 12.3 / cols;
+  ents.forEach(([k, lbl], i) => {
+    const col = i % cols, row = Math.floor(i / cols);
+    const x = 0.35 + col * cw, y = 0.85 + row * 1.55;
+    const v  = r[k] || 0;
+    const co = pScore(v);
+    s2.addShape(pres.ShapeType.rect, { x, y, w:cw-0.1, h:1.45, fill:{ color:'161b22' }, line:{ color:'21262d', width:1 } });
+    s2.addText(lbl, { x:x+0.1, y:y+0.1, w:cw-0.3, h:0.28, fontSize:10, color:'8b949e', fontFace:'Calibri' });
+    s2.addText(v ? String(v) : '—', { x:x+0.1, y:y+0.35, w:cw-0.3, h:0.65, fontSize:34, bold:true, color:co, fontFace:'Calibri' });
+    if (v) {
+      const bw = (cw - 0.3) * (v / 10);
+      s2.addShape(pres.ShapeType.rect, { x:x+0.1, y:y+1.08, w:bw, h:0.09, fill:{ color:co } });
+      s2.addShape(pres.ShapeType.rect, { x:x+0.1+bw, y:y+1.08, w:(cw-0.3)-bw, h:0.09, fill:{ color:'21262d' } });
+    }
+  });
+
+  // ── Slide 3: Pros & Cons ──
+  if (r.pros || r.cons) {
+    const s3 = pres.addSlide();
+    s3.background = { color: '0d1117' };
+    s3.addShape(pres.ShapeType.rect, { x:0, y:0, w:13.3, h:0.65, fill:{ color:'161b22' } });
+    s3.addText('Pros & Cons', { x:0.35, y:0.1, w:12, h:0.45, fontSize:17, bold:true, color:'e6edf3', fontFace:'Calibri' });
+    if (r.pros) {
+      s3.addShape(pres.ShapeType.rect, { x:0.35, y:0.8, w:5.9, h:5.9, fill:{ color:'0d422022' } });
+      s3.addShape(pres.ShapeType.rect, { x:0.35, y:0.8, w:0.06, h:5.9, fill:{ color:'2ea043' } });
+      s3.addText('✓  PROS', { x:0.5, y:0.9, w:5.6, h:0.35, fontSize:12, bold:true, color:'3fb950', fontFace:'Calibri' });
+      s3.addText(r.pros, { x:0.5, y:1.32, w:5.6, h:5.2, fontSize:13, color:'c9d1d9', fontFace:'Calibri', valign:'top', wrap:true });
+    }
+    if (r.cons) {
+      s3.addShape(pres.ShapeType.rect, { x:6.8, y:0.8, w:5.9, h:5.9, fill:{ color:'3d0c1222' } });
+      s3.addShape(pres.ShapeType.rect, { x:6.8, y:0.8, w:0.06, h:5.9, fill:{ color:'da3633' } });
+      s3.addText('✗  CONS', { x:6.95, y:0.9, w:5.6, h:0.35, fontSize:12, bold:true, color:'f85149', fontFace:'Calibri' });
+      s3.addText(r.cons, { x:6.95, y:1.32, w:5.6, h:5.2, fontSize:13, color:'c9d1d9', fontFace:'Calibri', valign:'top', wrap:true });
+    }
+  }
+
+  // ── Slide 4: Full Details ──
+  const secs = DEFS[r.type].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
+  const filledSecs = secs.filter(s => (s.f || []).some(f => r[f.k] && r[f.k] !== ''));
+  if (filledSecs.length) {
+    const s4 = pres.addSlide();
+    s4.background = { color: '0d1117' };
+    s4.addShape(pres.ShapeType.rect, { x:0, y:0, w:13.3, h:0.65, fill:{ color:'161b22' } });
+    s4.addText('Full Review Details', { x:0.35, y:0.1, w:12, h:0.45, fontSize:17, bold:true, color:'e6edf3', fontFace:'Calibri' });
+    const half = Math.ceil(filledSecs.length / 2);
+    let yL = 0.85, yR = 0.85;
+    const addBlock = (sec, x, yRef) => {
+      const filled = (sec.f || []).filter(f => r[f.k] && r[f.k] !== '');
+      if (!filled.length) return yRef;
+      const sv = sec.sk ? r[sec.sk] : null;
+      const blockH = 0.3 + filled.length * 0.34;
+      if (yRef + blockH > 7.1) return yRef;
+      const co = sv >= 8 ? '3fb950' : sv >= 5 ? 'e3b341' : sv ? 'f85149' : '6e7681';
+      s4.addShape(pres.ShapeType.rect, { x, y:yRef, w:6.1, h:blockH+0.1, fill:{ color:'161b22' }, line:{ color:'21262d', width:0.5 } });
+      s4.addText(sec.n + '. ' + sec.t + (sv ? '  [' + sv + ']' : ''), { x:x+0.1, y:yRef+0.05, w:5.8, h:0.24, fontSize:9, bold:true, color:co, fontFace:'Calibri' });
+      filled.forEach((f, fi) => {
+        s4.addText(f.l + ':', { x:x+0.1, y:yRef+0.3+fi*0.34, w:2.4, h:0.3, fontSize:9, color:'6e7681', fontFace:'Calibri' });
+        s4.addText(String(r[f.k]).slice(0, 42), { x:x+2.6, y:yRef+0.3+fi*0.34, w:3.4, h:0.3, fontSize:9, bold:true, color:'e6edf3', fontFace:'Calibri' });
+      });
+      return yRef + blockH + 0.18;
+    };
+    filledSecs.slice(0, half).forEach(s => { yL = addBlock(s, 0.35, yL); });
+    filledSecs.slice(half).forEach(s  => { yR = addBlock(s, 6.85, yR); });
+  }
+
+  pres.writeFile({ fileName: `${(r.brand||'device').replace(/ /g,'_')}_${(r.model||'review').replace(/ /g,'_')}_review.pptx` });
+}
+
+// ===== DASHBOARD COMPARISON PPTX =====
+function exportDashPptx() {
+  const compared = loadReviews().filter(r => selIds.includes(r.id));
+  if (!compared.length) return;
+  const sm     = DEFS[curTab].scoreMap;
+  const accent = hex(TYPE_COLORS[curTab]);
+  const pres   = new PptxGenJS();
+  pres.layout  = 'LAYOUT_WIDE';
+
+  // ── Slide 1: Comparison Cover ──
+  const s1 = pres.addSlide();
+  s1.background = { color: '0d1117' };
+  s1.addShape(pres.ShapeType.rect, { x:0, y:0, w:13.3, h:0.95, fill:{ color:'161b22' } });
+  s1.addShape(pres.ShapeType.rect, { x:0, y:0, w:0.07, h:7.5, fill:{ color: accent } });
+  s1.addText(TYPE_LABELS[curTab] + ' Comparison Dashboard', { x:0.28, y:0.14, w:12.5, h:0.5, fontSize:20, bold:true, color:'e6edf3', fontFace:'Calibri' });
+  s1.addText('Smartphone & IoT Lab  ·  JOVI', { x:0.28, y:0.6, w:12, h:0.28, fontSize:10, color:'6e7681', fontFace:'Calibri' });
+  const cw2 = 12.2 / compared.length;
+  compared.forEach((r, i) => {
+    const ov = calcOverall(r);
+    const x  = 0.35 + i * cw2;
+    const co = pScore(ov);
+    s1.addShape(pres.ShapeType.rect, { x, y:1.1, w:cw2-0.15, h:5.8, fill:{ color:'161b22' }, line:{ color:CHART_COLORS[i].replace('#',''), width:1 } });
+    s1.addShape(pres.ShapeType.rect, { x, y:1.1, w:cw2-0.15, h:0.06, fill:{ color:CHART_COLORS[i].replace('#','') } });
+    s1.addText(r.brand || '', { x:x+0.1, y:1.28, w:cw2-0.3, h:0.28, fontSize:9, color:'8b949e', fontFace:'Calibri' });
+    s1.addText(r.model || '', { x:x+0.1, y:1.55, w:cw2-0.3, h:0.5, fontSize:15, bold:true, color:'e6edf3', fontFace:'Calibri', wrap:true });
+    if (r.retail_price) s1.addText('R$ ' + parseInt(r.retail_price).toLocaleString('pt-BR'), { x:x+0.1, y:2.1, w:cw2-0.3, h:0.26, fontSize:10, color:'6e7681', fontFace:'Calibri' });
+    s1.addText(ov ? String(ov) : '—', { x:x+0.1, y:2.45, w:cw2-0.3, h:0.9, fontSize:46, bold:true, color:co, align:'center', fontFace:'Calibri' });
+    s1.addText('/10', { x:x+0.1, y:3.3, w:cw2-0.3, h:0.28, fontSize:10, color:'6e7681', align:'center', fontFace:'Calibri' });
+    if (r.final_verdict) s1.addText('"' + r.final_verdict.slice(0, 90) + '"', { x:x+0.1, y:3.7, w:cw2-0.3, h:2.9, fontSize:9, color:'8b949e', italic:true, fontFace:'Calibri', valign:'top', wrap:true });
+  });
+
+  // ── Slide 2: Scores Grid ──
+  const s2 = pres.addSlide();
+  s2.background = { color: '0d1117' };
+  s2.addShape(pres.ShapeType.rect, { x:0, y:0, w:13.3, h:0.65, fill:{ color:'161b22' } });
+  s2.addText('Category Scores Comparison', { x:0.35, y:0.1, w:12, h:0.45, fontSize:17, bold:true, color:'e6edf3', fontFace:'Calibri' });
+  const ents = Object.entries(sm);
+  const colW = 12.2 / (compared.length + 1);
+  // Headers
+  compared.forEach((r, ci) => {
+    s2.addText((r.model || '').slice(0, 12), { x:0.35+(ci+1)*colW, y:0.7, w:colW-0.1, h:0.28, fontSize:10, bold:true, color:CHART_COLORS[ci].replace('#',''), align:'center', fontFace:'Calibri' });
+  });
+  ents.forEach(([k, lbl], ri) => {
+    const y = 1.05 + ri * 0.58;
+    s2.addText(lbl, { x:0.35, y:y+0.14, w:colW-0.1, h:0.33, fontSize:10, bold:true, color:'c9d1d9', fontFace:'Calibri' });
+    compared.forEach((r, ci) => {
+      const v = r[k], x = 0.35 + (ci+1) * colW;
+      const co = pScore(v);
+      s2.addShape(pres.ShapeType.rect, { x, y, w:colW-0.12, h:0.53, fill:{ color:'161b22' }, line:{ color:'21262d', width:0.5 } });
+      s2.addText(v ? String(v) : '—', { x:x+0.08, y:y+0.05, w:colW-0.28, h:0.31, fontSize:17, bold:true, color:co, align:'center', fontFace:'Calibri' });
+      if (v) { const bw = (colW-0.28)*(v/10); s2.addShape(pres.ShapeType.rect, { x:x+0.08, y:y+0.42, w:bw, h:0.07, fill:{ color:co } }); }
+    });
+    s2.addShape(pres.ShapeType.rect, { x:0.35, y:y+0.53, w:12.2, h:0.02, fill:{ color:'21262d' } });
+  });
+
+  // ── Slide 3: Pros & Cons per device ──
+  const s3 = pres.addSlide();
+  s3.background = { color: '0d1117' };
+  s3.addShape(pres.ShapeType.rect, { x:0, y:0, w:13.3, h:0.65, fill:{ color:'161b22' } });
+  s3.addText('Pros & Cons', { x:0.35, y:0.1, w:12, h:0.45, fontSize:17, bold:true, color:'e6edf3', fontFace:'Calibri' });
+  const pcW = 12.2 / compared.length;
+  compared.forEach((r, i) => {
+    const x = 0.35 + i * pcW;
+    s3.addShape(pres.ShapeType.rect, { x, y:0.78, w:pcW-0.12, h:0.05, fill:{ color:CHART_COLORS[i].replace('#','') } });
+    s3.addText(r.model || '', { x:x+0.05, y:0.88, w:pcW-0.22, h:0.28, fontSize:10, bold:true, color:'e6edf3', fontFace:'Calibri' });
+    if (r.pros) { s3.addShape(pres.ShapeType.rect, { x:x+0.05, y:1.22, w:pcW-0.22, h:2.7, fill:{ color:'0d422022' } }); s3.addShape(pres.ShapeType.rect, { x:x+0.05, y:1.22, w:0.05, h:2.7, fill:{ color:'2ea043' } }); s3.addText('PROS', { x:x+0.17, y:1.27, w:pcW-0.38, h:0.25, fontSize:8, bold:true, color:'3fb950', fontFace:'Calibri' }); s3.addText(r.pros, { x:x+0.17, y:1.56, w:pcW-0.38, h:2.2, fontSize:10, color:'c9d1d9', fontFace:'Calibri', valign:'top', wrap:true }); }
+    if (r.cons) { s3.addShape(pres.ShapeType.rect, { x:x+0.05, y:4.1, w:pcW-0.22, h:2.7, fill:{ color:'3d0c1222' } }); s3.addShape(pres.ShapeType.rect, { x:x+0.05, y:4.1, w:0.05, h:2.7, fill:{ color:'da3633' } }); s3.addText('CONS', { x:x+0.17, y:4.15, w:pcW-0.38, h:0.25, fontSize:8, bold:true, color:'f85149', fontFace:'Calibri' }); s3.addText(r.cons, { x:x+0.17, y:4.44, w:pcW-0.38, h:2.2, fontSize:10, color:'c9d1d9', fontFace:'Calibri', valign:'top', wrap:true }); }
+  });
+
+  pres.writeFile({ fileName: `${TYPE_LABELS[curTab].replace(/ /g,'_')}_comparison.pptx` });
+}
+
+// ===== APP STATE =====
+let curTab = 'smartphone';
+
+// ===== PAGE ROUTING =====
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  showPage('home');
+  renderList();
+}
+
+function goAdd() {
+  formData = {};
+  formPhotoURL = null;
+  editingReviewId = null;
+  document.getElementById('add-title').textContent = 'New Review';
+  document.getElementById('add-sub').textContent = TYPE_LABELS[curTab] + ' · Draft';
+  document.getElementById('btn-complete').style.background = TYPE_COLORS[curTab];
+  buildAccordions();
+  showPage('add');
+}
+
+function goEditReview(id) {
+  const r = loadReviews().find(x => x.id === id);
+  if (!r) return;
+  formData = { ...r };
+  formPhotoURL = r.photo || null;
+  editingReviewId = r.id;
+  document.getElementById('add-title').textContent = (r.brand || '') + (r.model ? ' ' + r.model : '');
+  document.getElementById('add-sub').textContent = TYPE_LABELS[r.type] + ' · Editing';
+  document.getElementById('btn-complete').style.background = TYPE_COLORS[r.type];
+  buildAccordions();
+  populateForm(r);
+  showPage('add');
+}
+
+function goDash() {
+  selIds = loadReviews().filter(r => r.type === curTab).slice(0, 3).map(r => r.id);
+  renderDash();
+  showPage('dash');
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tab, btn) {
+  curTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cta-banner').style.background = TYPE_COLORS[tab];
+  document.getElementById('cta-title').textContent = 'New ' + TYPE_LABELS[tab] + ' Review';
+  renderList();
+}
+
+// ===== REVIEW LIST =====
+function renderList() {
+  const list = loadReviews().filter(r => r.type === curTab);
+  const el   = document.getElementById('reviews-list');
+
+  if (!list.length) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="5" y="2" width="14" height="20" rx="2"/>
+          <line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/>
+        </svg>
+        <p>No ${TYPE_LABELS[curTab]} reviews yet</p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(r => {
+    const ov   = calcOverall(r);
+    const c    = scoreColor(ov);
+    const circ = 2 * Math.PI * 17;
+    const dash = ov ? (circ * ov / 10).toFixed(1) : '0';
+
+    return `
+    <div class="review-card" onclick="showDetail('${r.id}')">
+      <div class="review-thumb">
+        ${r.photo
+          ? `<img src="${r.photo}" alt="${r.model || ''}">`
+          : `<span style="font-size:18px">${EMOJIS[r.type]}</span>`}
+      </div>
+      <div class="review-info">
+        <div class="review-brand">${r.brand || '—'}</div>
+        <div class="review-model">${r.model || 'New Device'}</div>
+        <div class="review-meta">
+          ${r.retail_price ? `<span>R$ ${parseInt(r.retail_price).toLocaleString('pt-BR')}</span><span>·</span>` : ''}
+          <span class="type-badge ${TYPE_CLASS[r.type]}">${TYPE_LABELS[r.type]}</span>
+          <span>·</span>
+          <span class="status-dot" style="background:${r.completed ? '#2ea043' : '#d29922'}"></span>
+          <span>${r.completed ? 'Completed' : 'Draft'}</span>
+        </div>
+      </div>
+      <div class="score-ring">
+        <svg width="42" height="42" viewBox="0 0 42 42">
+          <circle cx="21" cy="21" r="17" fill="none" stroke="#21262d" stroke-width="3"/>
+          <circle cx="21" cy="21" r="17" fill="none" stroke="${c}" stroke-width="3"
+            stroke-dasharray="${dash} ${circ.toFixed(1)}" stroke-linecap="round"/>
+        </svg>
+        <span class="score-ring-num" style="color:${c}">${ov ?? '—'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== SAVE ACTIONS =====
+function quickSave() {
+  const r = collectReview(false);
+  updateReview(r);
+  document.getElementById('add-title').textContent = (r.brand || '') + (r.model ? ' ' + r.model : '');
+  // Flash saved
+  const btn = document.querySelector('.save-icon-btn');
+  btn.style.color = '#3fb950';
+  setTimeout(() => { btn.style.color = ''; }, 1200);
+}
+
+function saveDraft() {
+  const r = collectReview(false);
+  updateReview(r);
+  goHome();
+}
+
+function saveComplete() {
+  const r = collectReview(true);
+  updateReview(r);
+  showDetail(r.id);
+}
+
+function deleteCurrentReview() {
+  if (!editingReviewId) return;
+  if (!confirm('Delete this review permanently?')) return;
+  deleteReview(editingReviewId);
+  editingReviewId = null;
+  goHome();
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  // Set initial CTA color
+  document.getElementById('cta-banner').style.background = TYPE_COLORS[curTab];
+  renderList();
+});
+
+  </script>
 </body>
 </html>

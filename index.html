@@ -182,7 +182,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   font-size: 18px; flex-shrink: 0; overflow: hidden;
 }
-.review-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+.review-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center; border-radius: 8px; }
 
 .review-info { flex: 1; min-width: 0; }
 .review-brand { font-size: 11px; color: var(--text4); margin-bottom: 1px; }
@@ -321,7 +321,7 @@ select option { background: var(--bg2); }
 .photo-upload span  { font-size: 11px; color: var(--text4); text-align: center; }
 .photo-upload .sub  { font-size: 10px; color: var(--text5); }
 .photo-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.photo-preview { width: 160px; height: 110px; border-radius: 10px; object-fit: cover; display: block; cursor: pointer; }
+.photo-preview { width: 160px; height: 110px; border-radius: 10px; object-fit: cover; object-position: center; display: block; cursor: pointer; }
 .photo-remove  { font-size: 11px; color: var(--text5); cursor: pointer; }
 .photo-remove:hover { color: #f85149; }
 
@@ -437,7 +437,8 @@ select option { background: var(--bg2); }
   border-radius: var(--radius-lg); padding: 18px; margin-bottom: 10px;
 }
 .detail-hero-photo {
-  width: 100%; height: 160px; object-fit: cover;
+  width: 100%; height: 220px;
+  object-fit: cover; object-position: center;
   border-radius: 9px; margin-bottom: 14px; display: block;
 }
 .detail-hero-body { display: flex; align-items: center; gap: 14px; }
@@ -567,7 +568,6 @@ select option { background: var(--bg2); }
 </head>
 <body>
   <div id="app">
-
     <header class="header">
       <div class="header-inner">
         <div class="header-left">
@@ -586,33 +586,22 @@ select option { background: var(--bg2); }
       <div class="tabs-wrap">
         <nav class="tabs">
           <button class="tab active" data-tab="smartphone" onclick="switchTab('smartphone',this)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
-            Smartphone
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="17" x2="12" y2="17"/></svg>Smartphone
           </button>
           <button class="tab" data-tab="smartwatch" onclick="switchTab('smartwatch',this)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M7 8h10M7 16h10"/></svg>
-            Smartwatch
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M7 8h10M7 16h10"/></svg>Smartwatch
           </button>
           <button class="tab" data-tab="tws" onclick="switchTab('tws',this)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
-            TWS
-          </button>
-          <button class="tab" data-tab="iot" onclick="switchTab('iot',this)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-            IoT
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>TWS
           </button>
         </nav>
       </div>
     </header>
-
     <main class="main">
-
       <div id="page-home" class="page active">
         <button class="cta-banner" id="cta-banner" onclick="goAdd()">
           <div class="cta-left">
-            <div class="cta-icon">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </div>
+            <div class="cta-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
             <div>
               <div class="cta-title" id="cta-title">New Smartphone Review</div>
               <div class="cta-sub">Start testing a new device</div>
@@ -629,15 +618,11 @@ select option { background: var(--bg2); }
         </div>
         <div id="reviews-list"></div>
       </div>
-
       <div id="page-add" class="page">
         <div class="page-topbar">
           <button class="back-btn" onclick="goHome()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-            <div>
-              <div class="page-title" id="add-title">New Review</div>
-              <div class="page-sub" id="add-sub">Draft</div>
-            </div>
+            <div><div class="page-title" id="add-title">New Review</div><div class="page-sub" id="add-sub">Draft</div></div>
           </button>
           <button class="save-icon-btn" onclick="quickSave()" title="Save">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -653,281 +638,280 @@ select option { background: var(--bg2); }
           <button class="btn-complete" id="btn-complete" onclick="saveComplete()">Complete &amp; View Dashboard</button>
         </div>
       </div>
-
       <div id="page-detail" class="page">
         <button class="back-btn" onclick="goHome()" style="margin-bottom:14px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          Back
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Back
         </button>
         <div id="detail-body"></div>
       </div>
-
       <div id="page-dash" class="page">
         <button class="back-btn" onclick="goHome()" style="margin-bottom:14px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          Back to Reviews
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Back to Reviews
         </button>
         <p class="hint-text" style="margin-bottom:10px">Tap to select/deselect (up to 6)</p>
         <div class="chips-row" id="dash-chips"></div>
         <div id="dash-body"></div>
       </div>
-
     </main>
   </div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
 // ===== CONSTANTS =====
-const EMOJIS = { smartphone: '📱', smartwatch: '⌚', tws: '🎧', iot: '🔌' };
-const TYPE_LABELS = { smartphone: 'Smartphone', smartwatch: 'Smartwatch', tws: 'TWS Earbuds', iot: 'IoT Device' };
-const TYPE_COLORS = { smartphone: '#2ea043', smartwatch: '#388bfd', tws: '#a855f7', iot: '#22c55e' };
-const TYPE_CLASS  = { smartphone: 'type-p', smartwatch: 'type-s', tws: 'type-t', iot: 'type-i' };
+const EMOJIS = { smartphone: '📱', smartwatch: '⌚', tws: '🎧' };
+const TYPE_LABELS = { smartphone: 'Smartphone', smartwatch: 'Smartwatch', tws: 'TWS Earbuds' };
+const TYPE_COLORS = { smartphone: '#2ea043', smartwatch: '#388bfd', tws: '#a855f7' };
+const TYPE_CLASS  = { smartphone: 'type-p', smartwatch: 'type-s', tws: 'type-t' };
 const CHART_COLORS = ['#3b82f6','#a855f7','#22c55e','#f59e0b','#ef4444','#06b6d4'];
 
 // ===== SECTION DEFINITIONS =====
 const DEFS = {
   smartphone: {
-    scoreMap: { s_price:'Price/Value', s_display:'Display', s_perf:'Performance', s_cam:'Camera', s_batt:'Battery', s_sw:'Software', s_build:'Build' },
+    scoreMap: { s_price:'Price/Value', s_display:'Display', s_perf:'Performance', s_cam:'Camera', s_batt:'Battery', s_sw:'Software', s_build:'Build & Design', s_calls:'Calls & Audio' },
     sections: [
-      { n:'0', k:'photo',  t:'Product Information', sk: null },
-      { n:'1', k:'price',  t:'Price & Positioning', sk:'s_price', f:[
-        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'' },
-        { tp:'sel', k:'positioning', l:'Market Positioning', h:'How does it position against direct competitors?', o:['Entry-level','Mid-range','Premium','Flagship'] },
-        { tp:'sel', k:'value_money', l:'Value for Money', h:'Does the cost-benefit make sense for what it delivers?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'price_notes', l:'Notes', h:'Price vs. competitors, promotions, bundles...' }
+      { n:'0', k:'photo', t:'Product Information', sk: null },
+
+      { n:'1', k:'price', t:'Price & Value', sk:'s_price', f:[
+        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'How much does it cost in stores right now?' },
+        { tp:'sel', k:'positioning', l:'Market Segment', h:'Which price category does this phone belong to?', o:['Entry-level (up to R$1,500)','Mid-range (R$1,500–R$3,500)','Premium (R$3,500–R$6,000)','Flagship (R$6,000+)'] },
+        { tp:'sel', k:'value_money', l:'Value for Money', h:'Considering everything this phone offers, is the price fair?', o:['Excellent — worth every cent','Good — fair price for what you get','Fair — acceptable but not exciting','Poor — overpriced for what it delivers'] },
+        { tp:'sel', k:'purchase_intent', l:'Would You Buy It Again?', h:'Knowing what you know now, would you buy this phone again?', o:['Definitely yes','Probably yes','Probably not','Definitely not'] },
+        { tp:'ta',  k:'price_notes', l:'Additional Comments', h:'Mention any promotions, bundles, trade-in offers, or competitor comparisons...' }
       ]},
-      { n:'2', k:'display', t:'Display', sk:'s_display', f:[
-        { tp:'sel', k:'display_tech', l:'Display Technology', h:'', o:['AMOLED/OLED','LCD IPS','LCD TFT','Mini-LED'] },
-        { tp:'sel', k:'refresh_rate', l:'Refresh Rate', h:'Higher refresh rate = smoother scrolling and animations', o:['144Hz+','120Hz','90Hz','60Hz'] },
-        { tp:'num', k:'peak_brightness', l:'Peak Brightness (nits)', h:'Maximum brightness measured or rated' },
-        { tp:'sel', k:'sunlight', l:'Sunlight Visibility', h:'Can you comfortably read the screen outdoors in direct sunlight?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'color_accuracy', l:'Color Accuracy', h:'Do colors look natural and accurate vs. oversaturated/washed out?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'display_notes', l:'Notes', h:'' }
+
+      { n:'2', k:'display', t:'Screen & Display', sk:'s_display', f:[
+        { tp:'sel', k:'display_tech', l:'Display Type', h:'What type of screen does this phone have?', o:['AMOLED / OLED — vibrant colors, deep blacks','LCD IPS — good brightness, natural colors','LCD TFT — basic screen','Mini-LED — bright with good contrast',"I don't know"] },
+        { tp:'sel', k:'screen_size_feel', l:'Screen Size Comfort', h:'Does the screen size feel right for everyday use — not too big, not too small?', o:['Perfect size','A bit too large','A bit too small','Way too large'] },
+        { tp:'sel', k:'sunlight', l:'Outdoor Visibility', h:'Can you read the screen comfortably under direct sunlight without struggling?', o:['Excellent — easy to read anywhere','Good — readable with some effort','Fair — hard to see on bright days','Poor — nearly unreadable outdoors'] },
+        { tp:'sel', k:'color_accuracy', l:'Color Quality', h:'How do the screen colors look to you — natural or exaggerated?', o:['Very natural and accurate','Slightly vivid but pleasant','Oversaturated / too colorful','Washed out / dull'] },
+        { tp:'sel', k:'scroll_smooth', l:'Scrolling Smoothness', h:'Does scrolling through apps, feeds and web pages feel smooth and fluid?', o:['Super smooth — no judder at all','Smooth — occasional minor stutter','Somewhat smooth — noticeable stutters','Choppy — annoying to scroll'] },
+        { tp:'sel', k:'screen_durability', l:'Screen Durability', h:'Does the screen feel solid and resistant to everyday scratches and drops?', o:['Very durable — no marks after daily use','Good — minor scratches only','Fragile feeling — scratches easily','Already cracked or damaged'] },
+        { tp:'ta',  k:'display_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'3', k:'performance', t:'Performance', sk:'s_perf', f:[
-        { tp:'txt', k:'chipset', l:'Chipset', h:'e.g. Snapdragon 8 Gen 3, Dimensity 9300, Apple A17 Pro' },
-        { tp:'num', k:'ram', l:'RAM (GB)', h:'' },
-        { tp:'num', k:'antutu', l:'AnTuTu Score', h:'Benchmark score for reference' },
-        { tp:'sel', k:'daily_perf', l:'Daily Performance', h:'How does it handle day-to-day tasks like browsing, social media, multitasking?', o:['Buttery Smooth','Smooth','Minor Hiccups','Laggy'] },
-        { tp:'sel', k:'gaming_perf', l:'Gaming Performance', h:'How does it handle demanding 3D games at high settings?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'thermal', l:'Thermal Throttling', h:'Does performance drop significantly after extended gaming sessions due to heat?', o:['None','Slight after 30min','Noticeable','Severe'] },
-        { tp:'ta',  k:'perf_notes', l:'Notes', h:'' }
+
+      { n:'3', k:'performance', t:'Speed & Performance', sk:'s_perf', f:[
+        { tp:'sel', k:'daily_perf', l:'Day-to-Day Speed', h:'How does the phone handle everyday tasks — opening apps, browsing, social media, multitasking?', o:['Blazing fast — always instant','Fast — rarely any wait','Occasionally slow — sometimes freezes','Slow — frustrating to use daily'] },
+        { tp:'sel', k:'app_open', l:'App Opening Speed', h:'How quickly do apps open after you tap them?', o:['Instantly','Fast — under 1 second','Moderate — 1 to 3 seconds','Slow — more than 3 seconds'] },
+        { tp:'sel', k:'multitask', l:'Multitasking', h:'When switching between multiple open apps, does the phone keep them loaded or reload them from scratch?', o:['Always keeps apps loaded','Usually keeps apps — rare reloads','Frequently reloads apps','Almost always reloads apps'] },
+        { tp:'sel', k:'gaming_perf', l:'Gaming Experience', h:'If you play games, how does the phone handle them?', o:['Excellent — runs everything smoothly','Good — handles most games well','Fair — struggles with heavier games','Poor — lags even on simple games',"Don't use for gaming"] },
+        { tp:'sel', k:'thermal', l:'Does the Phone Get Hot?', h:'During intensive use like gaming, video streaming or navigation, does the phone overheat uncomfortably?', o:['Never gets hot','Gets slightly warm — normal','Gets noticeably hot — uncomfortable','Gets very hot — had to stop using it'] },
+        { tp:'ta',  k:'perf_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'4', k:'camera', t:'Camera System', sk:'s_cam', f:[
-        { tp:'num', k:'main_mp', l:'Main Camera (MP)', h:'' },
-        { tp:'sel', k:'main_quality', l:'Main Camera Quality', h:'Overall photo quality in mixed lighting conditions', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'ultrawide', l:'Ultrawide Quality', h:'Does the ultrawide lens deliver consistent color and sharpness?', o:['Excellent','Good','Fair','Poor/None'] },
-        { tp:'sel', k:'telephoto', l:'Telephoto / Zoom Quality', h:'Does the zoom camera produce sharp, usable images?', o:['Excellent','Good','Fair','Poor/None'] },
-        { tp:'sel', k:'video_res', l:'Max Video Resolution', h:'Highest supported video recording resolution', o:['8K','4K 120fps','4K 60fps','4K 30fps','1080p max'] },
-        { tp:'sel', k:'night_mode', l:'Night Mode Quality', h:'How well does it handle low-light photography?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'selfie', l:'Selfie Camera Quality', h:'Front camera quality for photos and video calls', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'cam_notes', l:'Notes', h:'' }
+
+      { n:'4', k:'camera', t:'Camera & Photos', sk:'s_cam', f:[
+        { tp:'sel', k:'main_quality', l:'Main Camera Quality', h:'Overall, how satisfied are you with photos taken with the main camera in good lighting?', o:['Excellent — better than expected','Good — sharp and detailed','Fair — acceptable but nothing special','Poor — blurry or disappointing'] },
+        { tp:'sel', k:'night_mode', l:'Low-Light & Night Photos', h:'How well does the camera perform in dark environments or at night?', o:['Excellent — clear bright night shots','Good — usable photos in low light','Fair — grainy but recognizable','Poor — almost unusable in the dark'] },
+        { tp:'sel', k:'selfie', l:'Selfie Quality', h:'How are the selfie camera results for photos and video calls?', o:['Excellent — sharp and flattering','Good — clear and accurate','Fair — acceptable for casual use','Poor — blurry or unflattering'] },
+        { tp:'sel', k:'ultrawide', l:'Wide-Angle Camera', h:'Does the phone have a wide-angle camera? If yes, how is the quality?', o:['Excellent — consistent with main camera','Good — slightly less quality','Fair — noticeably lower quality','Poor quality / Not available'] },
+        { tp:'sel', k:'zoom_quality', l:'Zoom Quality', h:'When you zoom in on distant subjects, are photos still clear and sharp?', o:['Excellent — sharp even at high zoom','Good — good quality up to 5x','Fair — gets blurry above 2–3x','Poor — zooming makes photos unusable'] },
+        { tp:'sel', k:'video_quality', l:'Video Recording Quality', h:'How would you rate the quality and stability of videos recorded with this phone?', o:['Excellent — smooth and cinema-like','Good — stable and clear','Fair — occasional shake or blur','Poor — shaky or low quality'] },
+        { tp:'sel', k:'cam_speed', l:'Camera Speed', h:'How fast does the camera app open and take photos without delay?', o:['Instant — opens and shoots immediately','Fast — under 1 second','Moderate — noticeable delay','Slow — frustrating to capture moments'] },
+        { tp:'ta',  k:'cam_notes', l:'Additional Comments', h:'' }
       ]},
+
       { n:'5', k:'battery', t:'Battery & Charging', sk:'s_batt', f:[
-        { tp:'num', k:'batt_mah', l:'Battery Capacity (mAh)', h:'' },
-        { tp:'num', k:'screen_on', l:'Real Screen-On Time (hours)', h:'How many hours of active screen use before needing charge?' },
-        { tp:'num', k:'wired_w', l:'Wired Charging (Watts)', h:'' },
-        { tp:'num', k:'wireless_w', l:'Wireless Charging (Watts)', h:'0 if not supported' },
-        { tp:'sel', k:'reverse_wl', l:'Reverse Wireless Charging', h:'Can it wirelessly charge accessories like earbuds?', o:['Yes','No'] },
-        { tp:'ta',  k:'batt_notes', l:'Notes', h:'' }
+        { tp:'sel', k:'battery_day', l:'Does It Last a Full Day?', h:'With your typical usage (calls, social media, browsing), does the battery last through the whole day?', o:['Easily lasts all day with charge to spare','Lasts a full day — barely','Needs a top-up mid-afternoon','Needs charging by midday or earlier'] },
+        { tp:'sel', k:'heavy_use_batt', l:'Battery Under Heavy Use', h:'When using the phone intensively (navigation, streaming, gaming), how long does the battery last?', o:['4+ hours of heavy use','2–4 hours of heavy use','1–2 hours of heavy use','Less than 1 hour of heavy use'] },
+        { tp:'sel', k:'charge_speed', l:'Charging Speed', h:'How long does it take to charge the phone from near-empty to full?', o:['Under 30 minutes — ultra-fast','30–60 minutes — fast','1–2 hours — acceptable','More than 2 hours — slow'] },
+        { tp:'sel', k:'wireless_charge', l:'Wireless Charging', h:'Does this phone support wireless charging?', o:['Yes — works great','Yes — but charges slowly','No wireless charging'] },
+        { tp:'sel', k:'battery_degradation', l:'Battery Over Time', h:'If you have been using it for a while, has the battery life gotten noticeably worse?', o:['No degradation — same as new','Slightly less — barely noticeable','Noticeably worse','Significantly degraded'] },
+        { tp:'ta',  k:'batt_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'6', k:'software', t:'Software & OS', sk:'s_sw', f:[
-        { tp:'txt', k:'os_ver', l:'OS Version', h:'e.g. Android 14 / One UI 6.1 / iOS 17.4' },
-        { tp:'sel', k:'bloatware', l:'Bloatware Level', h:'How many pre-installed apps are non-removable?', o:['None','Minimal','Moderate','Heavy'] },
-        { tp:'sel', k:'update_policy', l:'Software Update Policy', h:'How many years of OS and security updates are guaranteed?', o:['5+ years OS updates','3-4 years','1-2 years','Unclear/None'] },
-        { tp:'sel', k:'ui_smooth', l:'UI Smoothness', h:'Does the interface feel fluid during animations and transitions?', o:['Very Smooth','Smooth','Minor Lag','Laggy'] },
-        { tp:'ta',  k:'sw_features', l:'Unique Software Features', h:'e.g. Samsung DeX, Circle to Search, AI eraser, split-screen gaming' },
-        { tp:'ta',  k:'sw_notes', l:'Notes', h:'' }
+
+      { n:'6', k:'software', t:'Software & User Experience', sk:'s_sw', f:[
+        { tp:'sel', k:'ease_of_use', l:'Ease of Use', h:'How easy is it to set up and use this phone for the first time, without reading a manual?', o:['Very intuitive — anyone can use it','Easy — minor learning curve','Moderate — takes some getting used to','Confusing — hard to figure out'] },
+        { tp:'sel', k:'ui_smooth', l:'Interface Fluidity', h:'Do menus, animations and transitions feel smooth when navigating the phone?', o:['Perfectly smooth','Mostly smooth — rare stutters','Noticeable stutters occasionally','Often laggy or choppy'] },
+        { tp:'sel', k:'preinstalled_apps', l:'Pre-installed Apps', h:'Does the phone come with too many unwanted apps that you cannot delete?', o:['No bloat — comes clean','A few extra apps — manageable','Many pre-installed apps — annoying','Extremely bloated — affects performance'] },
+        { tp:'sel', k:'notifications', l:'Notification Management', h:'How well does the phone handle and organize notifications from your apps?', o:['Excellent — organized and easy to manage','Good — mostly clean','Fair — sometimes messy','Poor — hard to manage or missing alerts'] },
+        { tp:'sel', k:'biometrics', l:'Fingerprint / Face Unlock', h:'How fast and reliable is the fingerprint sensor or face recognition to unlock the phone?', o:['Instant and always works','Fast — works 95% of the time','Slow or inconsistent — sometimes fails','Unreliable — fails frequently'] },
+        { tp:'sel', k:'updates', l:'Software Updates', h:'Does the phone receive regular software updates that improve features and fix bugs?', o:['Frequent and fast updates','Regular updates — slightly delayed','Infrequent updates','Rarely or never receives updates'] },
+        { tp:'ta',  k:'sw_features', l:'Favorite Software Features', h:'Is there any feature in the software that you love or that stands out? Describe it here.' },
+        { tp:'ta',  k:'sw_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'7', k:'build', t:'Build Quality & Ergonomics', sk:'s_build', f:[
-        { tp:'sel', k:'build_mat', l:'Build Material', h:'What materials are used for the chassis and back?', o:['Titanium + Glass','Aluminum + Glass','Plastic','Other'] },
-        { tp:'sel', k:'ip_rating', l:'IP Rating (Dust & Water)', h:'Official ingress protection certification', o:['IP68','IP67','IP65','IP54','No rating'] },
-        { tp:'sel', k:'in_hand', l:'In-Hand Feel', h:'Does it feel premium, grippy and balanced when held?', o:['Premium','Good','Acceptable','Cheap/Slippery'] },
-        { tp:'num', k:'weight', l:'Weight (grams)', h:'' },
-        { tp:'sel', k:'one_hand', l:'One-Hand Usability', h:'Can you comfortably operate the phone with one hand?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'build_notes', l:'Notes', h:'' }
+
+      { n:'7', k:'build', t:'Design & Build Quality', sk:'s_build', f:[
+        { tp:'sel', k:'first_impression', l:'First Impression', h:'When you first held this phone, what was your overall impression of the build and design?', o:['Wow — premium and impressive','Good — solid and well-made','Okay — nothing special','Disappointing — feels cheap'] },
+        { tp:'sel', k:'in_hand', l:'Comfort in Hand', h:'Does the phone feel comfortable and balanced when held for extended periods?', o:['Very comfortable — great to hold','Comfortable — fits most hands well','Somewhat comfortable — a bit large or slippery','Uncomfortable — too heavy, large or slippery'] },
+        { tp:'sel', k:'one_hand', l:'One-Hand Use', h:'Can you use the phone comfortably with just one hand for basic tasks?', o:['Easy with one hand','Possible but requires some stretching','Difficult — needs two hands for most tasks','Impossible to use with one hand'] },
+        { tp:'sel', k:'pocket_fit', l:'Fits in Your Pocket', h:'Does the phone fit comfortably in your jeans or pants pocket without being too bulky?', o:['Fits perfectly','Fits — slightly noticeable','Barely fits — noticeable bulge','Does not fit comfortably'] },
+        { tp:'sel', k:'durability_feel', l:'Build Durability', h:'Does the phone feel sturdy enough to survive normal daily use — minor drops, bumps, scratches?', o:['Very sturdy — feels indestructible','Solid — handles everyday wear well','Somewhat fragile — worried about drops','Fragile — already has damage from normal use'] },
+        { tp:'sel', k:'ip_rating', l:'Water & Dust Resistance', h:'Is the phone officially certified to resist water splashes, rain or dust?', o:['IP68 — fully water resistant','IP67 — water resistant','IP65 — splash proof only','IP54 — minimal protection','No official water resistance'] },
+        { tp:'ta',  k:'build_notes', l:'Additional Comments', h:'' }
       ]},
+
+      { n:'8', k:'calls', t:'Calls, Speaker & Connectivity', sk:'s_calls', f:[
+        { tp:'sel', k:'call_quality', l:'Call Quality', h:'How clear is the sound quality during regular phone calls — both hearing the other person and your voice being heard?', o:['Crystal clear — like being in the same room','Good — clear with minor issues','Fair — occasional crackling or echo','Poor — hard to hear or be heard'] },
+        { tp:'sel', k:'speaker_quality', l:'Speaker & Loudspeaker', h:'How is the sound quality when playing music, videos or speakerphone calls out loud?', o:['Excellent — loud and clear stereo sound','Good — decent volume and quality','Fair — acceptable for occasional use','Poor — tinny, quiet or distorted'] },
+        { tp:'sel', k:'signal_strength', l:'Signal & Network Quality', h:'Does the phone maintain a strong and stable signal — calls, mobile data and Wi-Fi?', o:['Excellent signal everywhere','Good — minor drops in weak areas','Fair — loses signal in some places','Poor — frequent dropped calls or slow data'] },
+        { tp:'sel', k:'wifi_stability', l:'Wi-Fi Stability', h:'Does the phone maintain a stable Wi-Fi connection without dropping or slowing down unexpectedly?', o:['Always stable','Mostly stable — rare drops','Sometimes unstable — reconnects occasionally','Frequently drops Wi-Fi'] },
+        { tp:'sel', k:'bluetooth', l:'Bluetooth Reliability', h:'How stable and easy is Bluetooth pairing with earbuds, speakers or car systems?', o:['Connects instantly — never drops','Reliable — connects quickly','Sometimes unreliable — occasional drops','Frequently disconnects or hard to pair'] },
+        { tp:'ta',  k:'calls_notes', l:'Additional Comments', h:'' }
+      ]},
+
       { n:'★', k:'verdict', t:'Final Verdict', sk: null }
     ]
   },
 
   smartwatch: {
-    scoreMap: { s_price:'Price/Value', s_design:'Design/Comfort', s_display:'Display', s_usability:'Usability', s_sports:'Sports/GPS', s_health:'Health', s_smart:'Smart', s_batt:'Battery', s_app:'App' },
+    scoreMap: { s_price:'Price/Value', s_design:'Design & Comfort', s_display:'Screen & Watch Faces', s_usability:'Ease of Use', s_sports:'Sports & Fitness', s_health:'Health Tracking', s_smart:'Smart Features', s_batt:'Battery Life', s_app:'App Experience' },
     sections: [
       { n:'0', k:'photo', t:'Product Information', sk: null },
-      { n:'1', k:'price', t:'Price & Positioning', sk:'s_price', f:[
-        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'' },
-        { tp:'sel', k:'positioning', l:'Market Positioning', h:'How does it position against direct competitors?', o:['Entry-level','Mid-range','Premium','Flagship'] },
-        { tp:'sel', k:'value_money', l:'Value for Money', h:'Does the cost-benefit make sense for what it delivers?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'price_notes', l:'Notes', h:'Price vs. competitors, promotions, bundles...' }
+
+      { n:'1', k:'price', t:'Price & Value', sk:'s_price', f:[
+        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'How much does it cost in stores right now?' },
+        { tp:'sel', k:'positioning', l:'Market Segment', h:'Which price category does this smartwatch belong to?', o:['Entry-level (up to R$500)','Mid-range (R$500–R$1,500)','Premium (R$1,500–R$3,000)','Flagship (R$3,000+)'] },
+        { tp:'sel', k:'value_money', l:'Value for Money', h:'Considering everything this watch offers, is the price fair?', o:['Excellent — worth every cent','Good — fair price for what you get','Fair — acceptable but not exciting','Poor — overpriced for what it delivers'] },
+        { tp:'sel', k:'purchase_intent', l:'Would You Buy It Again?', h:'Knowing what you know now, would you buy this watch again?', o:['Definitely yes','Probably yes','Probably not','Definitely not'] },
+        { tp:'ta',  k:'price_notes', l:'Additional Comments', h:'Mention any promotions, competitor comparisons, bundles...' }
       ]},
-      { n:'2', k:'design', t:'Design, Build & Comfort', sk:'s_design', f:[
-        { tp:'sel', k:'daily_comfort', l:'Daily Comfort', h:'Light and comfortable enough to wear all day and while sleeping?', o:['Very Comfortable','Comfortable','Acceptable','Uncomfortable'] },
-        { tp:'sel', k:'band_irritation', l:'Band Skin Irritation', h:'Does the band material irritate skin when sweating?', o:['None','Slight','Moderate','Severe'] },
-        { tp:'sel', k:'band_compat', l:'Third-Party Band Compatibility', h:'Easy to replace with universal third-party bands?', o:['Yes - Universal','Yes - Brand Specific','No'] },
-        { tp:'sel', k:'ergonomics', l:'Ergonomics', h:'Does the case size get in the way during long-sleeve shirts or specific workout movements?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'material_feel', l:'Material Feel', h:'Does it feel premium or cheap/plasticky on the wrist?', o:['Premium','Good','Acceptable','Cheap/Plasticky'] },
-        { tp:'ta',  k:'design_notes', l:'Notes', h:'' }
+
+      { n:'2', k:'design', t:'Design, Comfort & Wearability', sk:'s_design', f:[
+        { tp:'sel', k:'first_impression', l:'First Impression', h:'When you first put it on, what was your overall impression of the design and build?', o:['Wow — premium and stylish','Good — solid and well-made','Okay — nothing special','Disappointing — feels cheap'] },
+        { tp:'sel', k:'daily_comfort', l:'All-Day Comfort', h:'Is the watch comfortable enough to wear all day without noticing it on your wrist?', o:['Very comfortable — forget it is there','Comfortable — fine for all-day use','Acceptable — noticeable after a few hours','Uncomfortable — causes discomfort or irritation'] },
+        { tp:'sel', k:'sleep_comfort', l:'Sleep Comfort', h:'Is it comfortable enough to keep on while sleeping for sleep tracking?', o:['Very comfortable — no issues sleeping','Comfortable — barely notice it','Somewhat uncomfortable — wake up occasionally','Too uncomfortable to sleep with'] },
+        { tp:'sel', k:'band_irritation', l:'Skin Irritation', h:'Does the band cause any skin redness, itching or irritation after extended wear or sweating?', o:['None — skin feels great','Slight — minor redness after long wear','Moderate — needs breaks during the day','Severe — not wearable for long periods'] },
+        { tp:'sel', k:'material_feel', l:'Build Quality Feel', h:'Does the watch feel premium and sturdy on your wrist, or cheap and fragile?', o:['Premium — solid and impressive','Good — sturdy and well-finished','Acceptable — feels average','Cheap — plasticky or flimsy'] },
+        { tp:'sel', k:'workout_wearability', l:'Comfort During Exercise', h:'Does the watch stay in place and feel comfortable during workouts like running, cycling or gym?', o:['Excellent — secure and comfortable','Good — stays put with minor adjustments','Fair — moves around during intense exercise','Poor — uncomfortable or falls out of position'] },
+        { tp:'ta',  k:'design_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'3', k:'display', t:'Display, Watch Faces & Customization', sk:'s_display', f:[
-        { tp:'sel', k:'wf_change', l:'Watch Face Change Ease', h:'Is it easy and intuitive to change the watch face directly on the watch?', o:['Very Easy','Easy','Average','Difficult'] },
-        { tp:'sel', k:'free_wf', l:'Free Watch Face Variety', h:'Does the app offer a good variety of quality free watch faces?', o:['Excellent','Good','Limited','Very Limited'] },
-        { tp:'sel', k:'paid_wf', l:'Paid Watch Faces', h:'Are there paid watch faces? Is the price fair or abusive?', o:['None','Fair Price','Overpriced'] },
-        { tp:'sel', k:'custom_photo_wf', l:'Custom Photo Watch Face', h:'Can you set a personal photo as a watch face?', o:['Yes','No'] },
-        { tp:'sel', k:'raise_wake', l:'Raise-to-Wake Speed', h:'Is the screen-on gesture fast and natural, or do you need exaggerated movements?', o:['Instant','Fast','Slow','Unreliable'] },
-        { tp:'sel', k:'sunlight', l:'Sunlight Visibility', h:'Is maximum brightness sufficient for reading under direct sunlight?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'display_notes', l:'Notes', h:'' }
+
+      { n:'3', k:'display', t:'Screen, Watch Faces & Visibility', sk:'s_display', f:[
+        { tp:'sel', k:'screen_quality', l:'Screen Quality', h:'Overall, how would you rate the sharpness and clarity of the screen?', o:['Excellent — sharp and vivid','Good — clear and easy to read','Fair — readable but not impressive','Poor — hard to read or blurry'] },
+        { tp:'sel', k:'sunlight', l:'Outdoor Visibility', h:'Can you read the screen comfortably under direct sunlight without having to shade it?', o:['Excellent — perfectly readable outdoors','Good — readable with some effort','Fair — hard to see on bright days','Poor — nearly unreadable in sunlight'] },
+        { tp:'sel', k:'raise_wake', l:'Raise to Wake', h:'When you lift your wrist to check the time, does the screen turn on quickly and reliably?', o:['Always instant — works perfectly','Usually fast — rare misses','Sometimes slow or misses the gesture','Unreliable — often have to tap the screen'] },
+        { tp:'sel', k:'watchface_variety', l:'Watch Face Options', h:'Are you happy with the variety of watch face designs available for free?', o:['Excellent — many beautiful free options','Good — decent selection','Limited — few choices I like','Very limited — almost no good options'] },
+        { tp:'sel', k:'custom_photo_wf', l:'Custom Photo Watch Face', h:'Can you set one of your own photos as a watch face?', o:['Yes — works great','Yes — but limited customization','No'] },
+        { tp:'sel', k:'glance_info', l:'Useful Info at a Glance', h:'Does the watch face show the information you need most (time, steps, heart rate, notifications) in a clear way?', o:['Excellent — shows exactly what I need','Good — shows most useful info','Fair — missing some info I want','Poor — cluttered or missing key info'] },
+        { tp:'ta',  k:'display_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'4', k:'usability', t:'Usability & System Fluidity', sk:'s_usability', f:[
-        { tp:'sel', k:'ui_fluidity', l:'UI Fluidity', h:'Does the system run smoothly or show lag when scrolling menus and opening apps?', o:['Very Smooth','Smooth','Minor Lag','Laggy'] },
-        { tp:'sel', k:'menu_intuit', l:'Menu Intuitiveness', h:'Are menus intuitive? Easy to find basic settings like brightness, alarms, do-not-disturb?', o:['Very Intuitive','Intuitive','Confusing','Very Confusing'] },
-        { tp:'sel', k:'btn_haptic', l:'Button / Crown Haptic Feedback', h:'Do physical buttons or rotary crown have good tactile response, especially with sweaty hands?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'usability_notes', l:'Notes', h:'' }
+
+      { n:'4', k:'usability', t:'Ease of Use & Navigation', sk:'s_usability', f:[
+        { tp:'sel', k:'setup_ease', l:'Initial Setup', h:'How easy was it to set up the watch and connect it to your phone for the first time?', o:['Very easy — done in minutes','Easy — minor steps required','Moderate — took some effort','Difficult — confusing or took a long time'] },
+        { tp:'sel', k:'ui_fluidity', l:'Menu Navigation', h:'Is it easy to find what you need on the watch — notifications, workouts, settings?', o:['Very intuitive — always find things quickly','Easy — most things are where expected','Sometimes confusing — needs getting used to','Confusing — hard to navigate daily'] },
+        { tp:'sel', k:'scroll_smooth', l:'Scrolling & Animation Smoothness', h:'Does the interface feel smooth when scrolling through menus and notifications?', o:['Very smooth — no lag at all','Smooth — occasional minor stutter','Noticeable stutters sometimes','Often laggy or choppy'] },
+        { tp:'sel', k:'btn_feel', l:'Button & Crown Feel', h:'If the watch has physical buttons or a rotating crown, do they feel responsive and satisfying to press?', o:['Excellent — precise and satisfying','Good — responsive and reliable','Fair — sometimes unresponsive','Poor — stiff, slippery or unreliable',"No physical buttons"] },
+        { tp:'sel', k:'notification_clarity', l:'Notifications on the Watch', h:'When you receive a message or alert, is it easy to read and manage notifications from your wrist?', o:['Excellent — clear and easy to act on','Good — readable with minor issues','Fair — hard to read long messages','Poor — notifications are difficult to manage'] },
+        { tp:'ta',  k:'usability_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'5', k:'sports', t:'Sports, GPS & Navigation', sk:'s_sports', f:[
-        { tp:'num', k:'sport_modes', l:'Number of Sport Modes', h:'Total included sport/activity modes' },
-        { tp:'sel', k:'gps_accuracy', l:'GPS Accuracy', h:'During runs/rides in dense trees or buildings, does the tracked route stay true to the street?', o:['Excellent','Good','Fair','Poor - Many Deviations'] },
-        { tp:'sel', k:'offline_maps', l:'Offline Maps', h:'Does the watch support offline maps with terrain detail?', o:['Yes - Full Detail','Yes - Basic','No'] },
-        { tp:'sel', k:'gpx_import', l:'GPX Route Import', h:'Can you import routes (GPX files) from other apps like Strava?', o:['Yes','No'] },
-        { tp:'ta',  k:'sports_notes', l:'Notes', h:'' }
+
+      { n:'5', k:'sports', t:'Sports, Fitness & GPS', sk:'s_sports', f:[
+        { tp:'sel', k:'workout_tracking', l:'Workout Tracking Experience', h:'When you start a workout (running, cycling, gym, etc.), how accurately and easily does the watch track it?', o:['Excellent — accurate and effortless','Good — reliable with minor issues','Fair — sometimes misses or mislabels activities','Poor — unreliable tracking'] },
+        { tp:'sel', k:'gps_accuracy', l:'GPS Route Accuracy', h:'When using GPS for outdoor activities like running or cycling, does the tracked route match where you actually went?', o:['Very accurate — matches my route perfectly','Good — minor deviations occasionally','Fair — noticeable errors in the route','Poor — GPS is unreliable',"Don't use GPS features"] },
+        { tp:'sel', k:'auto_detect', l:'Automatic Workout Detection', h:'Does the watch automatically detect and start tracking when you begin exercising, without needing to start it manually?', o:['Excellent — always detects correctly','Good — detects most workouts','Inconsistent — sometimes misses','Does not auto-detect',"Don't use this feature"] },
+        { tp:'sel', k:'sport_variety', l:'Variety of Sports Modes', h:'Does the watch cover all the sports and activities you practice?', o:['Yes — covers all my activities','Mostly — covers the main ones','Partially — missing some I use','No — missing most of my activities'] },
+        { tp:'sel', k:'post_workout', l:'Post-Workout Data', h:'After finishing a workout, is the data shown (distance, pace, heart rate zones, calories) clear and useful?', o:['Excellent — detailed and easy to read','Good — covers the main metrics well','Fair — basic data only','Poor — confusing or inaccurate data'] },
+        { tp:'ta',  k:'sports_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'6', k:'health', t:'Health & Sleep Monitoring', sk:'s_health', f:[
-        { tp:'sel', k:'hr_accuracy', l:'Heart Rate Accuracy (Exercise)', h:'During high arm-movement exercises (e.g. weightlifting), does the optical sensor track HR reliably or show unrealistic spikes?', o:['Excellent','Good','Fair','Poor - Many Spikes'] },
-        { tp:'sel', k:'calorie_acc', l:'Calorie Calculation Accuracy', h:'Do the algorithms estimate caloric burn coherently with your actual effort?', o:['Accurate','Slightly Off','Very Inaccurate'] },
-        { tp:'sel', k:'sleep_track', l:'Sleep Tracking Accuracy', h:'Does the watch correctly detect when you fell asleep and woke up?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'hrv', l:'HRV Monitoring', h:'Does the system measure Heart Rate Variability (HRV)?', o:['Yes - Reliable','Yes - Unreliable','No'] },
-        { tp:'sel', k:'spo2', l:'Apnea / SpO2 Alerts', h:'Does it have reliable sleep apnea risk alerts or blood oxygen (SpO2) monitoring?', o:['Yes - Reliable','Yes - Unreliable','No'] },
-        { tp:'ta',  k:'health_notes', l:'Notes', h:'' }
+
+      { n:'6', k:'health', t:'Health & Sleep Tracking', sk:'s_health', f:[
+        { tp:'sel', k:'hr_daily', l:'Heart Rate Monitoring', h:'Does the heart rate reading throughout the day seem accurate and consistent when you check it?', o:['Very accurate — matches how I feel','Mostly accurate — occasional odd readings','Sometimes inaccurate — spikes or drops','Often inaccurate — hard to trust'] },
+        { tp:'sel', k:'hr_accuracy', l:'Heart Rate During Exercise', h:'During workouts, does the heart rate stay accurate even with arm movements (like weightlifting or cycling)?', o:['Very accurate — stays consistent','Good — minor inaccuracies during intense effort','Fair — loses accuracy during arm-heavy exercises','Poor — unreliable during workouts'] },
+        { tp:'sel', k:'sleep_track', l:'Sleep Tracking Accuracy', h:'Does the watch correctly detect when you fell asleep, woke up, and your sleep stages?', o:['Very accurate — matches my experience','Good — mostly correct with minor errors','Fair — sometimes wrong about when I slept','Poor — sleep data seems unreliable'] },
+        { tp:'sel', k:'sleep_insights', l:'Sleep Insights Usefulness', h:'Are the sleep scores and insights provided by the watch useful and easy to understand?', o:['Very useful — helps me improve my sleep','Useful — gives good information','Somewhat useful — basic information only','Not useful — confusing or not actionable'] },
+        { tp:'sel', k:'stress_tracking', l:'Stress & Recovery Tracking', h:'If the watch tracks stress or recovery levels, do these readings feel accurate and useful?', o:['Very accurate and useful','Mostly useful — makes sense most of the time','Sometimes useful — inconsistent','Not useful or not available'] },
+        { tp:'sel', k:'spo2', l:'Blood Oxygen (SpO2) Monitoring', h:'Does the watch measure blood oxygen levels? If yes, do the readings seem reasonable?', o:['Yes — readings seem accurate','Yes — but readings seem inconsistent','No — watch does not have this feature'] },
+        { tp:'ta',  k:'health_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'7', k:'smart', t:'Smart Features', sk:'s_smart', f:[
-        { tp:'sel', k:'notif_group', l:'Notification Grouping', h:'Does the watch organize phone notifications well?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'notif_reply', l:'Notification Reply Method', h:'Can you reply to notifications? If yes, how?', o:['Full QWERTY','Voice Dictation','Preset Replies Only','Read Only'] },
-        { tp:'sel', k:'voice_asst', l:'Voice Assistant Quality', h:'Does the native voice assistant understand commands well, or is it frustrating to use?', o:['Excellent','Good','Fair','Frustrating/None'] },
-        { tp:'sel', k:'call_speaker', l:'Call Speaker', h:'Can you make and answer calls directly from the watch speaker? Is the audio clear?', o:['Yes - Clear Audio','Yes - Poor Audio','No'] },
-        { tp:'sel', k:'nfc_pay', l:'NFC Payments', h:'Does it support NFC contactless payments in your region?', o:['Yes - Works in my region','Yes - Limited region support','No'] },
-        { tp:'sel', k:'music_ctrl', l:'Music App Control', h:'Can you control music apps (play, pause, skip) directly from the watch?', o:['Yes - Full Control','Yes - Basic (Play/Pause/Skip)','No'] },
-        { tp:'ta',  k:'music_apps', l:'Supported Music Apps', h:'Which apps work? (e.g. Spotify, YouTube Music, Apple Music, Amazon Music)' },
-        { tp:'ta',  k:'smart_notes', l:'Notes', h:'' }
+
+      { n:'7', k:'smart', t:'Smart Features & Connectivity', sk:'s_smart', f:[
+        { tp:'sel', k:'notif_experience', l:'Notification Experience', h:'When your phone gets a message or call, does the watch notify you clearly and in a timely way?', o:['Excellent — always on time and clear','Good — reliable with minor delays','Fair — sometimes misses notifications','Poor — often late or misses them'] },
+        { tp:'sel', k:'call_speaker', l:'Taking Calls on the Watch', h:'Can you answer and make phone calls directly from the watch? If yes, is the audio clear?', o:['Yes — audio is clear and convenient','Yes — but audio quality is poor','No — watch does not support calls'] },
+        { tp:'sel', k:'voice_asst', l:'Voice Assistant', h:'Can you use a voice assistant (Siri, Google, Alexa, Bixby) from the watch? How well does it work?', o:['Works great — understands me well','Works — but sometimes misunderstands','Unreliable — often fails','Not available on this watch'] },
+        { tp:'sel', k:'nfc_pay', l:'Contactless Payments', h:'Does the watch support paying at stores without your phone (like Google Pay, Samsung Pay, Apple Pay)?', o:['Yes — works perfectly at stores','Yes — but limited acceptance','No — watch does not support payments'] },
+        { tp:'sel', k:'music_ctrl', l:'Music Control', h:'Can you control music playback (play, pause, skip, volume) directly from your wrist?', o:['Yes — works great with my apps','Yes — basic controls only','No — watch does not control music'] },
+        { tp:'sel', k:'phone_sync', l:'Phone Sync & Connection', h:'Does the watch stay reliably connected to your phone throughout the day without dropping or needing to be reconnected?', o:['Always connected — never drops','Mostly connected — rare disconnects','Sometimes disconnects — needs manual reconnect','Frequently disconnects — very annoying'] },
+        { tp:'ta',  k:'smart_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'8', k:'battery', t:'Battery & Real Autonomy', sk:'s_batt', f:[
-        { tp:'num', k:'nightly_drain', l:'Nightly Battery Drain (%)', h:'Exact % of battery consumed during one night of sleep with sensors active' },
-        { tp:'num', k:'gps_drain', l:'GPS Workout Drain (% per hour)', h:'% battery consumed per 1 hour of workout with GPS active' },
-        { tp:'num', k:'real_batt_days', l:'Real Battery Life (days)', h:"Forget the box claim — in your real mixed use, how many days did it last?" },
-        { tp:'ta',  k:'batt_notes', l:'Notes', h:'' }
+
+      { n:'8', k:'battery', t:'Battery Life & Charging', sk:'s_batt', f:[
+        { tp:'sel', k:'battery_days', l:'How Long Does the Battery Last?', h:'With your typical daily use (notifications, health tracking, a few workouts per week), how many days does it last?', o:['7+ days — charge it weekly','4–6 days — charge it twice a week','2–3 days — charge every other day','1 day or less — needs daily charging'] },
+        { tp:'sel', k:'gps_battery', l:'Battery During GPS Workouts', h:'When using GPS for outdoor activities, how does the battery hold up during a typical session?', o:['Excellent — barely drains during workouts','Good — loses a reasonable amount','Fair — drains noticeably fast','Poor — a 1-hour workout drains it significantly',"Don't use GPS"] },
+        { tp:'sel', k:'sleep_battery', l:'Battery While Sleeping', h:'If you wear it at night for sleep tracking, how much battery does it typically consume overnight?', o:['Very little — under 5% overnight','Manageable — 5 to 15% overnight','Quite a lot — 15 to 25% overnight','Too much — sleep tracking kills the battery',"Don't sleep with it"] },
+        { tp:'sel', k:'charge_speed', l:'Charging Speed', h:'How long does it take to fully charge the watch from near-empty?', o:['Under 1 hour — very fast','1–2 hours — acceptable','2–3 hours — a bit slow','More than 3 hours — too slow'] },
+        { tp:'sel', k:'charge_convenience', l:'Charging Convenience', h:'Is the charging method (cable, cradle, wireless) easy and convenient to use daily?', o:['Very convenient — simple and reliable','Convenient — minor annoyances','Somewhat inconvenient — fiddly or awkward','Very inconvenient — frustrating to charge'] },
+        { tp:'ta',  k:'batt_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'9', k:'app', t:'Companion App & Ecosystem', sk:'s_app', f:[
-        { tp:'sel', k:'app_ui', l:'App Interface Quality', h:'Is the app clean and does it present health/workout data clearly and easily?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'subscriptions', l:'Subscription Paywalls', h:'Besides paid watch faces, are core features locked behind a monthly subscription?', o:['None','Optional Features','Core Features Locked'] },
-        { tp:'sel', k:'in_app_ads', l:'In-App Ads', h:'Does the app show brand advertisements every time you open it?', o:['None','Occasional','Frequent/Annoying'] },
-        { tp:'sel', k:'bt_stability', l:'Bluetooth Connection Stability', h:'Is the Bluetooth link to your phone stable or does the watch disconnect on its own?', o:['Very Stable','Stable','Occasional Drops','Frequent Drops'] },
-        { tp:'ta',  k:'app_notes', l:'Notes', h:'' }
+
+      { n:'9', k:'app', t:'Companion App Experience', sk:'s_app', f:[
+        { tp:'sel', k:'app_ease', l:'App Ease of Use', h:'Is the companion app easy to navigate and understand, even for someone not very tech-savvy?', o:['Very easy — anyone can use it','Easy — minor learning curve','Moderate — takes some getting used to','Confusing — hard to find things'] },
+        { tp:'sel', k:'app_data', l:'Health & Workout Data Presentation', h:'Does the app present your health and fitness data (sleep, steps, heart rate, workouts) in a clear and motivating way?', o:['Excellent — data is beautiful and useful','Good — clear and informative','Fair — basic and a bit dull','Poor — hard to understand or not useful'] },
+        { tp:'sel', k:'app_sync', l:'Sync Speed', h:'How quickly does data from the watch sync to the app after a workout or when opening the app?', o:['Instant — always up to date','Fast — syncs within seconds','Slow — takes a minute or more','Very slow or unreliable sync'] },
+        { tp:'sel', k:'subscriptions', l:'Paid Features or Subscriptions', h:'Does the app lock useful features behind a monthly or yearly subscription?', o:['No subscription needed — everything is free','Optional subscription — free features are enough','Some important features require payment','Core features locked behind a paywall'] },
+        { tp:'sel', k:'in_app_ads', l:'Ads in the App', h:'Does the companion app show advertisements?', o:['No ads at all','Occasional subtle ads','Frequent ads — somewhat annoying','Constant ads — very disruptive'] },
+        { tp:'ta',  k:'app_notes', l:'Additional Comments', h:'' }
       ]},
+
       { n:'★', k:'verdict', t:'Final Verdict', sk: null }
     ]
   },
 
   tws: {
-    scoreMap: { s_price:'Price/Value', s_sound:'Sound', s_anc:'ANC', s_design:'Design/Fit', s_batt:'Battery', s_conn:'Connectivity', s_ctrl:'Controls' },
+    scoreMap: { s_price:'Price/Value', s_sound:'Sound Quality', s_anc:'Noise Cancelling', s_design:'Design & Fit', s_batt:'Battery Life', s_conn:'Calls & Connection', s_ctrl:'Controls & App' },
     sections: [
       { n:'0', k:'photo', t:'Product Information', sk: null },
-      { n:'1', k:'price', t:'Price & Positioning', sk:'s_price', f:[
-        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'' },
-        { tp:'sel', k:'positioning', l:'Market Positioning', h:'', o:['Entry-level','Mid-range','Premium','Flagship'] },
-        { tp:'sel', k:'value_money', l:'Value for Money', h:'Is the asking price justified?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'price_notes', l:'Notes', h:'' }
-      ]},
-      { n:'2', k:'sound', t:'Sound Quality', sk:'s_sound', f:[
-        { tp:'sel', k:'driver', l:'Driver Type', h:'What transducer technology is used?', o:['Dynamic','Balanced Armature','Hybrid','Planar'] },
-        { tp:'sel', k:'bass', l:'Bass Quality', h:'Is the low end punchy and controlled, or muddy?', o:['Excellent','Good','Fair','Weak/Muddy'] },
-        { tp:'sel', k:'mids', l:'Mids Quality', h:'Are vocals and instruments natural and present?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'treble', l:'Treble Quality', h:'Are highs detailed without harshness or sibilance?', o:['Excellent','Good','Fair','Harsh/Sibilant'] },
-        { tp:'sel', k:'soundstage', l:'Soundstage', h:'Does music feel spacious and immersive, or closed/in-head?', o:['Wide & Immersive','Good','Narrow','Very Narrow'] },
-        { tp:'sel', k:'eq_support', l:'EQ / App Support', h:'Does the companion app offer EQ customization?', o:['Full parametric EQ','Preset EQ only','No EQ'] },
-        { tp:'ta',  k:'sound_notes', l:'Notes', h:'' }
-      ]},
-      { n:'3', k:'anc', t:'ANC & Transparency Mode', sk:'s_anc', f:[
-        { tp:'sel', k:'anc_eff', l:'ANC Effectiveness', h:'How well does it block ambient noise (e.g. office, plane, street)?', o:['Excellent','Good','Fair','Poor/None'] },
-        { tp:'sel', k:'anc_sound', l:'ANC Impact on Sound Quality', h:'Does activating ANC degrade the audio quality?', o:['No impact','Slight degradation','Noticeable degradation'] },
-        { tp:'sel', k:'transparency', l:'Transparency Mode', h:'Does passthrough mode sound natural, like not wearing earbuds?', o:['Natural & Clear','Good','Muffled','None'] },
-        { tp:'sel', k:'wind_noise', l:'Wind Noise Handling (ANC on)', h:'Does wind cause loud noise artifacts when ANC is active?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'anc_notes', l:'Notes', h:'' }
-      ]},
-      { n:'4', k:'design', t:'Design, Fit & Build', sk:'s_design', f:[
-        { tp:'sel', k:'fit_type', l:'Fit Type', h:'', o:['In-ear (silicone tips)','Semi-in-ear','Open-ear (hook)','Over-ear'] },
-        { tp:'sel', k:'comfort', l:'Comfort for Long Sessions', h:'Can you wear them comfortably for 2+ hours without ear fatigue?', o:['Excellent (4h+)','Good (2-4h)','Fair (1-2h)','Uncomfortable (<1h)'] },
-        { tp:'sel', k:'tip_sizes', l:'Ear Tip Sizes Included', h:'How many silicone tip sizes are provided in the box?', o:['XS/S/M/L/XL (5 sizes)','S/M/L (3 sizes)','Only 1 size'] },
-        { tp:'sel', k:'ipx', l:'IPX / Water Resistance Rating', h:'Is there official water/sweat resistance certification?', o:['IPX8','IPX7','IPX5/IPX4','No rating'] },
-        { tp:'sel', k:'build_quality', l:'Build Quality', h:'Do the earbuds and case feel premium or cheap?', o:['Premium','Good','Acceptable','Cheap/Plasticky'] },
-        { tp:'ta',  k:'design_notes', l:'Notes', h:'' }
-      ]},
-      { n:'5', k:'battery', t:'Battery & Charging', sk:'s_batt', f:[
-        { tp:'num', k:'earbud_hrs', l:'Earbud Battery Life (hours)', h:'Real-world battery life per charge (ANC off)' },
-        { tp:'num', k:'case_hrs', l:'Total with Case (hours)', h:'Total playtime including all charges from the case' },
-        { tp:'txt', k:'fast_charge', l:'Fast Charge', h:'e.g. 10 min charge = 2h playback' },
-        { tp:'sel', k:'wireless_case', l:'Wireless Charging Case', h:'Does the charging case support Qi wireless charging?', o:['Yes','No'] },
-        { tp:'ta',  k:'batt_notes', l:'Notes', h:'' }
-      ]},
-      { n:'6', k:'connectivity', t:'Calls & Connectivity', sk:'s_conn', f:[
-        { tp:'sel', k:'mic_quality', l:'Call Microphone Quality', h:'How do you sound to the other person on calls?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'wind_call', l:'Wind Noise Rejection (Calls)', h:'Does wind interfere with call clarity?', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'multipoint', l:'Multipoint Connection', h:'Can the earbuds connect to 2 devices simultaneously?', o:['Yes - Seamless','Yes - Manual switch','No'] },
-        { tp:'txt', k:'codec_support', l:'Codec Support', h:'e.g. AAC, aptX HD, LDAC, LC3/LE Audio' },
-        { tp:'sel', k:'latency', l:'Latency (Video/Gaming)', h:'Is there noticeable audio/video desync when watching or gaming?', o:['Excellent (<40ms)','Good (40-80ms)','Acceptable (80-150ms)','High (>150ms)'] },
-        { tp:'ta',  k:'conn_notes', l:'Notes', h:'' }
-      ]},
-      { n:'7', k:'controls', t:'Controls & Companion App', sk:'s_ctrl', f:[
-        { tp:'sel', k:'touch_ease', l:'Touch Controls Ease of Use', h:'Are touch gestures reliable and intuitive to use?', o:['Excellent','Good','Fair','Frustrating'] },
-        { tp:'sel', k:'accidental_touch', l:'Accidental Touch Rate', h:'Do earbuds accidentally trigger actions when adjusting them?', o:['Never','Rarely','Sometimes','Frequently'] },
-        { tp:'sel', k:'wear_detect', l:'Wear Detection (Auto Pause)', h:'Does the auto-pause when removing earbuds work reliably?', o:['Yes - Reliable','Yes - Unreliable','No'] },
-        { tp:'sel', k:'app_quality', l:'Companion App Quality', h:'Is the companion app well-designed and useful?', o:['Excellent','Good','Fair','Poor/None'] },
-        { tp:'ta',  k:'ctrl_notes', l:'Notes', h:'' }
-      ]},
-      { n:'★', k:'verdict', t:'Final Verdict', sk: null }
-    ]
-  },
 
-  iot: {
-    scoreMap: { s_price:'Price/Value', s_conn:'Connectivity', s_perf:'Performance', s_app:'App', s_batt:'Battery', s_sec:'Security', s_use:'Usability' },
-    sections: [
-      { n:'0', k:'photo', t:'Product Information', sk: null },
-      { n:'1', k:'price', t:'Price & Positioning', sk:'s_price', f:[
-        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'' },
-        { tp:'sel', k:'positioning', l:'Market Positioning', h:'', o:['Entry-level','Mid-range','Premium','Flagship'] },
-        { tp:'sel', k:'value_money', l:'Value for Money', h:'', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'price_notes', l:'Notes', h:'' }
+      { n:'1', k:'price', t:'Price & Value', sk:'s_price', f:[
+        { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'How much does it cost in stores right now?' },
+        { tp:'sel', k:'positioning', l:'Market Segment', h:'Which price category do these earbuds belong to?', o:['Entry-level (up to R$300)','Mid-range (R$300–R$800)','Premium (R$800–R$1,500)','Flagship (R$1,500+)'] },
+        { tp:'sel', k:'value_money', l:'Value for Money', h:'Considering the sound, features and build quality, is the price fair?', o:['Excellent — worth every cent','Good — fair price for what you get','Fair — acceptable but not exciting','Poor — overpriced for what it delivers'] },
+        { tp:'sel', k:'purchase_intent', l:'Would You Buy It Again?', h:'Knowing what you know now, would you buy these earbuds again?', o:['Definitely yes','Probably yes','Probably not','Definitely not'] },
+        { tp:'ta',  k:'price_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'2', k:'connectivity', t:'Connectivity', sk:'s_conn', f:[
-        { tp:'sel', k:'wifi', l:'Wi-Fi Standard', h:'', o:['Wi-Fi 6E','Wi-Fi 6','Wi-Fi 5','Wi-Fi 4'] },
-        { tp:'sel', k:'protocols', l:'Smart Home Protocols', h:'', o:['Matter + Thread + Zigbee','Matter + Thread','Zigbee only','Proprietary only'] },
-        { tp:'ta',  k:'conn_notes', l:'Notes', h:'' }
+
+      { n:'2', k:'sound', t:'Sound Quality', sk:'s_sound', f:[
+        { tp:'sel', k:'overall_sound', l:'Overall Sound Impression', h:'When listening to your usual music, how would you describe the overall sound quality?', o:['Exceptional — best earbuds I have used','Very good — clear and enjoyable','Good — decent everyday sound','Average — nothing special','Disappointing — poor quality'] },
+        { tp:'sel', k:'bass', l:'Bass (Low Sounds)', h:'How do the bass and low frequencies sound — punchy and controlled, or too much/too little?', o:['Perfect bass — deep and controlled','Good bass — satisfying without overdoing it','Too much bass — boomy and muddy','Too little bass — lacks punch and depth'] },
+        { tp:'sel', k:'vocals', l:'Vocals & Midrange', h:'When listening to music with singing or speech, do voices sound natural and clear?', o:['Excellent — voices are clear and natural','Good — natural with minor coloring','Fair — slightly muffled or distant','Poor — vocals sound unnatural or recessed'] },
+        { tp:'sel', k:'treble', l:'Treble (High Sounds)', h:'Do cymbals, high notes and details in music sound crisp and clear without being harsh?', o:['Excellent — detailed without being harsh','Good — clear and pleasant','Slightly harsh — sibilant on some tracks','Dull — lacks detail and sparkle'] },
+        { tp:'sel', k:'soundstage', l:'Sound Space & Immersion', h:'Does music feel like it surrounds you and has depth, or does everything sound like it is inside your head?', o:['Wide and immersive — great spatial feel','Good — decent sense of space','Narrow — sounds mostly in the center','Very closed-in — everything in your head'] },
+        { tp:'sel', k:'eq_support', l:'Sound Customization (EQ)', h:'Does the companion app let you adjust the sound to your preference with an equalizer?', o:['Full EQ — many customization options','Basic EQ — a few preset options','No EQ — cannot adjust the sound'] },
+        { tp:'ta',  k:'sound_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'3', k:'performance', t:'Performance', sk:'s_perf', f:[
-        { tp:'sel', k:'response', l:'Responsiveness', h:'', o:['Instant','Fast','Acceptable','Slow'] },
-        { tp:'sel', k:'reliability', l:'Reliability', h:'', o:['Very Reliable','Reliable','Occasional Issues','Unreliable'] },
-        { tp:'ta',  k:'perf_notes', l:'Notes', h:'' }
+
+      { n:'3', k:'anc', t:'Noise Cancelling & Transparency', sk:'s_anc', f:[
+        { tp:'sel', k:'anc_eff', l:'Noise Cancelling Effectiveness', h:'How well does the noise cancelling block out sounds around you — office noise, traffic, airplane cabin?', o:['Excellent — blocks almost everything','Good — noticeably reduces noise','Fair — reduces some noise but not impressive','Poor — barely makes a difference','No noise cancelling on this model'] },
+        { tp:'sel', k:'anc_comfort', l:'Comfort With Noise Cancelling On', h:'When noise cancelling is active, does it cause any uncomfortable pressure sensation in your ears?', o:['No pressure at all — very comfortable','Slight pressure — barely noticeable','Moderate pressure — a bit uncomfortable','Strong pressure — hard to wear for long'] },
+        { tp:'sel', k:'transparency', l:'Transparency / Passthrough Mode', h:'When you want to hear the world around you (e.g. talking to someone), does the passthrough mode sound natural?', o:['Very natural — like not wearing earbuds','Good — mostly natural with minor artifacts','Fair — sounds slightly processed or tinny','Poor — sounds very unnatural or unavailable'] },
+        { tp:'sel', k:'wind_noise', l:'Wind Noise', h:'When outside on a windy day with noise cancelling on, does wind cause loud or annoying noise in the earbuds?', o:['No wind noise — perfect outdoors','Slight wind noise — only in strong gusts','Noticeable wind noise — somewhat annoying','Severe wind noise — unusable outdoors'] },
+        { tp:'ta',  k:'anc_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'4', k:'app', t:'App & Ecosystem', sk:'s_app', f:[
-        { tp:'sel', k:'app_quality', l:'App Interface Quality', h:'', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'sel', k:'integrations', l:'Third-Party Integrations', h:'', o:['All major platforms','Most platforms','Limited','None'] },
-        { tp:'sel', k:'subscriptions', l:'Subscription Paywalls', h:'', o:['None','Optional Features','Core Features Locked'] },
-        { tp:'ta',  k:'app_notes', l:'Notes', h:'' }
+
+      { n:'4', k:'design', t:'Design, Fit & Build', sk:'s_design', f:[
+        { tp:'sel', k:'first_impression', l:'First Impression', h:'When you first held and put on the earbuds, what was your overall impression?', o:['Premium — looks and feels high-end','Good — solid and well-made','Average — nothing special','Cheap — feels plasticky or flimsy'] },
+        { tp:'sel', k:'comfort', l:'Comfort During Use', h:'How comfortable are the earbuds to wear for extended listening sessions?', o:['Very comfortable — can wear for hours','Comfortable — fine for 2–3 hours','Somewhat comfortable — ears get tired after a while','Uncomfortable — causes ear pain fairly quickly'] },
+        { tp:'sel', k:'fit_stability', l:'Fit Stability', h:'Do the earbuds stay securely in your ears during movement — walking, running, gym?', o:['Very secure — never fall out','Good — stay in place for most activities','Sometimes slip — need readjusting during exercise','Fall out easily — difficult to keep in'] },
+        { tp:'sel', k:'case_quality', l:'Charging Case Quality', h:'Is the charging case easy to open, close, and carry around daily?', o:['Excellent — premium feel and very practical','Good — solid and functional','Fair — acceptable but a bit bulky or awkward','Poor — fragile, hard to open or inconvenient'] },
+        { tp:'sel', k:'water_resistance', l:'Water & Sweat Resistance', h:'Are the earbuds resistant to sweat and light rain so you can use them during sports without worry?', o:['Yes — no concerns with sweat or light rain','Yes — but I am careful around water','Somewhat — might be an issue for intense workouts','No water resistance — avoid moisture entirely'] },
+        { tp:'ta',  k:'design_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'5', k:'battery', t:'Battery / Power', sk:'s_batt', f:[
-        { tp:'sel', k:'power_type', l:'Power Type', h:'', o:['Battery powered','Plug-in','Solar + Battery','USB-C'] },
-        { tp:'num', k:'batt_life', l:'Battery Life (months)', h:'If battery powered' },
-        { tp:'ta',  k:'batt_notes', l:'Notes', h:'' }
+
+      { n:'5', k:'battery', t:'Battery Life & Charging', sk:'s_batt', f:[
+        { tp:'sel', k:'earbud_battery', l:'Earbud Battery Life', h:'On a single charge (without the case), how long do the earbuds last with your typical usage?', o:['8+ hours — exceptional','6–8 hours — very good','4–6 hours — good for most use','2–4 hours — gets me through work or gym','Under 2 hours — too short'] },
+        { tp:'sel', k:'total_battery', l:'Total Battery With Case', h:'Including the charging case, how many times can you charge the earbuds before the case also runs out?', o:['4+ full charges — last many days','3 full charges — good for travel','2 full charges — manageable','Only 1 extra charge — case runs out too fast'] },
+        { tp:'sel', k:'anc_battery_impact', l:'Battery With Noise Cancelling On', h:'Does turning on noise cancelling noticeably shorten the battery life?', o:['No noticeable difference','Slight reduction — still lasts long enough','Noticeable reduction — affects daily use','Significant reduction — I avoid using ANC to save battery'] },
+        { tp:'sel', k:'fast_charge', l:'Quick Charge', h:'Does a short charge (10–15 minutes in the case) give you enough battery for a quick session?', o:['Yes — 15 minutes gives 2+ hours','Yes — gives about 1 hour','Minimal — barely enough for a short session','No quick charge feature'] },
+        { tp:'sel', k:'wireless_case', l:'Wireless Charging Case', h:'Does the charging case support wireless charging (Qi)?', o:['Yes — charges wirelessly','No — cable only'] },
+        { tp:'ta',  k:'batt_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'6', k:'security', t:'Security & Privacy', sk:'s_sec', f:[
-        { tp:'sel', k:'local_proc', l:'Local Processing', h:'', o:['Fully local','Mostly local','Cloud dependent','Cloud only'] },
-        { tp:'sel', k:'sec_updates', l:'Security Updates', h:'', o:['Regular updates','Occasional','Rarely','None'] },
-        { tp:'ta',  k:'sec_notes', l:'Notes', h:'' }
+
+      { n:'6', k:'connectivity', t:'Calls & Connection', sk:'s_conn', f:[
+        { tp:'sel', k:'call_quality', l:'Call Quality', h:'When making or receiving phone calls, how clearly can the other person hear you, and can you hear them?', o:['Excellent — crystal clear both ways','Good — clear with minor issues','Fair — acceptable but sometimes muffled','Poor — hard to hear or be heard on calls'] },
+        { tp:'sel', k:'wind_call', l:'Calls in Windy Conditions', h:'When taking a call outdoors on a windy day, does wind affect the call quality noticeably?', o:['No issues — wind does not affect calls','Slight wind interference','Noticeable wind noise on calls','Strong wind makes calls unusable'] },
+        { tp:'sel', k:'pairing_ease', l:'Bluetooth Pairing', h:'How easy is it to connect the earbuds to your phone when you take them out of the case?', o:['Instant and automatic — always connects','Fast — connects within a few seconds','Moderate — takes a moment to connect','Slow or unreliable — sometimes have to pair manually'] },
+        { tp:'sel', k:'connection_stability', l:'Connection Stability', h:'During daily use, does the audio ever cut out, drop, or stutter between the earbuds and your phone?', o:['Never cuts out — always stable','Rarely drops — very reliable','Occasionally cuts out — mildly annoying','Frequently cuts out — very frustrating'] },
+        { tp:'sel', k:'multipoint', l:'Using With Multiple Devices', h:'Can you connect the earbuds to two devices at the same time (e.g. phone and laptop) and switch between them easily?', o:['Yes — switches seamlessly','Yes — but switching requires manual steps','No — one device at a time only'] },
+        { tp:'ta',  k:'conn_notes', l:'Additional Comments', h:'' }
       ]},
-      { n:'7', k:'usability', t:'Usability', sk:'s_use', f:[
-        { tp:'sel', k:'setup', l:'Setup Difficulty', h:'', o:['Very Easy','Easy','Moderate','Difficult'] },
-        { tp:'sel', k:'daily_use', l:'Daily Use', h:'', o:['Excellent','Good','Fair','Poor'] },
-        { tp:'ta',  k:'use_notes', l:'Notes', h:'' }
+
+      { n:'7', k:'controls', t:'Controls & Companion App', sk:'s_ctrl', f:[
+        { tp:'sel', k:'touch_ease', l:'Touch Controls', h:'Are the touch controls on the earbuds easy to use reliably — play, pause, skip, volume, calls?', o:['Excellent — always works as expected','Good — reliable with minor misses','Fair — works but requires precise tapping','Frustrating — often misreads or fails'] },
+        { tp:'sel', k:'accidental_touch', l:'Accidental Touches', h:'When adjusting the earbuds in your ears or touching your face, do they accidentally trigger actions?', o:['Never — no accidental touches','Rarely — only occasionally','Sometimes — mildly annoying','Frequently — a real daily frustration'] },
+        { tp:'sel', k:'wear_detect', l:'Auto Pause When Removed', h:'When you remove one earbud, does the music pause automatically?', o:['Yes — always works reliably','Yes — works most of the time','Inconsistent — sometimes pauses, sometimes not','No — does not auto-pause'] },
+        { tp:'sel', k:'app_quality', l:'Companion App Quality', h:'Is the companion app easy to use and does it provide useful features (EQ, find my earbuds, firmware updates)?', o:['Excellent — well-designed and very useful','Good — functional with useful features','Fair — basic app, could be better','Poor — buggy, confusing or nearly useless','No companion app'] },
+        { tp:'sel', k:'customization', l:'Controls Customization', h:'Can you change what the touch controls do (e.g. assign double tap to volume instead of skip)?', o:['Full customization — can change everything','Partial — can adjust some controls','No customization — fixed controls only'] },
+        { tp:'ta',  k:'ctrl_notes', l:'Additional Comments', h:'' }
       ]},
+
       { n:'★', k:'verdict', t:'Final Verdict', sk: null }
     ]
   }

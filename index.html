@@ -569,20 +569,6 @@ select option { background: var(--bg2); }
 .lang-label{font-size:11px;color:var(--text4);font-family:var(--font-mono);margin-right:2px}
 .lang-btn{padding:4px 10px;border-radius:16px;border:1px solid var(--border2);background:transparent;font-size:12px;font-weight:500;color:var(--text4);cursor:pointer;transition:all .15s;font-family:var(--font)}
 .lang-btn:hover{color:var(--text2)}.lang-btn.active{background:#1a56ff22;border-color:#1a56ff;color:#60a5fa}
-.paste-box{background:#161b2299;border:1px solid #388bfd44;border-radius:13px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden}
-.paste-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#388bfd,#a855f7,#22c55e)}
-.paste-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
-.paste-icon{font-size:22px;flex-shrink:0;line-height:1}
-.paste-title{font-size:14px;font-weight:700;color:#e6edf3;margin-bottom:2px}
-.paste-sub{font-size:11px;color:#6e7681;line-height:1.4}
-.paste-textarea{width:100%;min-height:110px;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#c9d1d9;font-size:12px;padding:10px 12px;resize:vertical;font-family:var(--font);line-height:1.6;transition:border-color .15s}
-.paste-textarea:focus{outline:none;border-color:#388bfd;box-shadow:0 0 0 3px #388bfd1a}
-.paste-btn{flex:1;background:#1a56ff;border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;padding:10px 18px;cursor:pointer;font-family:var(--font);transition:opacity .15s}
-.paste-btn:hover{opacity:.9}.paste-btn:disabled{opacity:.5;cursor:not-allowed}
-.paste-clear-btn{background:transparent;border:1px solid var(--border2);border-radius:9px;color:var(--text4);font-size:12px;padding:10px 14px;cursor:pointer;font-family:var(--font)}
-.paste-clear-btn:hover{background:var(--bg3)}
-.paste-status{font-size:12px;margin-top:8px;min-height:18px;font-weight:500}
-.paste-status.success{color:#3fb950}.paste-status.error{color:#f85149}
 .stab-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .stab{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--bg2);font-size:12px;font-weight:500;color:var(--text4);cursor:pointer;transition:all .15s;font-family:var(--font)}
 .stab:hover{color:var(--text2)}.stab.active{background:#1a56ff22;border-color:#1a56ff;color:#60a5fa}
@@ -2454,9 +2440,6 @@ function renderSalesHome() {
   ).join('');
   document.getElementById('sales-type-buyer').classList.toggle('active', curSalesType==='buyer');
   document.getElementById('sales-type-nonbuyer').classList.toggle('active', curSalesType==='nonbuyer');
-  // Update CTA title label
-  const ctaTitle = document.getElementById('sales-cta-title');
-  if (ctaTitle) ctaTitle.textContent = curSalesType==='buyer' ? t('new_buyer_record') : t('new_nonbuyer_record')||t('new_buyer_record').replace(t('buyer'),t('non_buyer'));
   renderSalesList();
 }
 
@@ -2528,25 +2511,7 @@ function buildSalesForm() {
   const color   = isBuyer?'#2ea043':'#e3b341';
   document.getElementById('sales-add-sub').textContent = `${curSalesModel} · ${isBuyer?t('buyer'):t('non_buyer')}`;
   document.getElementById('sales-btn-complete').style.background = color;
-  document.getElementById('sales-form-body').innerHTML = buildSalesPasteBox(isBuyer) + (isBuyer?buildBuyerForm():buildNonBuyerForm());
-}
-
-function buildSalesPasteBox(isBuyer) {
-  return `<div class="paste-box" style="border-color:${isBuyer?'#2ea04344':'#d9770644'}">
-    <div class="paste-header">
-      <div class="paste-icon">📋</div>
-      <div>
-        <div class="paste-title">${t('sales_paste_title')}</div>
-        <div class="paste-sub">${t('sales_paste_sub')}</div>
-      </div>
-    </div>
-    <textarea id="sales-paste-input" class="paste-textarea" rows="5" placeholder="Nome: João Silva&#10;Gênero: M&#10;Idade: 35&#10;Celular roubado..."></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button id="sales-paste-btn" class="paste-btn" style="background:${isBuyer?'#2ea043':'#d97706'}" onclick="runSalesPasteAndFill()">${t('sales_paste_btn')}</button>
-      <button class="paste-clear-btn" onclick="document.getElementById('sales-paste-input').value=''">${t('sales_paste_clear')}</button>
-    </div>
-    <div id="sales-paste-status" class="paste-status"></div>
-  </div>`;
+  document.getElementById('sales-form-body').innerHTML = isBuyer?buildBuyerForm():buildNonBuyerForm();
 }
 
 // ── Field builder ──
@@ -2665,7 +2630,7 @@ function handleSalesPhoto(e, wrapId) {
   reader.onload=ev=>{
     salesPhotoURL=ev.target.result;
     const w=document.getElementById(wrapId);
-    if(w) w.innerHTML=`<img class="photo-preview" src="${salesPhotoURL}" onclick="clearSalesPhoto('${wrapId}')" title="Click to remove"><span class="photo-remove" onclick="clearSalesPhoto('${wrapId}')">✕ ${t('remove_photo').replace('✕ ','')}</span>`;
+    if(w) w.innerHTML=`<img class="photo-preview" src="${salesPhotoURL}" onclick="clearSalesPhoto('${wrapId}')" title="Click to remove"><span class="photo-remove" onclick="clearSalesPhoto('${wrapId}')">✕</span>`;
   };
   reader.readAsDataURL(file);
 }
@@ -2703,120 +2668,6 @@ function collectSales() {
 function saveSalesDraft()    { saveSalesEntry(collectSales()); goSales(); }
 function saveSalesComplete() { const e=collectSales(); saveSalesEntry(e); showSalesDetail(e.id); }
 function deleteCurSales()    { if(!editingSalesId){goSales();return;} if(!confirm(t('delete')+'?'))return; deleteSalesEntry(editingSalesId); editingSalesId=null; goSales(); }
-
-// ── AI paste for sales ──
-async function runSalesPasteAndFill() {
-  const textarea=document.getElementById('sales-paste-input');
-  const btn=document.getElementById('sales-paste-btn');
-  const status=document.getElementById('sales-paste-status');
-  const text=textarea?.value?.trim(); if(!text)return;
-  const isBuyer=curSalesType==='buyer';
-  btn.disabled=true; btn.textContent=t('sales_paste_loading'); status.textContent=''; status.className='paste-status';
-
-  const nonBuyerFields=`
-- cust_name: Nome do cliente (se mencionado)
-- gender: Gênero — use "Male" se masculino, "Female" se feminino
-- apparent_age: Idade aparente — converta para faixa: "Under 20"(<20), "20–30"(20-29), "30–40"(30-39), "40–50"(40-49), "Over 50"(>50). Se informar "37" use "30–40"
-- phone_uses: Usos — lista com vírgula, apenas: Work,Study,Entertainment,Social Media,Gaming,Photography,Other
-- fav_apps: Apps favoritos (texto livre)
-- current_phone: Celular atual (texto livre, deixe vazio se não identificado)
-- change_reason: Motivo troca — lista com vírgula: Broken / Cracked screen,Outdated or very old,Stolen,Too slow / laggy,Battery died,Upgrading to better camera,Other
-- change_reason_other: Detalhes adicionais sobre motivo
-- no_buy_reasons: Razões NÃO comprar — lista com vírgula: Price higher than expected,Specifications below desired,Prefers another brand,Prefers another model,Did not like the design / colors,Does not need 5G,Not ready to buy today,Wants to think more / research first,Partner or family needs to approve,Other
-- no_buy_other: Resumo detalhado de tudo sobre por que não comprou
-- preferred_alternative: O que o cliente preferiu (texto livre)
-- promoter_notes: Observações sobre a interação — capture TODA narrativa relevante
-- reconversion_chance: "High — showed real interest","Medium — undecided","Low — firmly chose another brand","Very low — just browsing"`;
-
-  const buyerFields=`
-- cust_name: Nome completo
-- gender: "Male","Female","Prefer not to say"
-- age_range: "Under 20","20–30","30–40","40–50","Over 50". Se idade exata converta p/ faixa
-- occupation: Ocupação
-- phone_uses: lista com vírgula: Work,Study,Entertainment,Social Media,Gaming,Photography,Other
-- fav_apps: Apps favoritos
-- current_phone: Celular atual
-- color_choice: Cor escolhida (texto livre)
-- change_reason: lista: Broken / Cracked screen,Outdated or very old,Stolen,Too slow / laggy,Battery died,Upgrading to better camera,Other
-- change_reason_other: Detalhes sobre motivo
-- prev_problems: lista: Lagged or froze constantly,Too fragile / broke easily,Battery drained too fast,Poor camera quality,Too little storage,Screen too small,Too expensive to repair,Other
-- prev_problems_other: Outros problemas
-- first_contact_when: "Today in store — first time seeing it","Saw it online before coming","Saw it in another store","Saw an ad (TV/social media)","Recommendation from friend/family"
-- first_spec_attracted: "Price","Camera quality","Design / color","Battery life","Screen size","Brand name","5G connectivity","Speed / performance","Other"
-- online_research: "Yes, did extensive research","Yes, briefly","No, came in without prior research"
-- research_where: lista: Tech websites / blogs,YouTube reviews,Social media (Instagram/TikTok),Online store reviews,Asked friends/family,Did not research
-- research_channel: Canal/site específico
-- competitor_brand: "Motorola Moto","Samsung Galaxy","Oppo","Xiaomi / Redmi","Realme","Apple iPhone","Another JOVI model","No other brand — came for JOVI"
-- competitor_model: Modelo específico
-- compared_in_store: "Yes — compared side by side","Yes — asked about others briefly","No — came directly for JOVI"
-- comparison_notes: Notas comparação
-- purchase_reasons: lista: Best price in the category,Camera quality,Design / attractive colors,Battery life,5G connectivity,Brand trust / recommendation,Promoter presentation,Promotions / installment plan,Performance / speed,Display quality,Storage capacity,Other
-- purchase_reasons_other: Comentários compra
-- promoter_notes: Observações do promotor
-- interaction_quality: "Excellent — very engaged customer","Good — showed genuine interest","Neutral — needed convincing","Difficult — many objections"`;
-
-  const prompt=`Você é um assistente especialista em análise de vendas no varejo. Analise o texto e extraia TODAS as informações.
-
-TIPO: ${isBuyer?'COMPRADOR':'NÃO COMPRADOR'} do JOVI ${curSalesModel}
-
-INSTRUÇÕES:
-1. Leia TODO o texto com atenção
-2. O texto pode ser narrativo e informal — interprete o CONTEXTO
-3. Para campos com opções fixas use EXATAMENTE um dos valores
-4. Para listas retorne valores separados por vírgula
-5. Para texto livre capture toda informação relevante em português
-6. "Não identificado" = deixe o campo vazio
-7. Capture o máximo possível em promoter_notes e no_buy_other/purchase_reasons_other
-
-CAMPOS:
-${isBuyer?buyerFields:nonBuyerFields}
-
-TEXTO:
-"""
-${text}
-"""
-
-Responda APENAS com JSON válido. Sem markdown. Sem texto fora do JSON.`;
-
-  try {
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:2048,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    const data=await resp.json();
-    console.log('API status:', resp.status);
-    console.log('API response:', JSON.stringify(data).slice(0,500));
-    if(data.error){throw new Error('API: '+JSON.stringify(data.error));}
-    const raw=(data.content?.map(c=>c.text||'').join('')||'');
-    console.log('Raw text:', raw.slice(0,300));
-    const clean=raw.replace(/```json[\s\S]*?```|```[\s\S]*?```/g,m=>m.replace(/```json\n?|```\n?/g,'')).replace(/```/g,'').trim();
-    const extracted=JSON.parse(clean);
-    Object.entries(extracted).forEach(([key,val])=>{
-      salesFormData[key]=val;
-      const el=document.getElementById('sff-'+key); if(!el)return;
-      if(el.tagName==='SELECT'||el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value=val;
-      else if(el.classList.contains('chk-grid')){
-        const vals=String(val).split(',').map(v=>v.trim());
-        el.querySelectorAll('input').forEach(cb=>{cb.checked=vals.some(v=>cb.value.toLowerCase().includes(v.toLowerCase())||v.toLowerCase().includes(cb.value.toLowerCase()));});
-      }
-    });
-    document.querySelectorAll('[id^="sacc-"]').forEach(el=>{if(el.classList.contains('acc-body'))el.classList.add('open');});
-    status.textContent=t('sales_paste_success'); status.className='paste-status success'; textarea.value='';
-  } catch(e) {
-    console.error('Parse error full:', e);
-    status.textContent = '✗ ' + (e.message||t('sales_paste_error'));
-    status.className='paste-status error';
-  }
-  btn.disabled=false; btn.textContent=t('sales_paste_btn');
-}
 
 // ── Detail view ──
 function showSalesDetail(id) {

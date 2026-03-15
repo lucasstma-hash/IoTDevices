@@ -720,9 +720,8 @@ select option { background: var(--bg2); }
     </main>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/libs/pptxgen.bundle.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
 // ===== INTERNATIONALIZATION =====
 let curLang = localStorage.getItem('jovi_lang') || 'en';
 
@@ -2317,151 +2316,6 @@ function exportSalesXlsx(id) {
   XLSX.writeFile(wb, filename+'.xlsx');
 }
 
-// ===== SALES POWERPOINT — single professional slide =====
-function exportSalesPptx(id) {
-  const s = loadSales().find(x => x.id === id);
-  if (!s) return;
-  const isBuyer = s.stype === 'buyer';
-  const accent  = isBuyer ? '2EA043' : 'D97706';
-  const light   = isBuyer ? 'E8F5E9' : 'FEF3C7';
-  const label   = isBuyer ? 'BUYER PROFILE' : 'NON-BUYER PROFILE';
-
-  const pres = new PptxGenJS();
-  pres.layout = 'LAYOUT_WIDE'; // 13.3 x 7.5 inches
-
-  const slide = pres.addSlide();
-  slide.background = { color: '0D1117' };
-
-  // ── LEFT accent bar ──
-  slide.addShape(pres.ShapeType.rect, { x:0, y:0, w:0.08, h:7.5, fill:{ color:accent } });
-
-  // ── TOP header band ──
-  slide.addShape(pres.ShapeType.rect, { x:0.08, y:0, w:13.22, h:1.05, fill:{ color:'161B22' } });
-
-  // JOVI badge top-right
-  slide.addShape(pres.ShapeType.rect, { x:11.8, y:0.15, w:1.3, h:0.55, fill:{ color:'1A56FF' }, rectRadius:0.06 });
-  slide.addText('JOVI', { x:11.8, y:0.15, w:1.3, h:0.55, fontSize:13, bold:true, color:'FFFFFF', align:'center', valign:'middle', fontFace:'Calibri', charSpacing:3 });
-
-  // Title
-  slide.addText('JOVI ' + s.model + '  ·  ' + label, { x:0.3, y:0.08, w:11.2, h:0.5, fontSize:20, bold:true, color:'E6EDF3', fontFace:'Calibri' });
-  slide.addText(new Date(s.created_at||Date.now()).toLocaleDateString('pt-BR'), { x:0.3, y:0.62, w:8, h:0.3, fontSize:10, color:'6E7681', fontFace:'Calibri' });
-
-  // ── PHOTO column (left) ──
-  const photoW = 2.6, photoH = 2.8, photoX = 0.25, photoY = 1.2;
-  if (s.photo) {
-    slide.addImage({ data: s.photo, x:photoX, y:photoY, w:photoW, h:photoH, rounding:false });
-  } else {
-    slide.addShape(pres.ShapeType.rect, { x:photoX, y:photoY, w:photoW, h:photoH, fill:{ color:'1C2128' }, line:{ color:'30363D', width:1 } });
-    slide.addText(isBuyer?'🛒':'👤', { x:photoX, y:photoY+1.0, w:photoW, h:0.8, fontSize:40, align:'center', fontFace:'Calibri' });
-    slide.addText('No photo', { x:photoX, y:photoY+1.9, w:photoW, h:0.4, fontSize:11, color:'484F58', align:'center', fontFace:'Calibri' });
-  }
-
-  // Name & key info under photo
-  const nameY = photoY + photoH + 0.1;
-  slide.addText(s.cust_name || (isBuyer?'Customer':'Anonymous'), { x:photoX, y:nameY, w:photoW, h:0.38, fontSize:13, bold:true, color:'E6EDF3', align:'center', fontFace:'Calibri' });
-  const sub1 = [s.gender, s.age_range||s.apparent_age].filter(Boolean).join(' · ');
-  if (sub1) slide.addText(sub1, { x:photoX, y:nameY+0.38, w:photoW, h:0.28, fontSize:10, color:'8B949E', align:'center', fontFace:'Calibri' });
-  if (s.occupation) slide.addText(s.occupation, { x:photoX, y:nameY+0.65, w:photoW, h:0.28, fontSize:10, color:'8B949E', align:'center', fontFace:'Calibri', italic:true });
-
-  // ── STATUS pill ──
-  slide.addShape(pres.ShapeType.rect, { x:photoX+0.35, y:nameY+0.98, w:photoW-0.7, h:0.38, fill:{ color: isBuyer?'0D422033':'3D2C0033' }, line:{ color:accent, width:1 } });
-  slide.addText(isBuyer ? '✓  PURCHASED' : '✗  DID NOT BUY', { x:photoX+0.35, y:nameY+0.98, w:photoW-0.7, h:0.38, fontSize:11, bold:true, color: isBuyer?'3FB950':'E3B341', align:'center', valign:'middle', fontFace:'Calibri' });
-
-  // ── CONTENT COLUMNS ──
-  // Column 1: x=3.1  width=3.1
-  // Column 2: x=6.5  width=3.1
-  // Column 3: x=9.9  width=3.2
-  const cols = [ {x:3.1,y:1.15,w:3.1}, {x:6.5,y:1.15,w:3.1}, {x:9.9,y:1.15,w:3.2} ];
-
-  function addBlock(col, title, items, yStart) {
-    const c = cols[col];
-    let y = yStart;
-    // Section header
-    slide.addShape(pres.ShapeType.rect, { x:c.x, y, w:c.w, h:0.3, fill:{ color: light }, line:{ color:accent, width:0.5 } });
-    slide.addText(title, { x:c.x+0.1, y, w:c.w-0.2, h:0.3, fontSize:9, bold:true, color:accent.length===6?accent:'2EA043', valign:'middle', fontFace:'Calibri' });
-    y += 0.3;
-    const filled = items.filter(([,v])=>v&&v!=='');
-    filled.forEach(([k,v],i) => {
-      const bg = i%2===0 ? 'FFFFFFFF' : 'F9FAFB';
-      slide.addShape(pres.ShapeType.rect, { x:c.x, y, w:c.w, h:0.32, fill:{ color:bg }, line:{ color:'E5E7EB', width:0.3 } });
-      slide.addText(k+':', { x:c.x+0.08, y:y+0.02, w:1.1, h:0.28, fontSize:8, color:'6E7681', fontFace:'Calibri', bold:true });
-      slide.addText(String(v).slice(0,55), { x:c.x+1.2, y:y+0.02, w:c.w-1.3, h:0.28, fontSize:8, color:'1F2937', fontFace:'Calibri', wrap:true });
-      y += 0.32;
-    });
-    return y + 0.15;
-  }
-
-  let y0=1.15, y1=1.15, y2=1.15;
-
-  if (isBuyer) {
-    y0 = addBlock(0,'PRODUCT & PURCHASE',[['Model',s.model],['Color',s.color_choice],['Purchase reasons',s.purchase_reasons]], y0);
-    y0 = addBlock(0,'PREVIOUS PHONE',[['Device',s.current_phone],['Change reason',s.change_reason],['Problems',s.prev_problems]], y0);
-    y1 = addBlock(1,'CUSTOMER PROFILE',[['Name',s.cust_name],['Gender',s.gender],['Age',s.age_range],['Occupation',s.occupation],['Uses',s.phone_uses],['Apps',s.fav_apps]], y1);
-    y2 = addBlock(2,'FIRST CONTACT',[['When',s.first_contact_when],['First spec noticed',s.first_spec_attracted],['Researched online',s.online_research],['Channel',s.research_channel]], y2);
-    y2 = addBlock(2,'COMPETITION',[['Brand considered',s.competitor_brand],['Model',s.competitor_model],['Compared in store',s.compared_in_store]], y2);
-    if (s.promoter_notes) y2 = addBlock(2,'PROMOTER NOTES',[['Notes',s.promoter_notes],['Interaction',s.interaction_quality]], y2);
-  } else {
-    y0 = addBlock(0,'CUSTOMER PROFILE',[['Gender',s.gender],['Apparent Age',s.apparent_age],['Uses',s.phone_uses],['Apps',s.fav_apps],['Current Phone',s.current_phone]], y0);
-    y1 = addBlock(1,'REASON FOR CHANGING',[['Reason',s.change_reason],['Details',s.change_reason_other]], y1);
-    y1 = addBlock(1,'REASONS NOT BUYING',[['Reasons',s.no_buy_reasons],['Details',s.no_buy_other],['Prefers',s.preferred_alternative]], y1);
-    y2 = addBlock(2,'PROMOTER NOTES',[['Notes',s.promoter_notes],['Return chance',s.reconversion_chance]], y2);
-  }
-
-  // ── Bottom bar ──
-  slide.addShape(pres.ShapeType.rect, { x:0.08, y:7.1, w:13.22, h:0.4, fill:{ color:'161B22' } });
-  slide.addText('JOVI Sales Intelligence  ·  Smartphone & IoT Lab  ·  ' + new Date().toLocaleDateString('pt-BR'), { x:0.3, y:7.1, w:12, h:0.4, fontSize:9, color:'484F58', valign:'middle', fontFace:'Calibri' });
-
-  const fn = [s.model, isBuyer?'Buyer':'Non-Buyer', s.cust_name||'Record'].filter(Boolean).join('_').replace(/[^a-zA-Z0-9_]/g,'_');
-  pres.writeFile({ fileName: fn + '.pptx' });
-}
-
-// ===== SALES SINGLE RECORD EXCEL — translated =====
-function exportSalesXlsx(id) {
-  const s = loadSales().find(x => x.id === id); if (!s) return;
-  const isBuyer = s.stype === 'buyer';
-  const accent  = isBuyer ? 'FF2EA043' : 'FFD97706';
-  const light   = isBuyer ? 'FFE8F5E9' : 'FFFEF3C7';
-  const label   = isBuyer ? t('buyer') : t('non_buyer');
-  const fn = [s.model, label, s.cust_name||'Record'].join(' - ').replace(/[^a-zA-Z0-9 \-_]/g,'');
-  const ws = {}; let row = 1;
-  function sc(addr,v,style){ws[addr]={v:v===undefined||v===null?'':v,t:typeof v==='number'?'n':'s',s:style};}
-  function mr(r1,c1,r2,c2){if(!ws['!merges'])ws['!merges']=[];ws['!merges'].push({s:{r:r1-1,c:c1-1},e:{r:r2-1,c:c2-1}});}
-  const today=new Date(s.created_at||Date.now()).toLocaleDateString('pt-BR');
-  sc('A'+row,'JOVI — '+s.model+' · '+label.toUpperCase(),cellStyle(accent,'FFFFFFFF',true,16));
-  sc('B'+row,'',cellStyle(accent,'FFFFFFFF',false,16)); sc('C'+row,'',cellStyle(accent,'FFFFFFFF',false,16));
-  mr(row,1,row,3); row++;
-  sc('A'+row,today,cellStyle('FF333333','FFAAAAAA',false,10)); sc('B'+row,'',cellStyle('FF333333','FFAAAAAA',false,10)); sc('C'+row,'',cellStyle('FF333333','FFAAAAAA',false,10));
-  mr(row,1,row,3); row+=2;
-  function block(title,pairs){
-    const filled=pairs.filter(([,v])=>v&&v!==''); if(!filled.length)return;
-    sc('A'+row,title,cellStyle(light,accent,true,11,true)); sc('B'+row,'',cellStyle(light,accent,true,11,true)); sc('C'+row,'',cellStyle(light,accent,true,11,true));
-    mr(row,1,row,3); row++;
-    filled.forEach(([k,v])=>{
-      sc('A'+row,k,cellStyle('FFFAFAFA','FF555555',true,10,true,'left',true));
-      sc('B'+row,String(v),cellStyle('FFFFFFFF','FF222222',false,10,true,'left',true));
-      sc('C'+row,'',cellStyle('FFFFFFFF','FF222222',false,10,true));
-      mr(row,2,row,3); row++;
-    }); row++;
-  }
-  if(isBuyer){
-    block(t('s_product_info').toUpperCase(),[[t('f_model_label'),s.model],[t('d_color'),s.color_choice]]);
-    block(t('s_customer_profile').toUpperCase(),[[t('d_name'),s.cust_name],[t('d_gender'),s.gender],[t('d_age'),s.age_range],[t('d_occupation'),s.occupation],[t('d_uses'),s.phone_uses],[t('d_apps'),s.fav_apps],[t('d_phone'),s.current_phone]]);
-    block(t('s_reason_changing').toUpperCase(),[[t('d_reasons'),s.change_reason],[t('d_details'),s.change_reason_other]]);
-    block(t('s_prev_issues').toUpperCase(),[[t('d_problems'),s.prev_problems],[t('d_details'),s.prev_problems_other]]);
-    block(t('s_first_contact').toUpperCase(),[[t('d_when'),s.first_contact_when],[t('d_first_spec'),s.first_spec_attracted],[t('d_online'),s.online_research],[t('d_where'),s.research_where],[t('d_channel'),s.research_channel]]);
-    block(t('s_competitor').toUpperCase(),[[t('d_brand'),s.competitor_brand],[t('d_model'),s.competitor_model],[t('d_compared'),s.compared_in_store],[t('d_notes'),s.comparison_notes]]);
-    block(t('s_purchase_reasons').toUpperCase(),[[t('d_top_reasons'),s.purchase_reasons],[t('d_comments'),s.purchase_reasons_other]]);
-    block(t('s_promoter_notes').toUpperCase(),[[t('d_obs'),s.promoter_notes],[t('d_interaction'),s.interaction_quality]]);
-  } else {
-    block(t('s_customer_profile').toUpperCase(),[[t('d_name'),s.cust_name],[t('d_gender'),s.gender],[t('d_apparent_age'),s.apparent_age],[t('d_uses'),s.phone_uses],[t('d_apps'),s.fav_apps],[t('d_phone'),s.current_phone]]);
-    block(t('s_reason_changing').toUpperCase(),[[t('d_reasons'),s.change_reason],[t('d_details'),s.change_reason_other]]);
-    block(t('s_not_buying').toUpperCase(),[[t('d_not_buy'),s.no_buy_reasons],[t('d_details'),s.no_buy_other],[t('d_preferred'),s.preferred_alternative]]);
-    block(t('s_promoter_nb').toUpperCase(),[[t('d_obs'),s.promoter_notes],[t('d_chance'),s.reconversion_chance]]);
-  }
-  ws['!ref']='A1:C'+row; ws['!cols']=[{wch:30},{wch:38},{wch:18}]; ws['!rows']=[{hpt:36},{hpt:16}];
-  XLSX.writeFile({SheetNames:['Profile'],Sheets:{Profile:ws}},fn+'.xlsx');
-}
-
 // ===== SALES REPORT EXCEL — PROFESSIONAL FULL EXPORT =====
 function exportSalesReportXlsx() {
   const all = loadSales();
@@ -2925,10 +2779,26 @@ ${text}
 Responda APENAS com JSON válido. Sem markdown. Sem texto fora do JSON.`;
 
   try {
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:2048,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
     const data=await resp.json();
-    const raw=(data.content?.map(c=>c.text||'').join('')||'').replace(/```json|```/g,'').trim();
-    const extracted=JSON.parse(raw);
+    console.log('API status:', resp.status);
+    console.log('API response:', JSON.stringify(data).slice(0,500));
+    if(data.error){throw new Error('API: '+JSON.stringify(data.error));}
+    const raw=(data.content?.map(c=>c.text||'').join('')||'');
+    console.log('Raw text:', raw.slice(0,300));
+    const clean=raw.replace(/```json[\s\S]*?```|```[\s\S]*?```/g,m=>m.replace(/```json\n?|```\n?/g,'')).replace(/```/g,'').trim();
+    const extracted=JSON.parse(clean);
     Object.entries(extracted).forEach(([key,val])=>{
       salesFormData[key]=val;
       const el=document.getElementById('sff-'+key); if(!el)return;
@@ -2941,7 +2811,9 @@ Responda APENAS com JSON válido. Sem markdown. Sem texto fora do JSON.`;
     document.querySelectorAll('[id^="sacc-"]').forEach(el=>{if(el.classList.contains('acc-body'))el.classList.add('open');});
     status.textContent=t('sales_paste_success'); status.className='paste-status success'; textarea.value='';
   } catch(e) {
-    console.error(e); status.textContent=t('sales_paste_error'); status.className='paste-status error';
+    console.error('Parse error full:', e);
+    status.textContent = '✗ ' + (e.message||t('sales_paste_error'));
+    status.className='paste-status error';
   }
   btn.disabled=false; btn.textContent=t('sales_paste_btn');
 }
@@ -3003,10 +2875,6 @@ function showSalesDetail(id) {
       <button class="btn-export" onclick="exportSalesXlsx('${s.id}')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         ${t('export_excel')}
-      </button>
-      <button class="btn-export" onclick="exportSalesPptx('${s.id}')">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-        PowerPoint
       </button>
       <button class="btn-export" onclick="goEditSales('${s.id}')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -3070,17 +2938,21 @@ Example: {"brand":"Samsung","model":"Galaxy S25","s_display":9,"display_tech":"A
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
+      max_tokens: 2048,
       messages: [{ role: 'user', content: prompt }]
     })
   });
 
   const data = await response.json();
+  if (data.error) throw new Error(data.error.message || 'API error');
   const raw  = data.content?.map(c => c.text || '').join('') || '';
-  const clean = raw.replace(/```json|```/g, '').trim();
+  const clean = raw.replace(/```json[\s\S]*?```|```[\s\S]*?```/g, m => m.replace(/```json\n?|```\n?/g,'')).trim();
   return JSON.parse(clean);
 }
 
@@ -3344,6 +3216,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderList();
 });
 
-  </script>
+</script>
 </body>
 </html>

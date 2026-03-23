@@ -705,6 +705,7 @@ select option { background: var(--bg2); }
       </div>
     </main>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
@@ -1417,42 +1418,43 @@ function ratingClass(n, selected) {
   return 'selected range-red';
 }
 
-// ===== STORAGE =====
-const STORAGE_KEY = 'jovi_lab_reviews';
+// ===== STORAGE — Supabase =====
+const SUPABASE_URL = 'https://jxcvsyjrgtuqzfwmzpgf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_dxd0q8b7npMfAP8jPC8vQg_bqMxVBJi';
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function loadReviews() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch(e) { return []; }
+async function loadReviews() {
+  const { data, error } = await _sb.from('reviews').select('id, data');
+  if (error) { console.error('loadReviews:', error.message); return []; }
+  return (data || []).map(r => ({ ...r.data, id: r.id }));
 }
 
-function saveReviews(reviews) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
-  } catch(e) { console.error('Storage error:', e); }
+async function updateReview(review) {
+  const { error } = await _sb.from('reviews')
+    .upsert({ id: review.id, data: review }, { onConflict: 'id' });
+  if (error) console.error('updateReview:', error.message);
 }
 
-function addReview(review) {
-  const reviews = loadReviews();
-  reviews.push(review);
-  saveReviews(reviews);
-  return reviews;
+async function deleteReview(id) {
+  const { error } = await _sb.from('reviews').delete().eq('id', id);
+  if (error) console.error('deleteReview:', error.message);
 }
 
-function updateReview(review) {
-  const reviews = loadReviews();
-  const idx = reviews.findIndex(r => r.id === review.id);
-  if (idx !== -1) reviews[idx] = review;
-  else reviews.push(review);
-  saveReviews(reviews);
-  return reviews;
+async function loadSales() {
+  const { data, error } = await _sb.from('sales').select('id, data');
+  if (error) { console.error('loadSales:', error.message); return []; }
+  return (data || []).map(r => ({ ...r.data, id: r.id }));
 }
 
-function deleteReview(id) {
-  const reviews = loadReviews().filter(r => r.id !== id);
-  saveReviews(reviews);
-  return reviews;
+async function saveSalesEntry(entry) {
+  const { error } = await _sb.from('sales')
+    .upsert({ id: entry.id, data: entry }, { onConflict: 'id' });
+  if (error) console.error('saveSalesEntry:', error.message);
+}
+
+async function deleteSalesEntry(id) {
+  const { error } = await _sb.from('sales').delete().eq('id', id);
+  if (error) console.error('deleteSalesEntry:', error.message);
 }
 
 function genId() {
@@ -1726,9 +1728,10 @@ function populateForm(r) {
 }
 
 // ===== DETAIL PAGE =====
-function showDetail(id) {
+async function showDetail(id) {
   window._lastDetailId = id;
-  const r = loadReviews().find(x => x.id === id);
+  const reviews = await loadReviews();
+  const r = reviews.find(x => x.id === id);
   if (!r) return;
   const ov = calcOverall(r), c = scoreColor(ov);
   const sm = DEFS[r.type].scoreMap;
@@ -1815,10 +1818,10 @@ function showDetail(id) {
   showPage('detail');
 }
 
-function deleteAndGoHome(id) {
+async function deleteAndGoHome(id) {
   if (!confirm(t('delete') + '?')) return;
-  deleteReview(id);
-  goHome();
+  await deleteReview(id);
+  await goHome();
 }
 
 // ===== DASHBOARD STATE =====
@@ -1943,8 +1946,9 @@ function scoreColor(val) {
 
 function col(letter, row) { return letter + row; }
 
-function exportXlsx(id) {
-  const r = loadReviews().find(x => x.id === id);
+async function exportXlsx(id) {
+  const all = await loadReviews();
+  const r = all.find(x => x.id === id);
   if (!r) return;
   const sm   = DEFS[r.type].scoreMap;
   const secs = DEFS[r.type].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
@@ -2096,8 +2100,8 @@ function exportXlsx(id) {
 }
 
 // ===== COMPARISON EXPORT =====
-function exportComparisonXlsx() {
-  const compared = loadReviews().filter(r => selIds.includes(r.id));
+async function exportComparisonXlsx() {
+  const compared = (await loadReviews()).filter(r => selIds.includes(r.id));
   if (!compared.length) return;
   const sm = DEFS[curTab].scoreMap;
   const secs = DEFS[curTab].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
@@ -2245,8 +2249,9 @@ function exportComparisonXlsx() {
 }
 
 // ===== SALES EXCEL EXPORT =====
-function exportSalesXlsx(id) {
-  const s = loadSales().find(x => x.id === id);
+async function exportSalesXlsx(id) {
+  const allS = await loadSales();
+  const s = allS.find(x => x.id === id);
   if (!s) return;
   const isBuyer = s.stype === 'buyer';
   const accent  = isBuyer ? 'FF2EA043' : 'FFD97706';
@@ -2303,8 +2308,8 @@ function exportSalesXlsx(id) {
 }
 
 // ===== SALES REPORT EXCEL — PROFESSIONAL FULL EXPORT =====
-function exportSalesReportXlsx() {
-  const all = loadSales();
+async function exportSalesReportXlsx() {
+  const all = await loadSales();
   if (!all.length) { alert(t('no_records')); return; }
 
   const wb = XLSX.utils.book_new();
@@ -2418,7 +2423,7 @@ function exportSalesReportXlsx() {
 }
 
 // ===== SALES REPORT =====
-const SALES_KEY   = 'jovi_lab_sales';
+// SALES_KEY removed — using Supabase
 const JOVI_MODELS = ['Y19s','Y21','Y21 5G','Y29','Y29s 5G','Y31'];
 
 let curSalesModel  = 'Y19s';
@@ -2427,38 +2432,35 @@ let salesFormData  = {};
 let salesPhotoURL  = null;
 let editingSalesId = null;
 
-function loadSales() { try { return JSON.parse(localStorage.getItem(SALES_KEY)||'[]'); } catch(e){return[];} }
-function saveSalesAll(a) { try { localStorage.setItem(SALES_KEY,JSON.stringify(a)); } catch(e){} }
-function saveSalesEntry(e) { const a=loadSales(),i=a.findIndex(s=>s.id===e.id); if(i!==-1)a[i]=e;else a.push(e); saveSalesAll(a); }
-function deleteSalesEntry(id) { saveSalesAll(loadSales().filter(s=>s.id!==id)); }
+// Sales storage — handled by Supabase functions above
 
-function goSales() { showPage('sales'); renderSalesHome(); }
+async function goSales() { showPage('sales'); await renderSalesHome(); }
 
-function renderSalesHome() {
+async function renderSalesHome() {
   document.getElementById('sales-model-tabs').innerHTML = JOVI_MODELS.map(m =>
     `<button class="stab ${m===curSalesModel?'active':''}" onclick="switchSalesModel('${m}',this)">${m}</button>`
   ).join('');
   document.getElementById('sales-type-buyer').classList.toggle('active', curSalesType==='buyer');
   document.getElementById('sales-type-nonbuyer').classList.toggle('active', curSalesType==='nonbuyer');
-  renderSalesList();
+  await renderSalesList();
 }
 
-function switchSalesModel(model, btn) {
+async function switchSalesModel(model, btn) {
   curSalesModel = model;
   document.querySelectorAll('.stab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderSalesList();
+  await renderSalesList();
 }
 
-function switchSalesType(type) {
+async function switchSalesType(type) {
   curSalesType = type;
   document.getElementById('sales-type-buyer').classList.toggle('active', type==='buyer');
   document.getElementById('sales-type-nonbuyer').classList.toggle('active', type==='nonbuyer');
-  renderSalesList();
+  await renderSalesList();
 }
 
-function renderSalesList() {
-  const list  = loadSales().filter(s=>s.model===curSalesModel && s.stype===curSalesType);
+async function renderSalesList() {
+  const list  = (await loadSales()).filter(s=>s.model===curSalesModel && s.stype===curSalesType);
   const el    = document.getElementById('sales-list');
   const label = curSalesType==='buyer' ? t('buyer') : t('non_buyer');
   const color = curSalesType==='buyer' ? '#2ea043' : '#e3b341';
@@ -2494,8 +2496,9 @@ function goSalesAdd() {
   showPage('sales-add');
 }
 
-function goEditSales(id) {
-  const s = loadSales().find(x=>x.id===id); if(!s)return;
+async function goEditSales(id) {
+  const allS=await loadSales();
+  const s=allS.find(x=>x.id===id); if(!s)return;
   salesFormData  = {...s};
   salesPhotoURL  = s.photo||null;
   editingSalesId = s.id;
@@ -2665,14 +2668,15 @@ function collectSales() {
   return entry;
 }
 
-function saveSalesDraft()    { saveSalesEntry(collectSales()); goSales(); }
-function saveSalesComplete() { const e=collectSales(); saveSalesEntry(e); showSalesDetail(e.id); }
-function deleteCurSales()    { if(!editingSalesId){goSales();return;} if(!confirm(t('delete')+'?'))return; deleteSalesEntry(editingSalesId); editingSalesId=null; goSales(); }
+async function saveSalesDraft()    { await saveSalesEntry(collectSales()); await goSales(); }
+async function saveSalesComplete() { const e=collectSales(); await saveSalesEntry(e); await showSalesDetail(e.id); }
+async function deleteCurSales()    { if(!editingSalesId){goSales();return;} if(!confirm(t('delete')+'?'))return; await deleteSalesEntry(editingSalesId); editingSalesId=null; await goSales(); }
 
 // ── Detail view ──
-function showSalesDetail(id) {
+async function showSalesDetail(id) {
   window._lastSalesDetailId = id;
-  const s=loadSales().find(x=>x.id===id); if(!s)return;
+  const allS = await loadSales();
+  const s=allS.find(x=>x.id===id); if(!s)return;
   const isBuyer=s.stype==='buyer';
   const color=isBuyer?'#2ea043':'#e3b341';
   const label=isBuyer?t('buyer'):t('non_buyer');
@@ -2736,9 +2740,9 @@ function showSalesDetail(id) {
   showPage('sales-detail');
 }
 
-function deleteSalesFromDetail(id) {
+async function deleteSalesFromDetail(id) {
   if(!confirm(t('delete')+'?'))return;
-  deleteSalesEntry(id); goSales();
+  await deleteSalesEntry(id); await goSales();
 }
 
 // ===== AI PASTE & PARSE =====
@@ -2922,9 +2926,9 @@ function showPage(name) {
   window.scrollTo(0, 0);
 }
 
-function goHome() {
+async function goHome() {
   showPage('home');
-  renderList();
+  await renderList();
 }
 
 function goAdd() {
@@ -2938,8 +2942,9 @@ function goAdd() {
   showPage('add');
 }
 
-function goEditReview(id) {
-  const r = loadReviews().find(x => x.id === id);
+async function goEditReview(id) {
+  const reviews = await loadReviews();
+  const r = reviews.find(x => x.id === id);
   if (!r) return;
   formData = { ...r };
   formPhotoURL = r.photo || null;
@@ -2952,14 +2957,14 @@ function goEditReview(id) {
   showPage('add');
 }
 
-function goDash() {
-  selIds = loadReviews().filter(r => r.type === curTab).slice(0, 3).map(r => r.id);
+async function goDash() {
+  selIds = (await loadReviews()).filter(r => r.type === curTab).slice(0, 3).map(r => r.id);
   renderDash();
   showPage('dash');
 }
 
 // ===== TAB SWITCHING =====
-function switchTab(tab, btn) {
+async function switchTab(tab, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
 
@@ -2973,12 +2978,12 @@ function switchTab(tab, btn) {
   document.getElementById('cta-banner').style.background = TYPE_COLORS[tab];
   document.getElementById('cta-title').textContent = t('new_review') + ' — ' + TYPE_LABELS[tab];
   showPage('home');
-  renderList();
+  await renderList();
 }
 
 // ===== REVIEW LIST =====
-function renderList() {
-  const list = loadReviews().filter(r => r.type === curTab);
+async function renderList() {
+  const list = (await loadReviews()).filter(r => r.type === curTab);
   const el   = document.getElementById('reviews-list');
 
   if (!list.length) {
@@ -3030,9 +3035,9 @@ function renderList() {
 }
 
 // ===== SAVE ACTIONS =====
-function quickSave() {
+async function quickSave() {
   const r = collectReview(false);
-  updateReview(r);
+  await updateReview(r);
   document.getElementById('add-title').textContent = (r.brand || '') + (r.model ? ' ' + r.model : '');
   // Flash saved
   const btn = document.querySelector('.save-icon-btn');
@@ -3040,33 +3045,33 @@ function quickSave() {
   setTimeout(() => { btn.style.color = ''; }, 1200);
 }
 
-function saveDraft() {
+async function saveDraft() {
   const r = collectReview(false);
-  updateReview(r);
-  goHome();
+  await updateReview(r);
+  await goHome();
 }
 
-function saveComplete() {
+async function saveComplete() {
   const r = collectReview(true);
-  updateReview(r);
-  showDetail(r.id);
+  await updateReview(r);
+  await showDetail(r.id);
 }
 
-function deleteCurrentReview() {
+async function deleteCurrentReview() {
   if (!editingReviewId) return;
   if (!confirm('Delete this review permanently?')) return;
-  deleteReview(editingReviewId);
+  await deleteReview(editingReviewId);
   editingReviewId = null;
-  goHome();
+  await goHome();
 }
 
 // ===== INIT =====
-document.addEventListener('DOMContentLoaded', () => {
-  // Set initial CTA color
+document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('cta-banner').style.background = TYPE_COLORS[curTab];
-  renderList();
+  await renderList();
 });
 
 </script>
+
 </body>
 </html>

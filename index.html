@@ -583,6 +583,9 @@ select option { background: var(--bg2); }
 .paste-status.success{color:#3fb950}.paste-status.error{color:#f85149}
 .xl-import-label{display:flex;align-items:center;gap:10px;background:#0d1117;border:1px dashed #f59e0b66;border-radius:9px;padding:12px 16px;cursor:pointer;transition:all .15s;color:#f59e0b;font-size:13px;font-weight:500}
 .xl-import-label:hover{background:#f59e0b11;border-color:#f59e0b}
+
+.xl-import-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 16px;margin-bottom:14px;background:var(--bg2);border:1px solid #f59e0b55;border-radius:12px;color:#f59e0b;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s}
+.xl-import-cta:hover{background:#f59e0b11;border-color:#f59e0b}
 .stab-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .stab{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--bg2);font-size:12px;font-weight:500;color:var(--text4);cursor:pointer;transition:all .15s;font-family:var(--font)}
 .stab:hover{color:var(--text2)}.stab.active{background:#1a56ff22;border-color:#1a56ff;color:#60a5fa}
@@ -652,6 +655,11 @@ select option { background: var(--bg2); }
           </div>
           <svg class="cta-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
+        <label class="xl-import-cta" title="Import a review from an Excel file exported by this app">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span data-t="xl_import_cta">Import Review from Excel</span>
+          <input type="file" accept=".xlsx,.xls" onchange="importReviewFromExcel(event)" style="display:none">
+        </label>
         <div class="section-header">
           <span class="section-label" data-t="reviews">REVIEWS</span>
           <button class="dash-btn" onclick="goDash()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-t="dashboard">Dashboard</span></button>
@@ -744,7 +752,7 @@ const T = {
     tab_smartphone:'Smartphone', tab_smartwatch:'Smartwatch', tab_tws:'TWS', tab_sales:'Sales Report',
     language:'Language',
     select_opt:'Select...', notes_placeholder:'Write your notes here...',
-    xl_import_title:'Import from Excel', xl_import_sub:'Upload an .xlsx file — fields are filled automatically', xl_import_btn:'Choose .xlsx file', xl_import_loading:'⏳ Reading file...', xl_import_success:'Fields imported successfully!', xl_import_error:'Could not read file. Make sure it is a valid .xlsx file.', xl_import_no_data:'No matching fields found. Check the file format.',
+    xl_import_cta:'Import Review from Excel', xl_import_saved:'imported and saved successfully!', xl_import_title:'Import from Excel', xl_import_sub:'Upload an .xlsx file — fields are filled automatically', xl_import_btn:'Choose .xlsx file', xl_import_loading:'⏳ Reading file...', xl_import_success:'Fields imported successfully!', xl_import_error:'Could not read file. Make sure it is a valid .xlsx file.', xl_import_no_data:'No matching fields found. Check the file format.',
     // Field labels
     fl_retail_price:'Retail Price (BRL)',
     fl_positioning:'Market Segment',
@@ -1030,7 +1038,7 @@ const T = {
     tab_smartphone:'Smartphone', tab_smartwatch:'Smartwatch', tab_tws:'TWS', tab_sales:'Relatório de Vendas',
     language:'Idioma',
     select_opt:'Selecionar...', notes_placeholder:'Escreva suas observações aqui...',
-    xl_import_title:'Importar do Excel', xl_import_sub:'Envie um arquivo .xlsx — os campos são preenchidos automaticamente', xl_import_btn:'Escolher arquivo .xlsx', xl_import_loading:'⏳ Lendo arquivo...', xl_import_success:'Campos importados com sucesso!', xl_import_error:'Não foi possível ler o arquivo. Certifique-se de que é um .xlsx válido.', xl_import_no_data:'Nenhum campo correspondente encontrado. Verifique o formato do arquivo.',
+    xl_import_cta:'Importar Avaliação do Excel', xl_import_saved:'importado e salvo com sucesso!', xl_import_title:'Importar do Excel', xl_import_sub:'Envie um arquivo .xlsx — os campos são preenchidos automaticamente', xl_import_btn:'Escolher arquivo .xlsx', xl_import_loading:'⏳ Lendo arquivo...', xl_import_success:'Campos importados com sucesso!', xl_import_error:'Não foi possível ler o arquivo. Certifique-se de que é um .xlsx válido.', xl_import_no_data:'Nenhum campo correspondente encontrado. Verifique o formato do arquivo.',
     // Rótulos dos campos
     fl_retail_price:'Preço de Varejo (BRL)',
     fl_positioning:'Segmento de Mercado',
@@ -1303,7 +1311,7 @@ const T = {
     tab_smartphone:'智能手机', tab_smartwatch:'智能手表', tab_tws:'真无线耳机', tab_sales:'销售报告',
     language:'语言',
     select_opt:'请选择...', notes_placeholder:'在此写下您的备注...',
-    xl_import_title:'从Excel导入', xl_import_sub:'上传.xlsx文件——字段将自动填写', xl_import_btn:'选择.xlsx文件', xl_import_loading:'⏳ 正在读取文件...', xl_import_success:'字段导入成功！', xl_import_error:'无法读取文件，请确认是有效的.xlsx文件。', xl_import_no_data:'未找到匹配字段，请检查文件格式。',
+    xl_import_cta:'从Excel导入评测', xl_import_saved:'导入并保存成功！', xl_import_title:'从Excel导入', xl_import_sub:'上传.xlsx文件——字段将自动填写', xl_import_btn:'选择.xlsx文件', xl_import_loading:'⏳ 正在读取文件...', xl_import_success:'字段导入成功！', xl_import_error:'无法读取文件，请确认是有效的.xlsx文件。', xl_import_no_data:'未找到匹配字段，请检查文件格式。',
     // 字段标签
     fl_retail_price:'零售价格（BRL）',
     fl_positioning:'市场定位',
@@ -3805,6 +3813,140 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('cta-title').textContent = t('new_review') + ' — ' + TYPE_LABELS[curTab];
   await renderList();
 });
+
+// ===== IMPORT REVIEW FROM EXCEL =====
+async function importReviewFromExcel(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  e.target.value = ''; // reset so same file can be picked again
+
+  try {
+    const buffer = await file.arrayBuffer();
+    const wb = XLSX.read(buffer, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+    // Build key→value map from two-column layout (our export format)
+    const map = {};
+    rows.forEach(row => {
+      const rawKey = String(row[0] || '').trim();
+      const val    = String(row[1] || '').trim();
+      if (rawKey && val) {
+        // normalize: lowercase, replace spaces/special chars with _
+        const key = rawKey.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+        map[key] = val;
+        map[rawKey] = val; // also keep original for direct field key matching
+      }
+    });
+
+    // Detect device type from the sheet content
+    const typeMap = {
+      'smartphone': 'smartphone', 'smartwatch': 'smartwatch',
+      'tws': 'tws', 'tws_earbuds': 'tws', 'earbuds': 'tws',
+    };
+    let detectedType = curTab; // default to current tab
+    const typeVal = (map['type'] || map['category'] || map['tipo'] || map['categoria'] || '').toLowerCase();
+    for (const [k, v] of Object.entries(typeMap)) {
+      if (typeVal.includes(k)) { detectedType = v; break; }
+    }
+
+    // Label → field key mapping (matches our export format)
+    const LABEL_MAP = {
+      // Header labels from our export
+      'brand': 'brand', 'marca': 'brand',
+      'model': 'model', 'model_name': 'model', 'nome_do_modelo': 'model', 'modelo': 'model',
+      'reviewer': 'reviewer', 'reviewer_name': 'reviewer', 'nome_do_avaliador': 'reviewer',
+      'retail_price_brl_': 'retail_price', 'price_brl_': 'retail_price', 'preco_brl_': 'retail_price',
+      'market_segment': 'positioning', 'posicionamento': 'positioning', 'positioning': 'positioning',
+      // Scores
+      'price_value': 's_price', 'preco_e_valor': 's_price', 'pre_o_e_valor': 's_price',
+      'screen_display': 's_display', 'tela_e_display': 's_display', 'display': 's_display',
+      'speed_performance': 's_perf', 'velocidade_e_desempenho': 's_perf', 'performance': 's_perf',
+      'camera_photos': 's_cam', 'c_mera_e_fotos': 's_cam', 'camera': 's_cam',
+      'battery_charging': 's_batt', 'bateria_e_carregamento': 's_batt', 'battery': 's_batt',
+      'software_user_experience': 's_sw', 'software': 's_sw',
+      'design_build_quality': 's_build', 'design_e_qualidade': 's_build', 'build': 's_build',
+      'calls_speaker_connectivity': 's_calls', 'calls': 's_calls',
+      'design_comfort_wearability': 's_design', 'design': 's_design',
+      'screen_watch_faces_visibility': 's_display',
+      'ease_of_use_navigation': 's_usability',
+      'sports_fitness_gps': 's_sports',
+      'health_sleep_tracking': 's_health',
+      'smart_features_connectivity': 's_smart',
+      'battery_life_charging': 's_batt',
+      'companion_app_experience': 's_app',
+      'sound_quality': 's_sound',
+      'noise_cancelling_transparency': 's_anc',
+      'design_fit_build': 's_design',
+      'battery_life': 's_batt',
+      'calls_connection': 's_conn',
+      'controls_companion_app': 's_ctrl',
+      // Verdict
+      'pros': 'pros', 'pontos_positivos': 'pros',
+      'cons': 'cons', 'pontos_negativos': 'cons',
+      'final_verdict': 'final_verdict', 'veredicto_final': 'final_verdict',
+    };
+
+    const review = {
+      id: genId(),
+      type: detectedType,
+      completed: true,
+      created_at: Date.now(),
+    };
+
+    // Apply mapped fields
+    Object.entries(map).forEach(([rawKey, val]) => {
+      if (!val || val === '—') return;
+      const normKey = rawKey.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+      const fieldKey = LABEL_MAP[normKey] || LABEL_MAP[rawKey];
+      if (fieldKey) {
+        // Score fields: parse as number
+        if (fieldKey.startsWith('s_')) {
+          const n = parseFloat(val);
+          if (!isNaN(n)) review[fieldKey] = n;
+        } else {
+          review[fieldKey] = val;
+        }
+        return;
+      }
+      // Direct field key match (for our own export which uses field keys as labels)
+      const allKeys = new Set();
+      Object.values(DEFS).forEach(def =>
+        def.sections.forEach(sec => (sec.f||[]).forEach(f => allKeys.add(f.k)))
+      );
+      if (allKeys.has(rawKey)) review[rawKey] = val;
+      if (allKeys.has(normKey)) review[normKey] = val;
+    });
+
+    // Validate we got something useful
+    if (!review.brand && !review.model) {
+      alert('✗ ' + (t('xl_import_no_data') || 'No matching fields found. Make sure this is a JOVI review export file.'));
+      return;
+    }
+
+    // Save directly to Supabase
+    await updateReview(review);
+
+    // Switch to correct tab and refresh
+    const tabBtn = document.querySelector(`.tab[data-tab="${detectedType}"]`);
+    if (tabBtn) {
+      curTab = detectedType;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tabBtn.classList.add('active');
+      document.getElementById('cta-banner').style.background = TYPE_COLORS[curTab];
+      document.getElementById('cta-title').textContent = t('new_review') + ' — ' + TYPE_LABELS[curTab];
+    }
+
+    await renderList();
+
+    const name = [review.brand, review.model].filter(Boolean).join(' ') || 'Review';
+    alert('✓ "' + name + '" ' + (t('xl_import_saved') || 'imported and saved successfully!'));
+
+  } catch(err) {
+    console.error('Excel import error:', err);
+    alert('✗ ' + (t('xl_import_error') || 'Could not read the file. Make sure it is a valid JOVI Excel export.'));
+  }
+}
 
 </script>
 </body>

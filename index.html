@@ -565,10 +565,24 @@ select option { background: var(--bg2); }
 }
 
 
-.lang-row{display:flex;align-items:center;gap:6px;padding:8px 20px 6px;border-bottom:1px solid var(--border)}
+.lang-row{display:flex;align-items:center;gap:6px;padding:6px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .lang-label{font-size:11px;color:var(--text4);font-family:var(--font-mono);margin-right:2px}
 .lang-btn{padding:4px 10px;border-radius:16px;border:1px solid var(--border2);background:transparent;font-size:12px;font-weight:500;color:var(--text4);cursor:pointer;transition:all .15s;font-family:var(--font)}
 .lang-btn:hover{color:var(--text2)}.lang-btn.active{background:#1a56ff22;border-color:#1a56ff;color:#60a5fa}
+.sync-btn{margin-left:auto;display:flex;align-items:center;gap:8px}
+.sync-action{padding:4px 11px;border-radius:16px;border:1px solid var(--border2);background:transparent;font-size:11px;font-weight:500;color:var(--text4);cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;transition:all .15s}
+.sync-action.import{border-color:#388bfd44;color:#58a6ff}.sync-action.import:hover{background:#388bfd22}
+.sync-action.export{border-color:#2ea04344;color:#3fb950}.sync-action.export:hover{background:#2ea04322}
+.paste-box{background:#161b2299;border:1px solid #388bfd44;border-radius:13px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden}
+.paste-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#388bfd,#a855f7,#22c55e)}
+.paste-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.paste-icon{font-size:22px;flex-shrink:0;line-height:1}
+.paste-title{font-size:14px;font-weight:700;color:#e6edf3;margin-bottom:2px}
+.paste-sub{font-size:11px;color:#6e7681;line-height:1.4}
+.paste-status{font-size:12px;margin-top:8px;min-height:18px;font-weight:500}
+.paste-status.success{color:#3fb950}.paste-status.error{color:#f85149}
+.xl-import-label{display:flex;align-items:center;gap:10px;background:#0d1117;border:1px dashed #f59e0b66;border-radius:9px;padding:12px 16px;cursor:pointer;transition:all .15s;color:#f59e0b;font-size:13px;font-weight:500}
+.xl-import-label:hover{background:#f59e0b11;border-color:#f59e0b}
 .stab-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .stab{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--bg2);font-size:12px;font-weight:500;color:var(--text4);cursor:pointer;transition:all .15s;font-family:var(--font)}
 .stab:hover{color:var(--text2)}.stab.active{background:#1a56ff22;border-color:#1a56ff;color:#60a5fa}
@@ -600,6 +614,16 @@ select option { background: var(--bg2); }
         <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
         <button class="lang-btn" data-lang="pt" onclick="setLang('pt')">PT</button>
         <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中文</button>
+        <div class="sync-btn">
+          <button class="sync-action import" onclick="importAllData()" title="Import backup">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Import
+          </button>
+          <button class="sync-action export" onclick="exportAllData()" title="Export backup">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+        </div>
       </div>
       <div class="tabs-wrap"><nav class="tabs">
         <button class="tab active" data-tab="smartphone" onclick="switchTab('smartphone',this)">
@@ -705,8 +729,9 @@ select option { background: var(--bg2); }
       </div>
     </main>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <!-- Supabase v2 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 // ===== INTERNATIONALIZATION =====
@@ -718,7 +743,153 @@ const T = {
     app_name:'Smartphone & IoT Lab', app_sub:'Tech Review Tool',
     tab_smartphone:'Smartphone', tab_smartwatch:'Smartwatch', tab_tws:'TWS', tab_sales:'Sales Report',
     language:'Language',
-    // Home
+    select_opt:'Select...', notes_placeholder:'Write your notes here...',
+    xl_import_title:'Import from Excel', xl_import_sub:'Upload an .xlsx file — fields are filled automatically', xl_import_btn:'Choose .xlsx file', xl_import_loading:'⏳ Reading file...', xl_import_success:'Fields imported successfully!', xl_import_error:'Could not read file. Make sure it is a valid .xlsx file.', xl_import_no_data:'No matching fields found. Check the file format.',
+    // Field labels
+    fl_retail_price:'Retail Price (BRL)',
+    fl_positioning:'Market Segment',
+    fl_value_money:'Value for Money',
+    fl_purchase_intent:'Would You Buy It Again?',
+    fl_price_notes:'Additional Comments',
+    fl_display_tech:'Display Type',
+    fl_screen_size_feel:'Screen Size Comfort',
+    fl_sunlight:'Outdoor Visibility',
+    fl_color_accuracy:'Color Quality',
+    fl_scroll_smooth:'Scrolling & Animation Smoothness',
+    fl_screen_durability:'Screen Durability',
+    fl_display_notes:'Additional Comments',
+    fl_daily_perf:'Day-to-Day Speed',
+    fl_app_open:'App Opening Speed',
+    fl_multitask:'Multitasking',
+    fl_gaming_perf:'Gaming Experience',
+    fl_thermal:'Does the Phone Get Hot?',
+    fl_perf_notes:'Additional Comments',
+    fl_main_quality:'Main Camera Quality',
+    fl_night_mode:'Low-Light & Night Photos',
+    fl_selfie:'Selfie Quality',
+    fl_ultrawide:'Wide-Angle Camera',
+    fl_zoom_quality:'Zoom Quality',
+    fl_video_quality:'Video Recording Quality',
+    fl_cam_speed:'Camera Speed',
+    fl_cam_notes:'Additional Comments',
+    fl_battery_day:'Does It Last a Full Day?',
+    fl_heavy_use_batt:'Battery Under Heavy Use',
+    fl_charge_speed:'Charging Speed',
+    fl_wireless_charge:'Wireless Charging',
+    fl_battery_degradation:'Battery Over Time',
+    fl_batt_notes:'Additional Comments',
+    fl_ease_of_use:'Ease of Use',
+    fl_ui_smooth:'Interface Fluidity',
+    fl_preinstalled_apps:'Pre-installed Apps',
+    fl_notifications:'Notification Management',
+    fl_biometrics:'Fingerprint / Face Unlock',
+    fl_updates:'Software Updates',
+    fl_sw_features:'Favorite Software Features',
+    fl_sw_notes:'Additional Comments',
+    fl_first_impression:'First Impression',
+    fl_in_hand:'Comfort in Hand',
+    fl_one_hand:'One-Hand Use',
+    fl_pocket_fit:'Fits in Your Pocket',
+    fl_durability_feel:'Build Durability',
+    fl_ip_rating:'Water & Dust Resistance',
+    fl_build_notes:'Additional Comments',
+    fl_call_quality:'Call Quality',
+    fl_speaker_quality:'Speaker & Loudspeaker',
+    fl_signal_strength:'Signal & Network Quality',
+    fl_wifi_stability:'Wi-Fi Stability',
+    fl_bluetooth:'Bluetooth Reliability',
+    fl_calls_notes:'Additional Comments',
+    fl_daily_comfort:'All-Day Comfort',
+    fl_sleep_comfort:'Sleep Comfort',
+    fl_band_irritation:'Skin Irritation',
+    fl_material_feel:'Build Quality Feel',
+    fl_workout_wearability:'Comfort During Exercise',
+    fl_design_notes:'Additional Comments',
+    fl_screen_quality:'Screen Quality',
+    fl_raise_wake:'Raise to Wake',
+    fl_watchface_variety:'Watch Face Options',
+    fl_custom_photo_wf:'Custom Photo Watch Face',
+    fl_glance_info:'Useful Info at a Glance',
+    fl_setup_ease:'Initial Setup',
+    fl_ui_fluidity:'Menu Navigation',
+    fl_btn_feel:'Button & Crown Feel',
+    fl_notification_clarity:'Notifications on the Watch',
+    fl_usability_notes:'Additional Comments',
+    fl_workout_tracking:'Workout Tracking Experience',
+    fl_gps_accuracy:'GPS Route Accuracy',
+    fl_auto_detect:'Automatic Workout Detection',
+    fl_sport_variety:'Variety of Sports Modes',
+    fl_post_workout:'Post-Workout Data',
+    fl_sports_notes:'Additional Comments',
+    fl_hr_daily:'Heart Rate Monitoring',
+    fl_hr_accuracy:'Heart Rate During Exercise',
+    fl_sleep_track:'Sleep Tracking Accuracy',
+    fl_sleep_insights:'Sleep Insights Usefulness',
+    fl_stress_tracking:'Stress & Recovery Tracking',
+    fl_spo2:'Blood Oxygen (SpO2) Monitoring',
+    fl_health_notes:'Additional Comments',
+    fl_notif_experience:'Notification Experience',
+    fl_call_speaker:'Taking Calls on the Watch',
+    fl_voice_asst:'Voice Assistant',
+    fl_nfc_pay:'Contactless Payments',
+    fl_music_ctrl:'Music Control',
+    fl_phone_sync:'Phone Sync & Connection',
+    fl_smart_notes:'Additional Comments',
+    fl_battery_days:'How Long Does the Battery Last?',
+    fl_gps_battery:'Battery During GPS Workouts',
+    fl_sleep_battery:'Battery While Sleeping',
+    fl_charge_convenience:'Charging Convenience',
+    fl_app_ease:'App Ease of Use',
+    fl_app_data:'Health & Workout Data Presentation',
+    fl_app_sync:'Sync Speed',
+    fl_subscriptions:'Paid Features or Subscriptions',
+    fl_in_app_ads:'Ads in the App',
+    fl_app_notes:'Additional Comments',
+    fl_overall_sound:'Overall Sound Impression',
+    fl_bass:'Bass (Low Sounds)',
+    fl_vocals:'Vocals & Midrange',
+    fl_treble:'Treble (High Sounds)',
+    fl_soundstage:'Sound Space & Immersion',
+    fl_eq_support:'Sound Customization (EQ)',
+    fl_sound_notes:'Additional Comments',
+    fl_anc_eff:'Noise Cancelling Effectiveness',
+    fl_anc_comfort:'Comfort With Noise Cancelling On',
+    fl_transparency:'Transparency / Passthrough Mode',
+    fl_wind_noise:'Wind Noise',
+    fl_anc_notes:'Additional Comments',
+    fl_comfort:'Comfort During Use',
+    fl_fit_stability:'Fit Stability',
+    fl_case_quality:'Charging Case Quality',
+    fl_water_resistance:'Water & Sweat Resistance',
+    fl_earbud_battery:'Earbud Battery Life',
+    fl_total_battery:'Total Battery With Case',
+    fl_anc_battery_impact:'Battery With Noise Cancelling On',
+    fl_fast_charge:'Quick Charge',
+    fl_wireless_case:'Wireless Charging Case',
+    fl_wind_call:'Calls in Windy Conditions',
+    fl_pairing_ease:'Bluetooth Pairing',
+    fl_connection_stability:'Connection Stability',
+    fl_multipoint:'Using With Multiple Devices',
+    fl_conn_notes:'Additional Comments',
+    fl_touch_ease:'Touch Controls',
+    fl_accidental_touch:'Accidental Touches',
+    fl_wear_detect:'Auto Pause When Removed',
+    fl_app_quality:'Companion App Quality',
+    fl_customization:'Controls Customization',
+    fl_ctrl_notes:'Additional Comments',
+    // Review section titles
+    sec_product_info:'Product Information', sec_price:'Price & Value',
+    sec_display_phone:'Screen & Display', sec_performance:'Speed & Performance',
+    sec_camera:'Camera & Photos', sec_battery_phone:'Battery & Charging',
+    sec_software:'Software & User Experience', sec_build:'Design & Build Quality',
+    sec_calls:'Calls, Speaker & Connectivity', sec_verdict:'Final Verdict',
+    sec_design_sw:'Design, Comfort & Wearability', sec_display_sw:'Screen, Watch Faces & Visibility',
+    sec_usability:'Ease of Use & Navigation', sec_sports:'Sports, Fitness & GPS',
+    sec_health:'Health & Sleep Tracking', sec_smart:'Smart Features & Connectivity',
+    sec_battery_sw:'Battery Life & Charging', sec_app:'Companion App Experience',
+    sec_sound:'Sound Quality', sec_anc:'Noise Cancelling & Transparency',
+    sec_design_tws:'Design, Fit & Build', sec_battery_tws:'Battery Life',
+    sec_calls_tws:'Calls & Connection', sec_controls:'Controls & Companion App',
     new_review:'New Review', start_testing:'Start testing a new device',
     reviews:'REVIEWS', dashboard:'Dashboard', no_reviews:'No reviews yet',
     completed:'Completed', draft_status:'Draft', price_brl:'R$',
@@ -858,6 +1029,153 @@ const T = {
     app_name:'Smartphone & IoT Lab', app_sub:'Ferramenta de Avaliação Tech',
     tab_smartphone:'Smartphone', tab_smartwatch:'Smartwatch', tab_tws:'TWS', tab_sales:'Relatório de Vendas',
     language:'Idioma',
+    select_opt:'Selecionar...', notes_placeholder:'Escreva suas observações aqui...',
+    xl_import_title:'Importar do Excel', xl_import_sub:'Envie um arquivo .xlsx — os campos são preenchidos automaticamente', xl_import_btn:'Escolher arquivo .xlsx', xl_import_loading:'⏳ Lendo arquivo...', xl_import_success:'Campos importados com sucesso!', xl_import_error:'Não foi possível ler o arquivo. Certifique-se de que é um .xlsx válido.', xl_import_no_data:'Nenhum campo correspondente encontrado. Verifique o formato do arquivo.',
+    // Rótulos dos campos
+    fl_retail_price:'Preço de Varejo (BRL)',
+    fl_positioning:'Segmento de Mercado',
+    fl_value_money:'Custo-Benefício',
+    fl_purchase_intent:'Compraria Novamente?',
+    fl_price_notes:'Comentários Adicionais',
+    fl_display_tech:'Tipo de Tela',
+    fl_screen_size_feel:'Conforto do Tamanho da Tela',
+    fl_sunlight:'Visibilidade ao Sol',
+    fl_color_accuracy:'Qualidade das Cores',
+    fl_scroll_smooth:'Suavidade de Rolagem e Animação',
+    fl_screen_durability:'Durabilidade da Tela',
+    fl_display_notes:'Comentários Adicionais',
+    fl_daily_perf:'Velocidade no Dia a Dia',
+    fl_app_open:'Velocidade de Abertura de Apps',
+    fl_multitask:'Multitarefa',
+    fl_gaming_perf:'Experiência em Jogos',
+    fl_thermal:'O Celular Esquenta?',
+    fl_perf_notes:'Comentários Adicionais',
+    fl_main_quality:'Qualidade da Câmera Principal',
+    fl_night_mode:'Fotos com Pouca Luz',
+    fl_selfie:'Qualidade da Selfie',
+    fl_ultrawide:'Câmera Grande Angular',
+    fl_zoom_quality:'Qualidade do Zoom',
+    fl_video_quality:'Qualidade de Vídeo',
+    fl_cam_speed:'Velocidade da Câmera',
+    fl_cam_notes:'Comentários Adicionais',
+    fl_battery_day:'Dura o Dia Todo?',
+    fl_heavy_use_batt:'Bateria com Uso Intenso',
+    fl_charge_speed:'Velocidade de Carregamento',
+    fl_wireless_charge:'Carregamento Sem Fio',
+    fl_battery_degradation:'Bateria ao Longo do Tempo',
+    fl_batt_notes:'Comentários Adicionais',
+    fl_ease_of_use:'Facilidade de Uso',
+    fl_ui_smooth:'Fluidez da Interface',
+    fl_preinstalled_apps:'Apps Pré-instalados',
+    fl_notifications:'Gestão de Notificações',
+    fl_biometrics:'Impressão Digital / Reconhecimento Facial',
+    fl_updates:'Atualizações de Software',
+    fl_sw_features:'Funcionalidades Favoritas do Software',
+    fl_sw_notes:'Comentários Adicionais',
+    fl_first_impression:'Primeira Impressão',
+    fl_in_hand:'Conforto na Mão',
+    fl_one_hand:'Uso com Uma Mão',
+    fl_pocket_fit:'Cabe no Bolso',
+    fl_durability_feel:'Durabilidade do Material',
+    fl_ip_rating:'Resistência à Água e Poeira',
+    fl_build_notes:'Comentários Adicionais',
+    fl_call_quality:'Qualidade das Ligações',
+    fl_speaker_quality:'Alto-falante e Caixa de Som',
+    fl_signal_strength:'Qualidade do Sinal e Rede',
+    fl_wifi_stability:'Estabilidade do Wi-Fi',
+    fl_bluetooth:'Confiabilidade do Bluetooth',
+    fl_calls_notes:'Comentários Adicionais',
+    fl_daily_comfort:'Conforto para o Dia Todo',
+    fl_sleep_comfort:'Conforto para Dormir',
+    fl_band_irritation:'Irritação na Pele',
+    fl_material_feel:'Sensação do Material',
+    fl_workout_wearability:'Conforto durante Exercícios',
+    fl_design_notes:'Comentários Adicionais',
+    fl_screen_quality:'Qualidade da Tela',
+    fl_raise_wake:'Ativação ao Levantar o Pulso',
+    fl_watchface_variety:'Variedade de Mostrador',
+    fl_custom_photo_wf:'Mostrador com Foto Pessoal',
+    fl_glance_info:'Informação Útil de Relance',
+    fl_setup_ease:'Configuração Inicial',
+    fl_ui_fluidity:'Navegação nos Menus',
+    fl_btn_feel:'Sensação dos Botões e Coroa',
+    fl_notification_clarity:'Notificações no Relógio',
+    fl_usability_notes:'Comentários Adicionais',
+    fl_workout_tracking:'Experiência de Rastreamento de Treino',
+    fl_gps_accuracy:'Precisão do GPS',
+    fl_auto_detect:'Detecção Automática de Treino',
+    fl_sport_variety:'Variedade de Modalidades Esportivas',
+    fl_post_workout:'Dados Pós-Treino',
+    fl_sports_notes:'Comentários Adicionais',
+    fl_hr_daily:'Monitoramento de Frequência Cardíaca',
+    fl_hr_accuracy:'FC durante Exercício',
+    fl_sleep_track:'Precisão do Monitoramento do Sono',
+    fl_sleep_insights:'Utilidade das Análises de Sono',
+    fl_stress_tracking:'Rastreamento de Estresse e Recuperação',
+    fl_spo2:'Monitoramento de Oxigênio no Sangue (SpO2)',
+    fl_health_notes:'Comentários Adicionais',
+    fl_notif_experience:'Experiência com Notificações',
+    fl_call_speaker:'Fazer Ligações pelo Relógio',
+    fl_voice_asst:'Assistente de Voz',
+    fl_nfc_pay:'Pagamentos por Aproximação',
+    fl_music_ctrl:'Controle de Música',
+    fl_phone_sync:'Sincronização com o Celular',
+    fl_smart_notes:'Comentários Adicionais',
+    fl_battery_days:'Quantos Dias Dura a Bateria?',
+    fl_gps_battery:'Bateria durante Treino com GPS',
+    fl_sleep_battery:'Consumo de Bateria durante o Sono',
+    fl_charge_convenience:'Conveniência de Carregamento',
+    fl_app_ease:'Facilidade de Uso do App',
+    fl_app_data:'Apresentação dos Dados de Saúde',
+    fl_app_sync:'Velocidade de Sincronização',
+    fl_subscriptions:'Funcionalidades Pagas ou Assinaturas',
+    fl_in_app_ads:'Anúncios no App',
+    fl_app_notes:'Comentários Adicionais',
+    fl_overall_sound:'Impressão Geral do Som',
+    fl_bass:'Graves (Sons Baixos)',
+    fl_vocals:'Vozes e Médios',
+    fl_treble:'Agudos (Sons Altos)',
+    fl_soundstage:'Espaço Sonoro e Imersão',
+    fl_eq_support:'Personalização de Som (EQ)',
+    fl_sound_notes:'Comentários Adicionais',
+    fl_anc_eff:'Eficácia do Cancelamento de Ruído',
+    fl_anc_comfort:'Conforto com NC Ativado',
+    fl_transparency:'Modo Transparência / Passagem',
+    fl_wind_noise:'Ruído de Vento',
+    fl_anc_notes:'Comentários Adicionais',
+    fl_comfort:'Conforto de Uso',
+    fl_fit_stability:'Estabilidade do Encaixe',
+    fl_case_quality:'Qualidade do Case de Carregamento',
+    fl_water_resistance:'Resistência à Água e Suor',
+    fl_earbud_battery:'Duração dos Fones',
+    fl_total_battery:'Duração Total com o Case',
+    fl_anc_battery_impact:'Bateria com NC Ativado',
+    fl_fast_charge:'Carga Rápida',
+    fl_wireless_case:'Case com Carregamento Sem Fio',
+    fl_wind_call:'Ligações com Vento',
+    fl_pairing_ease:'Facilidade de Pareamento Bluetooth',
+    fl_connection_stability:'Estabilidade da Conexão',
+    fl_multipoint:'Uso com Múltiplos Dispositivos',
+    fl_conn_notes:'Comentários Adicionais',
+    fl_touch_ease:'Controles por Toque',
+    fl_accidental_touch:'Toques Acidentais',
+    fl_wear_detect:'Pausa Automática ao Remover',
+    fl_app_quality:'Qualidade do App Parceiro',
+    fl_customization:'Personalização dos Controles',
+    fl_ctrl_notes:'Comentários Adicionais',
+    // Títulos das seções de avaliação
+    sec_product_info:'Informações do Produto', sec_price:'Preço e Valor',
+    sec_display_phone:'Tela e Display', sec_performance:'Velocidade e Desempenho',
+    sec_camera:'Câmera e Fotos', sec_battery_phone:'Bateria e Carregamento',
+    sec_software:'Software e Experiência', sec_build:'Design e Qualidade',
+    sec_calls:'Chamadas, Alto-falante e Conectividade', sec_verdict:'Veredicto Final',
+    sec_design_sw:'Design, Conforto e Usabilidade', sec_display_sw:'Tela, Mostradores e Visibilidade',
+    sec_usability:'Facilidade de Uso e Navegação', sec_sports:'Esportes, Fitness e GPS',
+    sec_health:'Saúde e Monitoramento do Sono', sec_smart:'Recursos Inteligentes e Conectividade',
+    sec_battery_sw:'Duração da Bateria e Carregamento', sec_app:'Experiência do App Parceiro',
+    sec_sound:'Qualidade de Som', sec_anc:'Cancelamento de Ruído e Transparência',
+    sec_design_tws:'Design, Ajuste e Construção', sec_battery_tws:'Duração da Bateria',
+    sec_calls_tws:'Chamadas e Conexão', sec_controls:'Controles e App Parceiro',
     new_review:'Nova Avaliação', start_testing:'Começar a testar um novo dispositivo',
     reviews:'AVALIAÇÕES', dashboard:'Painel', no_reviews:'Nenhuma avaliação ainda',
     completed:'Concluído', draft_status:'Rascunho', price_brl:'R$',
@@ -984,6 +1302,153 @@ const T = {
     app_name:'智能手机与物联网实验室', app_sub:'科技评测工具',
     tab_smartphone:'智能手机', tab_smartwatch:'智能手表', tab_tws:'真无线耳机', tab_sales:'销售报告',
     language:'语言',
+    select_opt:'请选择...', notes_placeholder:'在此写下您的备注...',
+    xl_import_title:'从Excel导入', xl_import_sub:'上传.xlsx文件——字段将自动填写', xl_import_btn:'选择.xlsx文件', xl_import_loading:'⏳ 正在读取文件...', xl_import_success:'字段导入成功！', xl_import_error:'无法读取文件，请确认是有效的.xlsx文件。', xl_import_no_data:'未找到匹配字段，请检查文件格式。',
+    // 字段标签
+    fl_retail_price:'零售价格（BRL）',
+    fl_positioning:'市场定位',
+    fl_value_money:'性价比',
+    fl_purchase_intent:'还会再买吗？',
+    fl_price_notes:'补充说明',
+    fl_display_tech:'屏幕类型',
+    fl_screen_size_feel:'屏幕尺寸舒适度',
+    fl_sunlight:'户外可见性',
+    fl_color_accuracy:'色彩质量',
+    fl_scroll_smooth:'滑动流畅度',
+    fl_screen_durability:'屏幕耐久性',
+    fl_display_notes:'补充说明',
+    fl_daily_perf:'日常使用速度',
+    fl_app_open:'应用打开速度',
+    fl_multitask:'多任务处理',
+    fl_gaming_perf:'游戏体验',
+    fl_thermal:'手机会变热吗？',
+    fl_perf_notes:'补充说明',
+    fl_main_quality:'主摄像头质量',
+    fl_night_mode:'低光/夜间拍摄',
+    fl_selfie:'自拍质量',
+    fl_ultrawide:'超广角摄像头',
+    fl_zoom_quality:'变焦质量',
+    fl_video_quality:'视频录制质量',
+    fl_cam_speed:'相机速度',
+    fl_cam_notes:'补充说明',
+    fl_battery_day:'能用一整天吗？',
+    fl_heavy_use_batt:'高强度使用下的电池',
+    fl_charge_speed:'充电速度',
+    fl_wireless_charge:'无线充电',
+    fl_battery_degradation:'电池长期表现',
+    fl_batt_notes:'补充说明',
+    fl_ease_of_use:'易用性',
+    fl_ui_smooth:'界面流畅度',
+    fl_preinstalled_apps:'预装应用',
+    fl_notifications:'通知管理',
+    fl_biometrics:'指纹/面部解锁',
+    fl_updates:'软件更新',
+    fl_sw_features:'最喜欢的软件功能',
+    fl_sw_notes:'补充说明',
+    fl_first_impression:'第一印象',
+    fl_in_hand:'手持舒适度',
+    fl_one_hand:'单手操作',
+    fl_pocket_fit:'口袋适配性',
+    fl_durability_feel:'机身耐久性',
+    fl_ip_rating:'防水防尘',
+    fl_build_notes:'补充说明',
+    fl_call_quality:'通话质量',
+    fl_speaker_quality:'扬声器音质',
+    fl_signal_strength:'信号与网络质量',
+    fl_wifi_stability:'Wi-Fi稳定性',
+    fl_bluetooth:'蓝牙可靠性',
+    fl_calls_notes:'补充说明',
+    fl_daily_comfort:'全天佩戴舒适度',
+    fl_sleep_comfort:'睡眠佩戴舒适度',
+    fl_band_irritation:'皮肤刺激',
+    fl_material_feel:'材质手感',
+    fl_workout_wearability:'运动时的舒适度',
+    fl_design_notes:'补充说明',
+    fl_screen_quality:'屏幕质量',
+    fl_raise_wake:'抬腕亮屏',
+    fl_watchface_variety:'表盘选择',
+    fl_custom_photo_wf:'自定义照片表盘',
+    fl_glance_info:'一眼可见的实用信息',
+    fl_setup_ease:'初始设置',
+    fl_ui_fluidity:'菜单导航',
+    fl_btn_feel:'按键与表冠手感',
+    fl_notification_clarity:'手表上的通知',
+    fl_usability_notes:'补充说明',
+    fl_workout_tracking:'运动追踪体验',
+    fl_gps_accuracy:'GPS路线精度',
+    fl_auto_detect:'自动运动检测',
+    fl_sport_variety:'运动模式多样性',
+    fl_post_workout:'运动后数据',
+    fl_sports_notes:'补充说明',
+    fl_hr_daily:'心率监测',
+    fl_hr_accuracy:'运动中的心率精度',
+    fl_sleep_track:'睡眠追踪精度',
+    fl_sleep_insights:'睡眠分析实用性',
+    fl_stress_tracking:'压力与恢复追踪',
+    fl_spo2:'血氧监测（SpO2）',
+    fl_health_notes:'补充说明',
+    fl_notif_experience:'通知体验',
+    fl_call_speaker:'手表接打电话',
+    fl_voice_asst:'语音助手',
+    fl_nfc_pay:'非接触式支付',
+    fl_music_ctrl:'音乐控制',
+    fl_phone_sync:'与手机同步',
+    fl_smart_notes:'补充说明',
+    fl_battery_days:'电池能用几天？',
+    fl_gps_battery:'GPS运动时的电池',
+    fl_sleep_battery:'睡眠时的电量消耗',
+    fl_charge_convenience:'充电便利性',
+    fl_app_ease:'应用易用性',
+    fl_app_data:'健康数据展示',
+    fl_app_sync:'同步速度',
+    fl_subscriptions:'付费功能或订阅',
+    fl_in_app_ads:'应用内广告',
+    fl_app_notes:'补充说明',
+    fl_overall_sound:'整体音质印象',
+    fl_bass:'低音（低频）',
+    fl_vocals:'人声与中频',
+    fl_treble:'高音（高频）',
+    fl_soundstage:'声场与沉浸感',
+    fl_eq_support:'音效自定义（EQ）',
+    fl_sound_notes:'补充说明',
+    fl_anc_eff:'降噪效果',
+    fl_anc_comfort:'开启降噪时的舒适度',
+    fl_transparency:'通透/环境声模式',
+    fl_wind_noise:'风噪',
+    fl_anc_notes:'补充说明',
+    fl_comfort:'佩戴舒适度',
+    fl_fit_stability:'佩戴稳定性',
+    fl_case_quality:'充电盒质量',
+    fl_water_resistance:'防水防汗',
+    fl_earbud_battery:'耳机续航',
+    fl_total_battery:'含充电盒总续航',
+    fl_anc_battery_impact:'开启降噪后的续航',
+    fl_fast_charge:'快速充电',
+    fl_wireless_case:'无线充电盒',
+    fl_wind_call:'大风环境通话',
+    fl_pairing_ease:'蓝牙配对便捷性',
+    fl_connection_stability:'连接稳定性',
+    fl_multipoint:'多设备同时连接',
+    fl_conn_notes:'补充说明',
+    fl_touch_ease:'触控操作',
+    fl_accidental_touch:'误触',
+    fl_wear_detect:'摘下自动暂停',
+    fl_app_quality:'配套应用质量',
+    fl_customization:'控制自定义',
+    fl_ctrl_notes:'补充说明',
+    // 评测章节标题
+    sec_product_info:'产品信息', sec_price:'价格与价值',
+    sec_display_phone:'屏幕与显示', sec_performance:'速度与性能',
+    sec_camera:'相机与照片', sec_battery_phone:'电池与充电',
+    sec_software:'软件与用户体验', sec_build:'设计与做工',
+    sec_calls:'通话、扬声器与连接', sec_verdict:'最终评价',
+    sec_design_sw:'设计、舒适度与可穿戴性', sec_display_sw:'屏幕、表盘与可视性',
+    sec_usability:'易用性与导航', sec_sports:'运动、健身与GPS',
+    sec_health:'健康与睡眠追踪', sec_smart:'智能功能与连接',
+    sec_battery_sw:'续航与充电', sec_app:'配套应用体验',
+    sec_sound:'音质', sec_anc:'主动降噪与通透模式',
+    sec_design_tws:'设计、佩戴与做工', sec_battery_tws:'续航',
+    sec_calls_tws:'通话与连接', sec_controls:'控制与配套应用',
     new_review:'新评测', start_testing:'开始测试新设备',
     reviews:'评测记录', dashboard:'数据面板', no_reviews:'暂无评测',
     completed:'已完成', draft_status:'草稿', price_brl:'R$',
@@ -1117,7 +1582,7 @@ function setLang(lang) {
   applyLang();
 }
 
-function applyLang() {
+async function applyLang() {
   // 1. Update all static [data-t] elements
   document.querySelectorAll('[data-t]').forEach(el => {
     el.textContent = t(el.getAttribute('data-t'));
@@ -1127,17 +1592,17 @@ function applyLang() {
     b.classList.toggle('active', b.getAttribute('data-lang') === curLang);
   });
   // 3. Always re-render the reviews list (it uses t())
-  if (document.getElementById('reviews-list')) renderList();
+  if (document.getElementById('reviews-list')) await renderList();
   // 4. Re-render the active page fully
   const pg = document.querySelector('.page.active');
   if (!pg) return;
   const id = pg.id;
   if (id === 'page-add')          { buildAccordions(); }
-  if (id === 'page-sales')        { renderSalesHome(); }
+  if (id === 'page-sales')        { await renderSalesHome(); }
   if (id === 'page-sales-add')    { buildSalesForm(); }
-  if (id === 'page-dash')         { renderDash(); }
-  if (id === 'page-detail'    && window._lastDetailId)      showDetail(window._lastDetailId);
-  if (id === 'page-sales-detail' && window._lastSalesDetailId) showSalesDetail(window._lastSalesDetailId);
+  if (id === 'page-dash')         { await renderDash(); }
+  if (id === 'page-detail'    && window._lastDetailId)      await showDetail(window._lastDetailId);
+  if (id === 'page-sales-detail' && window._lastSalesDetailId) await showSalesDetail(window._lastSalesDetailId);
 }
 
 // ===== CONSTANTS =====
@@ -1152,9 +1617,9 @@ const DEFS = {
   smartphone: {
     scoreMap: { s_price:'Price/Value', s_display:'Display', s_perf:'Performance', s_cam:'Camera', s_batt:'Battery', s_sw:'Software', s_build:'Build & Design', s_calls:'Calls & Audio' },
     sections: [
-      { n:'0', k:'photo', t:'Product Information', sk: null },
+      { n:'0', k:'photo', tk:'sec_product_info', t:'Product Information', sk: null },
 
-      { n:'1', k:'price', t:'Price & Value', sk:'s_price', f:[
+      { n:'1', k:'price', tk:'sec_price', t:'Price & Value', sk:'s_price', f:[
         { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'How much does it cost in stores right now?' },
         { tp:'sel', k:'positioning', l:'Market Segment', h:'Which price category does this phone belong to?', o:['Entry-level (up to R$1,500)','Mid-range (R$1,500–R$3,500)','Premium (R$3,500–R$6,000)','Flagship (R$6,000+)'] },
         { tp:'sel', k:'value_money', l:'Value for Money', h:'Considering everything this phone offers, is the price fair?', o:['Excellent — worth every cent','Good — fair price for what you get','Fair — acceptable but not exciting','Poor — overpriced for what it delivers'] },
@@ -1162,7 +1627,7 @@ const DEFS = {
         { tp:'ta',  k:'price_notes', l:'Additional Comments', h:'Mention any promotions, bundles, trade-in offers, or competitor comparisons...' }
       ]},
 
-      { n:'2', k:'display', t:'Screen & Display', sk:'s_display', f:[
+      { n:'2', k:'display', tk:'sec_display_phone', t:'Screen & Display', sk:'s_display', f:[
         { tp:'sel', k:'display_tech', l:'Display Type', h:'What type of screen does this phone have?', o:['AMOLED / OLED — vibrant colors, deep blacks','LCD IPS — good brightness, natural colors','LCD TFT — basic screen','Mini-LED — bright with good contrast',"I don't know"] },
         { tp:'sel', k:'screen_size_feel', l:'Screen Size Comfort', h:'Does the screen size feel right for everyday use — not too big, not too small?', o:['Perfect size','A bit too large','A bit too small','Way too large'] },
         { tp:'sel', k:'sunlight', l:'Outdoor Visibility', h:'Can you read the screen comfortably under direct sunlight without struggling?', o:['Excellent — easy to read anywhere','Good — readable with some effort','Fair — hard to see on bright days','Poor — nearly unreadable outdoors'] },
@@ -1172,7 +1637,7 @@ const DEFS = {
         { tp:'ta',  k:'display_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'3', k:'performance', t:'Speed & Performance', sk:'s_perf', f:[
+      { n:'3', k:'performance', tk:'sec_performance', t:'Speed & Performance', sk:'s_perf', f:[
         { tp:'sel', k:'daily_perf', l:'Day-to-Day Speed', h:'How does the phone handle everyday tasks — opening apps, browsing, social media, multitasking?', o:['Blazing fast — always instant','Fast — rarely any wait','Occasionally slow — sometimes freezes','Slow — frustrating to use daily'] },
         { tp:'sel', k:'app_open', l:'App Opening Speed', h:'How quickly do apps open after you tap them?', o:['Instantly','Fast — under 1 second','Moderate — 1 to 3 seconds','Slow — more than 3 seconds'] },
         { tp:'sel', k:'multitask', l:'Multitasking', h:'When switching between multiple open apps, does the phone keep them loaded or reload them from scratch?', o:['Always keeps apps loaded','Usually keeps apps — rare reloads','Frequently reloads apps','Almost always reloads apps'] },
@@ -1181,7 +1646,7 @@ const DEFS = {
         { tp:'ta',  k:'perf_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'4', k:'camera', t:'Camera & Photos', sk:'s_cam', f:[
+      { n:'4', k:'camera', tk:'sec_camera', t:'Camera & Photos', sk:'s_cam', f:[
         { tp:'sel', k:'main_quality', l:'Main Camera Quality', h:'Overall, how satisfied are you with photos taken with the main camera in good lighting?', o:['Excellent — better than expected','Good — sharp and detailed','Fair — acceptable but nothing special','Poor — blurry or disappointing'] },
         { tp:'sel', k:'night_mode', l:'Low-Light & Night Photos', h:'How well does the camera perform in dark environments or at night?', o:['Excellent — clear bright night shots','Good — usable photos in low light','Fair — grainy but recognizable','Poor — almost unusable in the dark'] },
         { tp:'sel', k:'selfie', l:'Selfie Quality', h:'How are the selfie camera results for photos and video calls?', o:['Excellent — sharp and flattering','Good — clear and accurate','Fair — acceptable for casual use','Poor — blurry or unflattering'] },
@@ -1192,7 +1657,7 @@ const DEFS = {
         { tp:'ta',  k:'cam_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'5', k:'battery', t:'Battery & Charging', sk:'s_batt', f:[
+      { n:'5', k:'battery', tk:'sec_battery_phone', t:'Battery & Charging', sk:'s_batt', f:[
         { tp:'sel', k:'battery_day', l:'Does It Last a Full Day?', h:'With your typical usage (calls, social media, browsing), does the battery last through the whole day?', o:['Easily lasts all day with charge to spare','Lasts a full day — barely','Needs a top-up mid-afternoon','Needs charging by midday or earlier'] },
         { tp:'sel', k:'heavy_use_batt', l:'Battery Under Heavy Use', h:'When using the phone intensively (navigation, streaming, gaming), how long does the battery last?', o:['4+ hours of heavy use','2–4 hours of heavy use','1–2 hours of heavy use','Less than 1 hour of heavy use'] },
         { tp:'sel', k:'charge_speed', l:'Charging Speed', h:'How long does it take to charge the phone from near-empty to full?', o:['Under 30 minutes — ultra-fast','30–60 minutes — fast','1–2 hours — acceptable','More than 2 hours — slow'] },
@@ -1201,7 +1666,7 @@ const DEFS = {
         { tp:'ta',  k:'batt_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'6', k:'software', t:'Software & User Experience', sk:'s_sw', f:[
+      { n:'6', k:'software', tk:'sec_software', t:'Software & User Experience', sk:'s_sw', f:[
         { tp:'sel', k:'ease_of_use', l:'Ease of Use', h:'How easy is it to set up and use this phone for the first time, without reading a manual?', o:['Very intuitive — anyone can use it','Easy — minor learning curve','Moderate — takes some getting used to','Confusing — hard to figure out'] },
         { tp:'sel', k:'ui_smooth', l:'Interface Fluidity', h:'Do menus, animations and transitions feel smooth when navigating the phone?', o:['Perfectly smooth','Mostly smooth — rare stutters','Noticeable stutters occasionally','Often laggy or choppy'] },
         { tp:'sel', k:'preinstalled_apps', l:'Pre-installed Apps', h:'Does the phone come with too many unwanted apps that you cannot delete?', o:['No bloat — comes clean','A few extra apps — manageable','Many pre-installed apps — annoying','Extremely bloated — affects performance'] },
@@ -1212,7 +1677,7 @@ const DEFS = {
         { tp:'ta',  k:'sw_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'7', k:'build', t:'Design & Build Quality', sk:'s_build', f:[
+      { n:'7', k:'build', tk:'sec_build', t:'Design & Build Quality', sk:'s_build', f:[
         { tp:'sel', k:'first_impression', l:'First Impression', h:'When you first held this phone, what was your overall impression of the build and design?', o:['Wow — premium and impressive','Good — solid and well-made','Okay — nothing special','Disappointing — feels cheap'] },
         { tp:'sel', k:'in_hand', l:'Comfort in Hand', h:'Does the phone feel comfortable and balanced when held for extended periods?', o:['Very comfortable — great to hold','Comfortable — fits most hands well','Somewhat comfortable — a bit large or slippery','Uncomfortable — too heavy, large or slippery'] },
         { tp:'sel', k:'one_hand', l:'One-Hand Use', h:'Can you use the phone comfortably with just one hand for basic tasks?', o:['Easy with one hand','Possible but requires some stretching','Difficult — needs two hands for most tasks','Impossible to use with one hand'] },
@@ -1222,7 +1687,7 @@ const DEFS = {
         { tp:'ta',  k:'build_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'8', k:'calls', t:'Calls, Speaker & Connectivity', sk:'s_calls', f:[
+      { n:'8', k:'calls', tk:'sec_calls', t:'Calls, Speaker & Connectivity', sk:'s_calls', f:[
         { tp:'sel', k:'call_quality', l:'Call Quality', h:'How clear is the sound quality during regular phone calls — both hearing the other person and your voice being heard?', o:['Crystal clear — like being in the same room','Good — clear with minor issues','Fair — occasional crackling or echo','Poor — hard to hear or be heard'] },
         { tp:'sel', k:'speaker_quality', l:'Speaker & Loudspeaker', h:'How is the sound quality when playing music, videos or speakerphone calls out loud?', o:['Excellent — loud and clear stereo sound','Good — decent volume and quality','Fair — acceptable for occasional use','Poor — tinny, quiet or distorted'] },
         { tp:'sel', k:'signal_strength', l:'Signal & Network Quality', h:'Does the phone maintain a strong and stable signal — calls, mobile data and Wi-Fi?', o:['Excellent signal everywhere','Good — minor drops in weak areas','Fair — loses signal in some places','Poor — frequent dropped calls or slow data'] },
@@ -1231,16 +1696,16 @@ const DEFS = {
         { tp:'ta',  k:'calls_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'★', k:'verdict', t:'Final Verdict', sk: null }
+      { n:'★', k:'verdict', tk:'sec_verdict', t:'Final Verdict', sk: null }
     ]
   },
 
   smartwatch: {
-    scoreMap: { s_price:'Price/Value', s_design:'Design & Comfort', s_display:'Screen & Watch Faces', s_usability:'Ease of Use', s_sports:'Sports & Fitness', s_health:'Health Tracking', s_smart:'Smart Features', s_batt:'Battery Life', s_app:'App Experience' },
+    scoreMap: { s_price:'Price/Value', s_design:'Design & Comfort', s_display:'Screen & Watch Faces', s_usability:'Ease of Use', s_sports:'Sports & Fitness', s_health:'Health Tracking', s_smart:'Smart Features', s_battk:'sec_battery_tws', t:'Battery Life', s_app:'App Experience' },
     sections: [
-      { n:'0', k:'photo', t:'Product Information', sk: null },
+      { n:'0', k:'photo', tk:'sec_product_info', t:'Product Information', sk: null },
 
-      { n:'1', k:'price', t:'Price & Value', sk:'s_price', f:[
+      { n:'1', k:'price', tk:'sec_price', t:'Price & Value', sk:'s_price', f:[
         { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'How much does it cost in stores right now?' },
         { tp:'sel', k:'positioning', l:'Market Segment', h:'Which price category does this smartwatch belong to?', o:['Entry-level (up to R$500)','Mid-range (R$500–R$1,500)','Premium (R$1,500–R$3,000)','Flagship (R$3,000+)'] },
         { tp:'sel', k:'value_money', l:'Value for Money', h:'Considering everything this watch offers, is the price fair?', o:['Excellent — worth every cent','Good — fair price for what you get','Fair — acceptable but not exciting','Poor — overpriced for what it delivers'] },
@@ -1248,7 +1713,7 @@ const DEFS = {
         { tp:'ta',  k:'price_notes', l:'Additional Comments', h:'Mention any promotions, competitor comparisons, bundles...' }
       ]},
 
-      { n:'2', k:'design', t:'Design, Comfort & Wearability', sk:'s_design', f:[
+      { n:'2', k:'design', tk:'sec_design_sw', t:'Design, Comfort & Wearability', sk:'s_design', f:[
         { tp:'sel', k:'first_impression', l:'First Impression', h:'When you first put it on, what was your overall impression of the design and build?', o:['Wow — premium and stylish','Good — solid and well-made','Okay — nothing special','Disappointing — feels cheap'] },
         { tp:'sel', k:'daily_comfort', l:'All-Day Comfort', h:'Is the watch comfortable enough to wear all day without noticing it on your wrist?', o:['Very comfortable — forget it is there','Comfortable — fine for all-day use','Acceptable — noticeable after a few hours','Uncomfortable — causes discomfort or irritation'] },
         { tp:'sel', k:'sleep_comfort', l:'Sleep Comfort', h:'Is it comfortable enough to keep on while sleeping for sleep tracking?', o:['Very comfortable — no issues sleeping','Comfortable — barely notice it','Somewhat uncomfortable — wake up occasionally','Too uncomfortable to sleep with'] },
@@ -1258,7 +1723,7 @@ const DEFS = {
         { tp:'ta',  k:'design_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'3', k:'display', t:'Screen, Watch Faces & Visibility', sk:'s_display', f:[
+      { n:'3', k:'display', tk:'sec_display_sw', t:'Screen, Watch Faces & Visibility', sk:'s_display', f:[
         { tp:'sel', k:'screen_quality', l:'Screen Quality', h:'Overall, how would you rate the sharpness and clarity of the screen?', o:['Excellent — sharp and vivid','Good — clear and easy to read','Fair — readable but not impressive','Poor — hard to read or blurry'] },
         { tp:'sel', k:'sunlight', l:'Outdoor Visibility', h:'Can you read the screen comfortably under direct sunlight without having to shade it?', o:['Excellent — perfectly readable outdoors','Good — readable with some effort','Fair — hard to see on bright days','Poor — nearly unreadable in sunlight'] },
         { tp:'sel', k:'raise_wake', l:'Raise to Wake', h:'When you lift your wrist to check the time, does the screen turn on quickly and reliably?', o:['Always instant — works perfectly','Usually fast — rare misses','Sometimes slow or misses the gesture','Unreliable — often have to tap the screen'] },
@@ -1268,7 +1733,7 @@ const DEFS = {
         { tp:'ta',  k:'display_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'4', k:'usability', t:'Ease of Use & Navigation', sk:'s_usability', f:[
+      { n:'4', k:'usability', tk:'sec_usability', t:'Ease of Use & Navigation', sk:'s_usability', f:[
         { tp:'sel', k:'setup_ease', l:'Initial Setup', h:'How easy was it to set up the watch and connect it to your phone for the first time?', o:['Very easy — done in minutes','Easy — minor steps required','Moderate — took some effort','Difficult — confusing or took a long time'] },
         { tp:'sel', k:'ui_fluidity', l:'Menu Navigation', h:'Is it easy to find what you need on the watch — notifications, workouts, settings?', o:['Very intuitive — always find things quickly','Easy — most things are where expected','Sometimes confusing — needs getting used to','Confusing — hard to navigate daily'] },
         { tp:'sel', k:'scroll_smooth', l:'Scrolling & Animation Smoothness', h:'Does the interface feel smooth when scrolling through menus and notifications?', o:['Very smooth — no lag at all','Smooth — occasional minor stutter','Noticeable stutters sometimes','Often laggy or choppy'] },
@@ -1277,7 +1742,7 @@ const DEFS = {
         { tp:'ta',  k:'usability_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'5', k:'sports', t:'Sports, Fitness & GPS', sk:'s_sports', f:[
+      { n:'5', k:'sports', tk:'sec_sports', t:'Sports, Fitness & GPS', sk:'s_sports', f:[
         { tp:'sel', k:'workout_tracking', l:'Workout Tracking Experience', h:'When you start a workout (running, cycling, gym, etc.), how accurately and easily does the watch track it?', o:['Excellent — accurate and effortless','Good — reliable with minor issues','Fair — sometimes misses or mislabels activities','Poor — unreliable tracking'] },
         { tp:'sel', k:'gps_accuracy', l:'GPS Route Accuracy', h:'When using GPS for outdoor activities like running or cycling, does the tracked route match where you actually went?', o:['Very accurate — matches my route perfectly','Good — minor deviations occasionally','Fair — noticeable errors in the route','Poor — GPS is unreliable',"Don't use GPS features"] },
         { tp:'sel', k:'auto_detect', l:'Automatic Workout Detection', h:'Does the watch automatically detect and start tracking when you begin exercising, without needing to start it manually?', o:['Excellent — always detects correctly','Good — detects most workouts','Inconsistent — sometimes misses','Does not auto-detect',"Don't use this feature"] },
@@ -1286,7 +1751,7 @@ const DEFS = {
         { tp:'ta',  k:'sports_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'6', k:'health', t:'Health & Sleep Tracking', sk:'s_health', f:[
+      { n:'6', k:'health', tk:'sec_health', t:'Health & Sleep Tracking', sk:'s_health', f:[
         { tp:'sel', k:'hr_daily', l:'Heart Rate Monitoring', h:'Does the heart rate reading throughout the day seem accurate and consistent when you check it?', o:['Very accurate — matches how I feel','Mostly accurate — occasional odd readings','Sometimes inaccurate — spikes or drops','Often inaccurate — hard to trust'] },
         { tp:'sel', k:'hr_accuracy', l:'Heart Rate During Exercise', h:'During workouts, does the heart rate stay accurate even with arm movements (like weightlifting or cycling)?', o:['Very accurate — stays consistent','Good — minor inaccuracies during intense effort','Fair — loses accuracy during arm-heavy exercises','Poor — unreliable during workouts'] },
         { tp:'sel', k:'sleep_track', l:'Sleep Tracking Accuracy', h:'Does the watch correctly detect when you fell asleep, woke up, and your sleep stages?', o:['Very accurate — matches my experience','Good — mostly correct with minor errors','Fair — sometimes wrong about when I slept','Poor — sleep data seems unreliable'] },
@@ -1296,7 +1761,7 @@ const DEFS = {
         { tp:'ta',  k:'health_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'7', k:'smart', t:'Smart Features & Connectivity', sk:'s_smart', f:[
+      { n:'7', k:'smart', tk:'sec_smart', t:'Smart Features & Connectivity', sk:'s_smart', f:[
         { tp:'sel', k:'notif_experience', l:'Notification Experience', h:'When your phone gets a message or call, does the watch notify you clearly and in a timely way?', o:['Excellent — always on time and clear','Good — reliable with minor delays','Fair — sometimes misses notifications','Poor — often late or misses them'] },
         { tp:'sel', k:'call_speaker', l:'Taking Calls on the Watch', h:'Can you answer and make phone calls directly from the watch? If yes, is the audio clear?', o:['Yes — audio is clear and convenient','Yes — but audio quality is poor','No — watch does not support calls'] },
         { tp:'sel', k:'voice_asst', l:'Voice Assistant', h:'Can you use a voice assistant (Siri, Google, Alexa, Bixby) from the watch? How well does it work?', o:['Works great — understands me well','Works — but sometimes misunderstands','Unreliable — often fails','Not available on this watch'] },
@@ -1306,7 +1771,7 @@ const DEFS = {
         { tp:'ta',  k:'smart_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'8', k:'battery', t:'Battery Life & Charging', sk:'s_batt', f:[
+      { n:'8', k:'battery', tk:'sec_battery_sw', t:'Battery Life & Charging', sk:'s_batt', f:[
         { tp:'sel', k:'battery_days', l:'How Long Does the Battery Last?', h:'With your typical daily use (notifications, health tracking, a few workouts per week), how many days does it last?', o:['7+ days — charge it weekly','4–6 days — charge it twice a week','2–3 days — charge every other day','1 day or less — needs daily charging'] },
         { tp:'sel', k:'gps_battery', l:'Battery During GPS Workouts', h:'When using GPS for outdoor activities, how does the battery hold up during a typical session?', o:['Excellent — barely drains during workouts','Good — loses a reasonable amount','Fair — drains noticeably fast','Poor — a 1-hour workout drains it significantly',"Don't use GPS"] },
         { tp:'sel', k:'sleep_battery', l:'Battery While Sleeping', h:'If you wear it at night for sleep tracking, how much battery does it typically consume overnight?', o:['Very little — under 5% overnight','Manageable — 5 to 15% overnight','Quite a lot — 15 to 25% overnight','Too much — sleep tracking kills the battery',"Don't sleep with it"] },
@@ -1315,7 +1780,7 @@ const DEFS = {
         { tp:'ta',  k:'batt_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'9', k:'app', t:'Companion App Experience', sk:'s_app', f:[
+      { n:'9', k:'app', tk:'sec_app', t:'Companion App Experience', sk:'s_app', f:[
         { tp:'sel', k:'app_ease', l:'App Ease of Use', h:'Is the companion app easy to navigate and understand, even for someone not very tech-savvy?', o:['Very easy — anyone can use it','Easy — minor learning curve','Moderate — takes some getting used to','Confusing — hard to find things'] },
         { tp:'sel', k:'app_data', l:'Health & Workout Data Presentation', h:'Does the app present your health and fitness data (sleep, steps, heart rate, workouts) in a clear and motivating way?', o:['Excellent — data is beautiful and useful','Good — clear and informative','Fair — basic and a bit dull','Poor — hard to understand or not useful'] },
         { tp:'sel', k:'app_sync', l:'Sync Speed', h:'How quickly does data from the watch sync to the app after a workout or when opening the app?', o:['Instant — always up to date','Fast — syncs within seconds','Slow — takes a minute or more','Very slow or unreliable sync'] },
@@ -1324,16 +1789,16 @@ const DEFS = {
         { tp:'ta',  k:'app_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'★', k:'verdict', t:'Final Verdict', sk: null }
+      { n:'★', k:'verdict', tk:'sec_verdict', t:'Final Verdict', sk: null }
     ]
   },
 
   tws: {
-    scoreMap: { s_price:'Price/Value', s_sound:'Sound Quality', s_anc:'Noise Cancelling', s_design:'Design & Fit', s_batt:'Battery Life', s_conn:'Calls & Connection', s_ctrl:'Controls & App' },
+    scoreMap: { s_price:'Price/Value', s_sound:'Sound Quality', s_anc:'Noise Cancelling', s_design:'Design & Fit', s_battk:'sec_battery_tws', t:'Battery Life', s_conn:'Calls & Connection', s_ctrl:'Controls & App' },
     sections: [
-      { n:'0', k:'photo', t:'Product Information', sk: null },
+      { n:'0', k:'photo', tk:'sec_product_info', t:'Product Information', sk: null },
 
-      { n:'1', k:'price', t:'Price & Value', sk:'s_price', f:[
+      { n:'1', k:'price', tk:'sec_price', t:'Price & Value', sk:'s_price', f:[
         { tp:'num', k:'retail_price', l:'Retail Price (BRL)', h:'How much does it cost in stores right now?' },
         { tp:'sel', k:'positioning', l:'Market Segment', h:'Which price category do these earbuds belong to?', o:['Entry-level (up to R$300)','Mid-range (R$300–R$800)','Premium (R$800–R$1,500)','Flagship (R$1,500+)'] },
         { tp:'sel', k:'value_money', l:'Value for Money', h:'Considering the sound, features and build quality, is the price fair?', o:['Excellent — worth every cent','Good — fair price for what you get','Fair — acceptable but not exciting','Poor — overpriced for what it delivers'] },
@@ -1341,7 +1806,7 @@ const DEFS = {
         { tp:'ta',  k:'price_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'2', k:'sound', t:'Sound Quality', sk:'s_sound', f:[
+      { n:'2', k:'sound', tk:'sec_sound', t:'Sound Quality', sk:'s_sound', f:[
         { tp:'sel', k:'overall_sound', l:'Overall Sound Impression', h:'When listening to your usual music, how would you describe the overall sound quality?', o:['Exceptional — best earbuds I have used','Very good — clear and enjoyable','Good — decent everyday sound','Average — nothing special','Disappointing — poor quality'] },
         { tp:'sel', k:'bass', l:'Bass (Low Sounds)', h:'How do the bass and low frequencies sound — punchy and controlled, or too much/too little?', o:['Perfect bass — deep and controlled','Good bass — satisfying without overdoing it','Too much bass — boomy and muddy','Too little bass — lacks punch and depth'] },
         { tp:'sel', k:'vocals', l:'Vocals & Midrange', h:'When listening to music with singing or speech, do voices sound natural and clear?', o:['Excellent — voices are clear and natural','Good — natural with minor coloring','Fair — slightly muffled or distant','Poor — vocals sound unnatural or recessed'] },
@@ -1351,7 +1816,7 @@ const DEFS = {
         { tp:'ta',  k:'sound_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'3', k:'anc', t:'Noise Cancelling & Transparency', sk:'s_anc', f:[
+      { n:'3', k:'anc', tk:'sec_anc', t:'Noise Cancelling & Transparency', sk:'s_anc', f:[
         { tp:'sel', k:'anc_eff', l:'Noise Cancelling Effectiveness', h:'How well does the noise cancelling block out sounds around you — office noise, traffic, airplane cabin?', o:['Excellent — blocks almost everything','Good — noticeably reduces noise','Fair — reduces some noise but not impressive','Poor — barely makes a difference','No noise cancelling on this model'] },
         { tp:'sel', k:'anc_comfort', l:'Comfort With Noise Cancelling On', h:'When noise cancelling is active, does it cause any uncomfortable pressure sensation in your ears?', o:['No pressure at all — very comfortable','Slight pressure — barely noticeable','Moderate pressure — a bit uncomfortable','Strong pressure — hard to wear for long'] },
         { tp:'sel', k:'transparency', l:'Transparency / Passthrough Mode', h:'When you want to hear the world around you (e.g. talking to someone), does the passthrough mode sound natural?', o:['Very natural — like not wearing earbuds','Good — mostly natural with minor artifacts','Fair — sounds slightly processed or tinny','Poor — sounds very unnatural or unavailable'] },
@@ -1359,7 +1824,7 @@ const DEFS = {
         { tp:'ta',  k:'anc_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'4', k:'design', t:'Design, Fit & Build', sk:'s_design', f:[
+      { n:'4', k:'design', tk:'sec_design_tws', t:'Design, Fit & Build', sk:'s_design', f:[
         { tp:'sel', k:'first_impression', l:'First Impression', h:'When you first held and put on the earbuds, what was your overall impression?', o:['Premium — looks and feels high-end','Good — solid and well-made','Average — nothing special','Cheap — feels plasticky or flimsy'] },
         { tp:'sel', k:'comfort', l:'Comfort During Use', h:'How comfortable are the earbuds to wear for extended listening sessions?', o:['Very comfortable — can wear for hours','Comfortable — fine for 2–3 hours','Somewhat comfortable — ears get tired after a while','Uncomfortable — causes ear pain fairly quickly'] },
         { tp:'sel', k:'fit_stability', l:'Fit Stability', h:'Do the earbuds stay securely in your ears during movement — walking, running, gym?', o:['Very secure — never fall out','Good — stay in place for most activities','Sometimes slip — need readjusting during exercise','Fall out easily — difficult to keep in'] },
@@ -1368,7 +1833,7 @@ const DEFS = {
         { tp:'ta',  k:'design_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'5', k:'battery', t:'Battery Life & Charging', sk:'s_batt', f:[
+      { n:'5', k:'battery', tk:'sec_battery_sw', t:'Battery Life & Charging', sk:'s_batt', f:[
         { tp:'sel', k:'earbud_battery', l:'Earbud Battery Life', h:'On a single charge (without the case), how long do the earbuds last with your typical usage?', o:['8+ hours — exceptional','6–8 hours — very good','4–6 hours — good for most use','2–4 hours — gets me through work or gym','Under 2 hours — too short'] },
         { tp:'sel', k:'total_battery', l:'Total Battery With Case', h:'Including the charging case, how many times can you charge the earbuds before the case also runs out?', o:['4+ full charges — last many days','3 full charges — good for travel','2 full charges — manageable','Only 1 extra charge — case runs out too fast'] },
         { tp:'sel', k:'anc_battery_impact', l:'Battery With Noise Cancelling On', h:'Does turning on noise cancelling noticeably shorten the battery life?', o:['No noticeable difference','Slight reduction — still lasts long enough','Noticeable reduction — affects daily use','Significant reduction — I avoid using ANC to save battery'] },
@@ -1377,7 +1842,7 @@ const DEFS = {
         { tp:'ta',  k:'batt_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'6', k:'connectivity', t:'Calls & Connection', sk:'s_conn', f:[
+      { n:'6', k:'connectivity', tk:'sec_calls_tws', t:'Calls & Connection', sk:'s_conn', f:[
         { tp:'sel', k:'call_quality', l:'Call Quality', h:'When making or receiving phone calls, how clearly can the other person hear you, and can you hear them?', o:['Excellent — crystal clear both ways','Good — clear with minor issues','Fair — acceptable but sometimes muffled','Poor — hard to hear or be heard on calls'] },
         { tp:'sel', k:'wind_call', l:'Calls in Windy Conditions', h:'When taking a call outdoors on a windy day, does wind affect the call quality noticeably?', o:['No issues — wind does not affect calls','Slight wind interference','Noticeable wind noise on calls','Strong wind makes calls unusable'] },
         { tp:'sel', k:'pairing_ease', l:'Bluetooth Pairing', h:'How easy is it to connect the earbuds to your phone when you take them out of the case?', o:['Instant and automatic — always connects','Fast — connects within a few seconds','Moderate — takes a moment to connect','Slow or unreliable — sometimes have to pair manually'] },
@@ -1386,7 +1851,7 @@ const DEFS = {
         { tp:'ta',  k:'conn_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'7', k:'controls', t:'Controls & Companion App', sk:'s_ctrl', f:[
+      { n:'7', k:'controls', tk:'sec_controls', t:'Controls & Companion App', sk:'s_ctrl', f:[
         { tp:'sel', k:'touch_ease', l:'Touch Controls', h:'Are the touch controls on the earbuds easy to use reliably — play, pause, skip, volume, calls?', o:['Excellent — always works as expected','Good — reliable with minor misses','Fair — works but requires precise tapping','Frustrating — often misreads or fails'] },
         { tp:'sel', k:'accidental_touch', l:'Accidental Touches', h:'When adjusting the earbuds in your ears or touching your face, do they accidentally trigger actions?', o:['Never — no accidental touches','Rarely — only occasionally','Sometimes — mildly annoying','Frequently — a real daily frustration'] },
         { tp:'sel', k:'wear_detect', l:'Auto Pause When Removed', h:'When you remove one earbud, does the music pause automatically?', o:['Yes — always works reliably','Yes — works most of the time','Inconsistent — sometimes pauses, sometimes not','No — does not auto-pause'] },
@@ -1395,7 +1860,7 @@ const DEFS = {
         { tp:'ta',  k:'ctrl_notes', l:'Additional Comments', h:'' }
       ]},
 
-      { n:'★', k:'verdict', t:'Final Verdict', sk: null }
+      { n:'★', k:'verdict', tk:'sec_verdict', t:'Final Verdict', sk: null }
     ]
   }
 };
@@ -1421,45 +1886,56 @@ function ratingClass(n, selected) {
 // ===== STORAGE — Supabase =====
 const SUPABASE_URL = 'https://jxcvsyjrgtuqzfwmzpgf.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_dxd0q8b7npMfAP8jPC8vQg_bqMxVBJi';
-const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let sb;
+function getClient() {
+  if (!sb) sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  return sb;
+}
+
+// ── Reviews ──
 async function loadReviews() {
-  const { data, error } = await _sb.from('reviews').select('id, data');
-  if (error) { console.error('loadReviews:', error.message); return []; }
+  const { data, error } = await getClient().from('reviews').select('id, data');
+  if (error) { console.error('loadReviews error:', error.message, error.code, error.details); return []; }
   return (data || []).map(r => ({ ...r.data, id: r.id }));
 }
 
 async function updateReview(review) {
-  const { error } = await _sb.from('reviews')
+  const { error } = await getClient().from('reviews')
     .upsert({ id: review.id, data: review }, { onConflict: 'id' });
-  if (error) console.error('updateReview:', error.message);
+  if (error) console.error('updateReview error:', error.message);
 }
 
 async function deleteReview(id) {
-  const { error } = await _sb.from('reviews').delete().eq('id', id);
-  if (error) console.error('deleteReview:', error.message);
+  const { error } = await getClient().from('reviews').delete().eq('id', id);
+  if (error) console.error('deleteReview error:', error.message);
 }
 
+// ── Sales ──
 async function loadSales() {
-  const { data, error } = await _sb.from('sales').select('id, data');
-  if (error) { console.error('loadSales:', error.message); return []; }
+  const { data, error } = await getClient().from('sales').select('id, data');
+  if (error) { console.error('loadSales error:', error.message, error.code); return []; }
   return (data || []).map(r => ({ ...r.data, id: r.id }));
 }
 
 async function saveSalesEntry(entry) {
-  const { error } = await _sb.from('sales')
+  const { error } = await getClient().from('sales')
     .upsert({ id: entry.id, data: entry }, { onConflict: 'id' });
-  if (error) console.error('saveSalesEntry:', error.message);
+  if (error) console.error('saveSalesEntry error:', error.message);
 }
 
 async function deleteSalesEntry(id) {
-  const { error } = await _sb.from('sales').delete().eq('id', id);
-  if (error) console.error('deleteSalesEntry:', error.message);
+  const { error } = await getClient().from('sales').delete().eq('id', id);
+  if (error) console.error('deleteSalesEntry error:', error.message);
 }
 
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
+
+// ── Legacy localStorage helpers (for export/import only) ──
+function saveReviews(arr) { try { localStorage.setItem('jovi_lab_reviews', JSON.stringify(arr)); } catch(e){} }
+function saveSalesAll(arr) { try { localStorage.setItem('jovi_lab_sales', JSON.stringify(arr)); } catch(e){} }
 
 // ===== FORM STATE =====
 let formData = {};
@@ -1477,7 +1953,7 @@ function buildAccordions() {
       <div class="acc-header" onclick="toggleAcc('${sec.k}')">
         <div class="acc-left">
           <div class="acc-num">${sec.n}</div>
-          <span class="acc-title">${sec.t}</span>
+          <span class="acc-title">${sec.tk ? t(sec.tk) : sec.t}</span>
         </div>
         <div class="acc-meta">
           <span class="acc-score-badge" id="asb-${sec.k}"></span>
@@ -1501,6 +1977,7 @@ function toggleAcc(k) {
 // ===== PHOTO / PRODUCT INFO SECTION =====
 function buildPhotoSection() {
   return `
+  ${buildExcelImportBox()}
   <div class="field-block">
     <div class="field-label">${t('brand')}</div>
     <input type="text" id="ff-brand" placeholder="e.g. Samsung, Apple, Sony" oninput="fd('brand', this.value)">
@@ -1552,11 +2029,14 @@ function clearPhoto() {
 // ===== FIELD BUILDER =====
 function buildFields(sec) {
   return (sec.f || []).map(f => {
+    const lbl  = t('fl_' + f.k) || f.l;
     const hint = f.h ? `<div class="field-hint">${f.h}</div>` : '';
-    if (f.tp === 'ta')  return `<div class="field-block"><div class="field-label">${f.l}</div>${hint}<textarea id="ff-${f.k}" placeholder="Write your notes here..." oninput="fd('${f.k}', this.value)"></textarea></div>`;
-    if (f.tp === 'sel') return `<div class="field-block"><div class="field-label">${f.l}</div>${hint}<select id="ff-${f.k}" onchange="fd('${f.k}', this.value)"><option value="">Select...</option>${(f.o||[]).map(o=>`<option>${o}</option>`).join('')}</select></div>`;
-    if (f.tp === 'num') return `<div class="field-block"><div class="field-label">${f.l}</div>${hint}<input type="number" id="ff-${f.k}" placeholder="${f.h||''}" oninput="fd('${f.k}', this.value)"></div>`;
-    return `<div class="field-block"><div class="field-label">${f.l}</div>${hint}<input type="text" id="ff-${f.k}" placeholder="${f.h||''}" oninput="fd('${f.k}', this.value)"></div>`;
+    const sel  = t('select_opt') || 'Select...';
+    const ta_p = t('notes_placeholder') || 'Write your notes here...';
+    if (f.tp === 'ta')  return `<div class="field-block"><div class="field-label">${lbl}</div>${hint}<textarea id="ff-${f.k}" placeholder="${ta_p}" oninput="fd('${f.k}', this.value)"></textarea></div>`;
+    if (f.tp === 'sel') return `<div class="field-block"><div class="field-label">${lbl}</div>${hint}<select id="ff-${f.k}" onchange="fd('${f.k}', this.value)"><option value="">${sel}</option>${(f.o||[]).map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+    if (f.tp === 'num') return `<div class="field-block"><div class="field-label">${lbl}</div>${hint}<input type="number" id="ff-${f.k}" placeholder="${f.h||''}" oninput="fd('${f.k}', this.value)"></div>`;
+    return `<div class="field-block"><div class="field-label">${lbl}</div>${hint}<input type="text" id="ff-${f.k}" placeholder="${f.h||''}" oninput="fd('${f.k}', this.value)"></div>`;
   }).join('');
 }
 
@@ -1727,6 +2207,216 @@ function populateForm(r) {
   }, 50);
 }
 
+// ===== EXCEL IMPORT =====
+function buildExcelImportBox() {
+  return `
+  <div class="paste-box" style="border-color:#f59e0b44;margin-bottom:16px">
+    <div class="paste-header">
+      <div class="paste-icon">📊</div>
+      <div>
+        <div class="paste-title" style="color:#f59e0b">${t('xl_import_title') || 'Import from Excel'}</div>
+        <div class="paste-sub">${t('xl_import_sub') || 'Upload an .xlsx file to auto-fill the review form'}</div>
+      </div>
+    </div>
+    <label class="xl-import-label" id="xl-import-label">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span id="xl-import-label-text">${t('xl_import_btn') || 'Choose .xlsx file'}</span>
+      <input type="file" accept=".xlsx,.xls" onchange="handleExcelImport(event)" style="display:none">
+    </label>
+    <div id="xl-import-status" class="paste-status"></div>
+    <div id="xl-import-preview" style="display:none;margin-top:10px"></div>
+  </div>`;
+}
+
+async function handleExcelImport(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const status = document.getElementById('xl-import-status');
+  const label  = document.getElementById('xl-import-label-text');
+  const preview = document.getElementById('xl-import-preview');
+
+  label.textContent = file.name;
+  status.textContent = t('xl_import_loading') || '⏳ Reading file...';
+  status.className = 'paste-status';
+
+  try {
+    const buffer = await file.arrayBuffer();
+    const wb = XLSX.read(buffer, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+    // Build a flat key→value map from the sheet
+    // Supports two layouts:
+    // 1. Two-column: col A = label, col B = value
+    // 2. Our own exported format (same two-column)
+    const map = {};
+    rows.forEach(row => {
+      const key = String(row[0] || '').trim().toLowerCase().replace(/[^a-z0-9]/g,'_');
+      const val = String(row[1] || '').trim();
+      if (key && val) map[key] = val;
+    });
+
+    // Also try to detect header rows for column-based imports
+    // (e.g. exported comparison sheets where row 0 = headers)
+    const headerRow = rows[0] || [];
+    const dataRow   = rows[1] || [];
+    if (headerRow.length > 2) {
+      headerRow.forEach((h, i) => {
+        const k = String(h||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'_');
+        const v = String(dataRow[i]||'').trim();
+        if (k && v) map[k] = v;
+      });
+    }
+
+    // Field mapping — normalize Excel labels → formData keys
+    const FIELD_MAP = {
+      // Product info
+      'brand': 'brand', 'marca': 'brand',
+      'model': 'model', 'model_name': 'model', 'nome_do_modelo': 'model', 'modelo': 'model',
+      'reviewer': 'reviewer', 'reviewer_name': 'reviewer', 'nome_do_avaliador': 'reviewer', 'avaliador': 'reviewer',
+      'retail_price__brl_': 'retail_price', 'price__brl_': 'retail_price', 'preco__brl_': 'retail_price',
+      'price_brl_': 'retail_price', 'retail_price': 'retail_price', 'preco': 'retail_price',
+      'market_segment': 'positioning', 'positioning': 'positioning', 'posicionamento': 'positioning',
+      // Scores
+      'overall_score': '_overall', 'pontuacao_geral': '_overall',
+      'price_value': 's_price', 'price__value': 's_price', 'preco_e_valor': 's_price',
+      'display': 's_display', 'screen___display': 's_display', 'tela_e_display': 's_display',
+      'performance': 's_perf', 'speed___performance': 's_perf', 'velocidade_e_desempenho': 's_perf',
+      'camera': 's_cam', 'camera___photos': 's_cam', 'camera_e_fotos': 's_cam',
+      'battery': 's_batt', 'battery___charging': 's_batt', 'bateria_e_carregamento': 's_batt',
+      'software': 's_sw', 'software___user_experience': 's_sw',
+      'build': 's_build', 'design___build_quality': 's_build', 'design_e_qualidade': 's_build',
+      'calls___audio': 's_calls', 'calls__speaker___connectivity': 's_calls',
+      // Smartwatch scores
+      'design___comfort': 's_design', 'design__comfort___wearability': 's_design',
+      'screen__watch_faces___visibility': 's_display',
+      'ease_of_use___navigation': 's_usability',
+      'sports__fitness___gps': 's_sports',
+      'health___sleep_tracking': 's_health',
+      'smart_features___connectivity': 's_smart',
+      'battery_life___charging': 's_batt',
+      'companion_app_experience': 's_app',
+      // TWS scores
+      'sound_quality': 's_sound', 'qualidade_de_som': 's_sound',
+      'noise_cancelling': 's_anc', 'noise_cancelling___transparency': 's_anc',
+      'design__fit___build': 's_design', 'design__fit_and_build': 's_design',
+      'battery_life': 's_batt',
+      'calls___connection': 's_conn',
+      'controls___companion_app': 's_ctrl',
+      // Verdict
+      'pros': 'pros', 'pontos_positivos': 'pros',
+      'cons': 'cons', 'pontos_negativos': 'cons',
+      'final_verdict': 'final_verdict', 'veredicto_final': 'final_verdict',
+    };
+
+    const extracted = {};
+    Object.entries(map).forEach(([rawKey, val]) => {
+      const mappedKey = FIELD_MAP[rawKey];
+      if (mappedKey && val) extracted[mappedKey] = val;
+    });
+
+    // Try direct field keys from data.js too (exact match)
+    const allFieldKeys = new Set();
+    Object.values(DEFS).forEach(def => {
+      def.sections.forEach(sec => (sec.f||[]).forEach(f => allFieldKeys.add(f.k)));
+    });
+    Object.entries(map).forEach(([rawKey, val]) => {
+      if (allFieldKeys.has(rawKey) && val) extracted[rawKey] = val;
+    });
+
+    if (!Object.keys(extracted).length) {
+      status.textContent = '✗ ' + (t('xl_import_no_data') || 'No matching fields found. Check the file format.');
+      status.className = 'paste-status error';
+      return;
+    }
+
+    // Apply to form
+    applyExtractedToForm(extracted);
+
+    // Show preview summary
+    const filled = Object.keys(extracted).filter(k => k !== '_overall');
+    preview.style.display = 'block';
+    preview.innerHTML = `<div style="font-size:11px;color:#6e7681;margin-bottom:6px">${filled.length} fields filled:</div>` +
+      filled.slice(0,12).map(k => `<span style="display:inline-block;background:#f59e0b22;border:1px solid #f59e0b44;border-radius:5px;padding:2px 7px;font-size:10px;color:#f59e0b;margin:2px">${k}</span>`).join('') +
+      (filled.length > 12 ? `<span style="font-size:10px;color:#6e7681"> +${filled.length-12} more</span>` : '');
+
+    status.textContent = '✓ ' + (t('xl_import_success') || `${filled.length} fields imported successfully!`);
+    status.className = 'paste-status success';
+
+  } catch(err) {
+    console.error('Excel import error:', err);
+    status.textContent = '✗ ' + (t('xl_import_error') || 'Could not read file. Make sure it is a valid .xlsx file.');
+    status.className = 'paste-status error';
+  }
+}
+
+function applyExtractedToForm(extracted) {
+  // Apply brand/model/reviewer
+  ['brand','model','reviewer'].forEach(k => {
+    if (!extracted[k]) return;
+    formData[k] = extracted[k];
+    const el = document.getElementById('ff-' + k);
+    if (el) el.value = extracted[k];
+  });
+
+  // Update title
+  const title = ((formData.brand||'') + (formData.model ? ' '+formData.model : '')).trim();
+  if (title) document.getElementById('add-title').textContent = title;
+
+  // Apply all other fields
+  const secs = DEFS[curTab].sections;
+  secs.forEach(sec => {
+    // Apply score
+    if (sec.sk && extracted[sec.sk]) {
+      const n = parseInt(extracted[sec.sk]);
+      if (!isNaN(n) && n >= 1 && n <= 10) {
+        formData[sec.sk] = n;
+        const row = document.getElementById('rr-' + sec.k);
+        if (row) {
+          row.querySelectorAll('.rb').forEach(b => {
+            const bN = parseInt(b.getAttribute('data-n'));
+            b.className = 'rb';
+            if (bN <= n) {
+              b.classList.add('selected');
+              if (n < 5) b.classList.add('range-red');
+              else if (n < 8) b.classList.add('range-yellow');
+            }
+            if (bN === n) b.classList.add('active-btn');
+          });
+          const lbl = document.getElementById('rsl-' + sec.k);
+          if (lbl) { lbl.textContent = n+'/10'; lbl.className = 'rating-score-label '+(n>=8?'green':n>=5?'yellow':'red'); }
+          const badge = document.getElementById('asb-' + sec.k);
+          if (badge) { badge.style.display='inline-block'; badge.textContent=n+'/10'; badge.className='acc-score-badge '+(n>=8?'s-g':n>=5?'s-y':'s-r'); }
+        }
+      }
+    }
+    // Apply field values
+    (sec.f||[]).forEach(f => {
+      if (!extracted[f.k]) return;
+      formData[f.k] = extracted[f.k];
+      const el = document.getElementById('ff-' + f.k);
+      if (el) el.value = extracted[f.k];
+    });
+  });
+
+  // Pros / cons / verdict
+  ['pros','cons','final_verdict'].forEach(k => {
+    if (!extracted[k]) return;
+    formData[k] = extracted[k];
+    const el = document.getElementById('ff-' + k);
+    if (el) el.value = extracted[k];
+  });
+
+  // Open all accordions so user can see filled fields
+  secs.forEach(sec => {
+    const body  = document.getElementById('ab-' + sec.k);
+    const arrow = document.getElementById('aar-' + sec.k);
+    if (body)  body.classList.add('open');
+    if (arrow) arrow.classList.add('open');
+  });
+
+  updateOverallDisplay();
+}
+
 // ===== DETAIL PAGE =====
 async function showDetail(id) {
   window._lastDetailId = id;
@@ -1753,7 +2443,7 @@ async function showDetail(id) {
     const sv = sec.sk ? r[sec.sk] : null;
     return `<div style="margin-bottom:14px">
       <div class="detail-section-header">
-        ${sec.n}. ${sec.t.toUpperCase()}
+        ${sec.n}. ${(sec.tk ? t(sec.tk) : sec.t).toUpperCase()}
         ${sv ? `<span class="s-badge ${scoreClass(sv)}">${sv}</span>` : ''}
       </div>
       <table class="details-table">${filled.map(f=>`<tr><td class="dt-key">${f.l}</td><td class="dt-val">${r[f.k]}</td></tr>`).join('')}</table>
@@ -1818,18 +2508,18 @@ async function showDetail(id) {
   showPage('detail');
 }
 
-async function deleteAndGoHome(id) {
+function deleteAndGoHome(id) {
   if (!confirm(t('delete') + '?')) return;
-  await deleteReview(id);
-  await goHome();
+  deleteReview(id);
+  goHome();
 }
 
 // ===== DASHBOARD STATE =====
 let selIds = [];
 let radarChart = null, barChart = null;
 
-function renderDash() {
-  const list = loadReviews().filter(r => r.type === curTab);
+async function renderDash() {
+  const list = await loadReviews().filter(r => r.type === curTab);
   document.getElementById('dash-chips').innerHTML = list.map((r,i) => {
     const idx = selIds.indexOf(r.id), on = idx !== -1, ov = calcOverall(r);
     return `<div class="d-chip ${on?'on':''}" onclick="toggleDashChip('${r.id}')">
@@ -1841,14 +2531,14 @@ function renderDash() {
   renderDashBody();
 }
 
-function toggleDashChip(id) {
+async function toggleDashChip(id) {
   if (selIds.includes(id)) selIds = selIds.filter(x => x !== id);
   else if (selIds.length < 6) selIds.push(id);
-  renderDash();
+  await renderDash();
 }
 
-function renderDashBody() {
-  const all = loadReviews();
+async function renderDashBody() {
+  const all = await loadReviews();
   const compared = all.filter(r => selIds.includes(r.id));
   const body = document.getElementById('dash-body');
   if (!compared.length) {
@@ -1947,8 +2637,8 @@ function scoreColor(val) {
 function col(letter, row) { return letter + row; }
 
 async function exportXlsx(id) {
-  const all = await loadReviews();
-  const r = all.find(x => x.id === id);
+  const reviews = await loadReviews();
+  const r = reviews.find(x => x.id === id);
   if (!r) return;
   const sm   = DEFS[r.type].scoreMap;
   const secs = DEFS[r.type].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
@@ -2101,7 +2791,8 @@ async function exportXlsx(id) {
 
 // ===== COMPARISON EXPORT =====
 async function exportComparisonXlsx() {
-  const compared = (await loadReviews()).filter(r => selIds.includes(r.id));
+  const all = await loadReviews();
+  const compared = all.filter(r => selIds.includes(r.id));
   if (!compared.length) return;
   const sm = DEFS[curTab].scoreMap;
   const secs = DEFS[curTab].sections.filter(s => s.k !== 'photo' && s.k !== 'verdict');
@@ -2250,8 +2941,8 @@ async function exportComparisonXlsx() {
 
 // ===== SALES EXCEL EXPORT =====
 async function exportSalesXlsx(id) {
-  const allS = await loadSales();
-  const s = allS.find(x => x.id === id);
+  const all = await loadSales();
+  const s = all.find(x => x.id === id);
   if (!s) return;
   const isBuyer = s.stype === 'buyer';
   const accent  = isBuyer ? 'FF2EA043' : 'FFD97706';
@@ -2423,7 +3114,7 @@ async function exportSalesReportXlsx() {
 }
 
 // ===== SALES REPORT =====
-// SALES_KEY removed — using Supabase
+const SALES_KEY   = 'jovi_lab_sales';
 const JOVI_MODELS = ['Y19s','Y21','Y21 5G','Y29','Y29s 5G','Y31'];
 
 let curSalesModel  = 'Y19s';
@@ -2432,7 +3123,10 @@ let salesFormData  = {};
 let salesPhotoURL  = null;
 let editingSalesId = null;
 
-// Sales storage — handled by Supabase functions above
+function loadSales() { try { return JSON.parse(localStorage.getItem(SALES_KEY)||'[]'); } catch(e){return[];} }
+function saveSalesAll(a) { try { localStorage.setItem(SALES_KEY,JSON.stringify(a)); } catch(e){} }
+function saveSalesEntry(e) { const a=loadSales(),i=a.findIndex(s=>s.id===e.id); if(i!==-1)a[i]=e;else a.push(e); saveSalesAll(a); }
+function deleteSalesEntry(id) { saveSalesAll(loadSales().filter(s=>s.id!==id)); }
 
 async function goSales() { showPage('sales'); await renderSalesHome(); }
 
@@ -2488,7 +3182,7 @@ async function renderSalesList() {
 }
 
 // ── Form ──
-function goSalesAdd() {
+async function goSalesAdd() {
   salesFormData  = {model:curSalesModel,stype:curSalesType};
   salesPhotoURL  = null;
   editingSalesId = null;
@@ -2497,8 +3191,8 @@ function goSalesAdd() {
 }
 
 async function goEditSales(id) {
-  const allS=await loadSales();
-  const s=allS.find(x=>x.id===id); if(!s)return;
+  const all = await loadSales();
+  const s = all.find(x=>x.id===id); if(!s)return;
   salesFormData  = {...s};
   salesPhotoURL  = s.photo||null;
   editingSalesId = s.id;
@@ -2670,13 +3364,13 @@ function collectSales() {
 
 async function saveSalesDraft()    { await saveSalesEntry(collectSales()); await goSales(); }
 async function saveSalesComplete() { const e=collectSales(); await saveSalesEntry(e); await showSalesDetail(e.id); }
-async function deleteCurSales()    { if(!editingSalesId){goSales();return;} if(!confirm(t('delete')+'?'))return; await deleteSalesEntry(editingSalesId); editingSalesId=null; await goSales(); }
+async function deleteCurSales()    { if(!editingSalesId){await goSales();return;} if(!confirm(t('delete')+'?'))return; await deleteSalesEntry(editingSalesId); editingSalesId=null; await goSales(); }
 
 // ── Detail view ──
 async function showSalesDetail(id) {
   window._lastSalesDetailId = id;
-  const allS = await loadSales();
-  const s=allS.find(x=>x.id===id); if(!s)return;
+  const all=await loadSales();
+  const s=all.find(x=>x.id===id); if(!s)return;
   const isBuyer=s.stype==='buyer';
   const color=isBuyer?'#2ea043':'#e3b341';
   const label=isBuyer?t('buyer'):t('non_buyer');
@@ -2931,11 +3625,11 @@ async function goHome() {
   await renderList();
 }
 
-function goAdd() {
+async function goAdd() {
   formData = {};
   formPhotoURL = null;
   editingReviewId = null;
-  document.getElementById('add-title').textContent = 'New Review';
+  document.getElementById('add-title').textContent = t('new_review');
   document.getElementById('add-sub').textContent = TYPE_LABELS[curTab] + ' · ' + t('draft');
   document.getElementById('btn-complete').style.background = TYPE_COLORS[curTab];
   buildAccordions();
@@ -2958,8 +3652,9 @@ async function goEditReview(id) {
 }
 
 async function goDash() {
-  selIds = (await loadReviews()).filter(r => r.type === curTab).slice(0, 3).map(r => r.id);
-  renderDash();
+  const reviews = await loadReviews();
+  selIds = reviews.filter(r => r.type === curTab).slice(0, 3).map(r => r.id);
+  await renderDash();
   showPage('dash');
 }
 
@@ -2967,13 +3662,11 @@ async function goDash() {
 async function switchTab(tab, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-
   if (tab === 'sales') {
     showPage('sales');
-    renderSalesHome();
+    await renderSalesHome();
     return;
   }
-
   curTab = tab;
   document.getElementById('cta-banner').style.background = TYPE_COLORS[tab];
   document.getElementById('cta-title').textContent = t('new_review') + ' — ' + TYPE_LABELS[tab];
@@ -2983,13 +3676,15 @@ async function switchTab(tab, btn) {
 
 // ===== REVIEW LIST =====
 async function renderList() {
-  const list = (await loadReviews()).filter(r => r.type === curTab);
-  const el   = document.getElementById('reviews-list');
+  const el = document.getElementById('reviews-list');
+  el.innerHTML = `<div class="empty-state"><p style="color:#6e7681;font-size:13px">⏳</p></div>`;
+  const all  = await loadReviews();
+  const list = all.filter(r => r.type === curTab);
 
   if (!list.length) {
     el.innerHTML = `
       <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32">
           <rect x="5" y="2" width="14" height="20" rx="2"/>
           <line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/>
         </svg>
@@ -3003,23 +3698,20 @@ async function renderList() {
     const c    = scoreColor(ov);
     const circ = 2 * Math.PI * 17;
     const dash = ov ? (circ * ov / 10).toFixed(1) : '0';
-
     return `
     <div class="review-card" onclick="showDetail('${r.id}')">
       <div class="review-thumb">
-        ${r.photo
-          ? `<img src="${r.photo}" alt="${r.model || ''}">`
-          : `<span style="font-size:18px">${EMOJIS[r.type]}</span>`}
+        ${r.photo ? `<img src="${r.photo}" alt="${r.model || ''}">` : `<span style="font-size:18px">${EMOJIS[r.type]}</span>`}
       </div>
       <div class="review-info">
         <div class="review-brand">${r.brand || '—'}</div>
-        <div class="review-model">${r.model || 'New Device'}</div>
+        <div class="review-model">${r.model || t('new_review')}</div>
         <div class="review-meta">
-          ${r.retail_price ? `<span>R$ ${parseInt(r.retail_price).toLocaleString('pt-BR')}</span><span>·</span>` : ''}
+          ${r.retail_price ? `<span>${t('price_brl')} ${parseInt(r.retail_price).toLocaleString('pt-BR')}</span><span>·</span>` : ''}
           <span class="type-badge ${TYPE_CLASS[r.type]}">${TYPE_LABELS[r.type]}</span>
           <span>·</span>
           <span class="status-dot" style="background:${r.completed ? '#2ea043' : '#d29922'}"></span>
-          <span>${r.completed ? 'Completed' : 'Draft'}</span>
+          <span>${r.completed ? t('completed') : t('draft_status')}</span>
         </div>
       </div>
       <div class="score-ring">
@@ -3039,7 +3731,6 @@ async function quickSave() {
   const r = collectReview(false);
   await updateReview(r);
   document.getElementById('add-title').textContent = (r.brand || '') + (r.model ? ' ' + r.model : '');
-  // Flash saved
   const btn = document.querySelector('.save-icon-btn');
   btn.style.color = '#3fb950';
   setTimeout(() => { btn.style.color = ''; }, 1200);
@@ -3048,30 +3739,73 @@ async function quickSave() {
 async function saveDraft() {
   const r = collectReview(false);
   await updateReview(r);
-  await goHome();
+  goHome();
 }
 
 async function saveComplete() {
   const r = collectReview(true);
   await updateReview(r);
-  await showDetail(r.id);
+  showDetail(r.id);
 }
 
 async function deleteCurrentReview() {
   if (!editingReviewId) return;
-  if (!confirm('Delete this review permanently?')) return;
+  if (!confirm(t('delete') + '?')) return;
   await deleteReview(editingReviewId);
   editingReviewId = null;
-  await goHome();
+  goHome();
+}
+
+async function deleteAndGoHome(id) {
+  if (!confirm(t('delete') + '?')) return;
+  await deleteReview(id);
+  goHome();
+}
+
+// ===== DATA BACKUP / RESTORE =====
+async function exportAllData() {
+  const reviews = await loadReviews();
+  const sales   = await loadSales();
+  const payload = { version: 2, exported_at: new Date().toISOString(), reviews, sales };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'JOVI_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+async function importAllData() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = async e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!data.reviews && !data.sales) throw new Error('Invalid backup file');
+        for (const r of (data.reviews || [])) await updateReview(r);
+        for (const s of (data.sales   || [])) await saveSalesEntry(s);
+        alert('✓ Import successful!');
+        await renderList();
+      } catch(err) { alert('✗ Import failed: ' + err.message); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
 }
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', async () => {
+  // Apply saved language
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-lang') === curLang);
+  });
   document.getElementById('cta-banner').style.background = TYPE_COLORS[curTab];
+  document.getElementById('cta-title').textContent = t('new_review') + ' — ' + TYPE_LABELS[curTab];
   await renderList();
 });
 
 </script>
-
 </body>
 </html>
